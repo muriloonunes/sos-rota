@@ -1,0 +1,53 @@
+@import "colors.css";
+
+.main-content-area {
+    -fx-background-color: -fx-background-light-color;
+}
+
+.h1 {
+    -fx-text-fill: -fx-primary-color;
+    -fx-alignment: CENTER;
+}
+
+.separator {
+    -fx-max-width: 90%;
+    -fx-background-color: -fx-border-color;
+}
+
+.filter-bar {
+    -fx-background-color: -fx-background-card-color;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 0);
+    -fx-spacing: 15px; /* Espaçamento entre os elementos do filtro */
+    -fx-wrap-text: true; /* Para responsividade em telas menores, embora FXML puro tenha limitações */
+}
+
+.filter-bar .label {
+    -fx-font-weight: normal;
+    -fx-text-fill: -fx-text-dark-color;
+}
+
+.summary-bar {
+    -fx-background-color: -fx-background-medium-color;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 0);
+}
+
+.summary-bar .h3 {
+    -fx-text-fill: -fx-accent-color; /* Tempo médio de resposta em verde */
+}
+
+/* Specific styling for table actions if any */
+.table-view .table-row-cell .button-view-details {
+    -fx-background-color: transparent;
+    -fx-padding: 5px;
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-secondary-color;
+    -fx-effect: null;
+}
+
+.table-view .table-row-cell .button-view-details:hover {
+    -fx-text-fill: -fx-secondary-dark-color;
+    -fx-underline: true;
+}

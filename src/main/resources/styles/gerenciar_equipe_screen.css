@@ -1,0 +1,76 @@
+@import "colors.css";
+
+.main-content-area {
+    -fx-background-color: -fx-background-light-color;
+}
+
+.h1 {
+    -fx-text-fill: -fx-primary-color;
+    -fx-alignment: CENTER;
+}
+
+.h2 {
+    -fx-text-fill: -fx-text-dark-color;
+    -fx-alignment: CENTER;
+}
+
+.separator {
+    -fx-max-width: 70%;
+    -fx-background-color: -fx-border-color;
+}
+
+.tab-pane-modern .tab-header-area {
+    -fx-background-color: -fx-background-medium-color; /* Cor de fundo da área dos cabeçalhos das abas */
+    -fx-background-radius: 8px 8px 0 0;
+}
+
+.tab-pane-modern .tab-header-area .tab {
+    -fx-background-color: -fx-background-medium-color;
+    -fx-padding: 10px 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -fx-secondary-color;
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-border-color: -fx-background-medium-color;
+    -fx-border-width: 0 0 2px 0; /* Borda inferior para o estado inativo */
+    -fx-transition: -fx-background-color 0.2s ease, -fx-text-fill 0.2s ease, -fx-border-color 0.2s ease;
+}
+
+.tab-pane-modern .tab-header-area .tab:hover {
+    -fx-background-color: derive(-fx-background-medium-color, 5%);
+    -fx-text-fill: -fx-primary-color;
+    -fx-border-color: -fx-primary-light-color;
+}
+
+.tab-pane-modern .tab-header-area .tab:selected {
+    -fx-background-color: -fx-background-card-color;
+    -fx-text-fill: -fx-primary-color;
+    -fx-border-color: -fx-primary-color; /* Borda inferior primária para o estado ativo */
+    -fx-border-width: 0 0 3px 0; /* Borda mais grossa para o estado ativo */
+}
+
+.tab-pane-modern .tab-content-area {
+    -fx-background-color: -fx-background-light-color;
+    -fx-border-radius: 0 0 8px 8px; /* Cantos arredondados na parte inferior */
+    -fx-background-radius: 0 0 8px 8px;
+}
+
+.grid-pane {
+    -fx-padding: 20px;
+    -fx-background-color: -fx-background-card-color;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 5, 0, 0, 0); /* Sombra mais leve */
+}
+
+/* TableView for actions column buttons */
+.table-view .table-row-cell .button-action {
+    -fx-background-color: transparent;
+    -fx-padding: 5px;
+    -fx-font-size: 12px;
+    -fx-text-fill: -fx-danger-color;
+    -fx-effect: null;
+}
+
+.table-view .table-row-cell .button-action:hover {
+    -fx-text-fill: -fx-danger-dark-color;
+    -fx-underline: true;
+}

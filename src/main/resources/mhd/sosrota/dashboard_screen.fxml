@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+<?import java.lang.String?>
+
+<BorderPane stylesheets="@../../styles/dashboard_screen.css" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.DashboardController">
+    <left>
+        <VBox prefWidth="220" spacing="15" alignment="TOP_CENTER" styleClass="sidebar">
+            <padding>
+                <Insets top="20" right="10" bottom="20" left="10"/>
+            </padding>
+            <ImageView fitWidth="120" preserveRatio="true">
+<!--                <Image url="@../assets/logo_s_s_rota.png"/>-->
+            </ImageView>
+            <Text text="SOS-Rota" styleClass="h2-sidebar"/>
+            <Separator styleClass="separator-sidebar"/>
+
+            <Button fx:id="dashboardNavButton" text="Dashboard" maxWidth="Infinity" styleClass="nav-button" onAction="#handleDashboardClick"/>
+            <Button fx:id="occurrencesNavButton" text="Ocorrências" maxWidth="Infinity" styleClass="nav-button" onAction="#handleOcorrenciasClick"/>
+            <Button fx:id="ambulancesNavButton" text="Ambulâncias" maxWidth="Infinity" styleClass="nav-button" onAction="#handleAmbulanciasClick"/>
+            <Button fx:id="professionalsNavButton" text="Profissionais" maxWidth="Infinity" styleClass="nav-button" onAction="#handleProfissionaisClick"/>
+            <Button fx:id="reportsNavButton" text="Relatórios" maxWidth="Infinity" styleClass="nav-button" onAction="#handleRelatoriosClick"/>
+            <VBox VBox.vgrow="ALWAYS"/>
+            <Button text="Sair" maxWidth="Infinity" styleClass="button-danger" onAction="#handleLogout"/>
+        </VBox>
+    </left>
+    <center>
+        <!-- Esta área (StackPane) conterá o conteúdo dinamicamente carregado -->
+        <StackPane fx:id="contentArea" BorderPane.alignment="CENTER" />
+    </center>
+</BorderPane>
