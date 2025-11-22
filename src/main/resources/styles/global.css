@@ -232,3 +232,37 @@
     -fx-table-cell-border-color: red;
 }
 
+/*Cadastrar ocorrencia*/
+.observacao-textfield {
+    -fx-background-color: -white;
+    -fx-border-color: -border-color;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.observacao-textfield .content {
+    -fx-background-color: -white;
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+}
+.observacao-textfield .corner {
+    -fx-background-color: transparent;
+}
+
+.observacao-textfield:focused {
+    -fx-border-color: -primary-color-500;
+}
+
+.info-selectors {
+    -fx-background-color: -white;
+    -fx-border-color: -border-color;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+.info-selectors:focused {
+    -fx-border-color: -primary-color-500;
+}
+.info-selectors .list-view {
+    -fx-background-color: white;
+    -fx-border-color: -border-color;
+}

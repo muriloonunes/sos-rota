@@ -1,21 +1,17 @@
 package mhd.sosrota.controller;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
-import mhd.sosrota.util.FXMLLoaderHelper;
+import mhd.sosrota.navigation.Navigable;
+import mhd.sosrota.navigation.Navigator;
+import mhd.sosrota.navigation.Screens;
 
-import java.io.IOException;
 import java.util.Objects;
 
-import static mhd.sosrota.SOSRota.TELA_APP;
 
 /**
  *
@@ -23,7 +19,7 @@ import static mhd.sosrota.SOSRota.TELA_APP;
  * @date 17/11/2025
  * @brief Class LoginController
  */
-public class LoginController {
+public class LoginController implements Navigable {
     @FXML
     private TextField usernameField;
 
@@ -40,6 +36,8 @@ public class LoginController {
     private ImageView buttonImageView;
 
     private boolean isPasswordVisible = false;
+
+    private Navigator navigator;
 
     public void initialize() {
         passwordField.setVisible(true);
@@ -99,23 +97,29 @@ public class LoginController {
 
     private void loadDashboardScreen() {
         //TODO
-        try {
-            Stage stage = (Stage) usernameField.getScene().getWindow();
+        navigator.navigate(Screens.TELA_APP);
+//        try {
+//            Stage stage = (Stage) usernameField.getScene().getWindow();
+//
+//            FXMLLoader dashboardLoader = FXMLLoaderHelper.loadFXML(TELA_APP);
+//            Parent root = dashboardLoader.getRoot();
+//
+//            Scene scene = FXMLLoaderHelper.createScene(root);
+//
+//            stage.setScene(scene);
+//            stage.show();
+//            // stage.setFullScreen(true);
+//            // stage.setMaximized(true);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            errorMessageLabel.setText("Erro ao carregar a tela do Dashboard.");
+//            errorMessageLabel.setVisible(true);
+//            errorMessageLabel.setManaged(true);
+//        }
+    }
 
-            FXMLLoader dashboardLoader = FXMLLoaderHelper.loadFXML(TELA_APP);
-            Parent root = dashboardLoader.getRoot();
-
-            Scene scene = FXMLLoaderHelper.createScene(root);
-
-            stage.setScene(scene);
-            stage.show();
-            // stage.setFullScreen(true);
-            // stage.setMaximized(true);
-        } catch (IOException e) {
-            e.printStackTrace();
-            errorMessageLabel.setText("Erro ao carregar a tela do Dashboard.");
-            errorMessageLabel.setVisible(true);
-            errorMessageLabel.setManaged(true);
-        }
+    @Override
+    public void setNavigator(Navigator navigator) {
+        this.navigator = navigator;
     }
 }

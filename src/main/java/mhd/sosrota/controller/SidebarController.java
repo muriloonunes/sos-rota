@@ -1,24 +1,18 @@
 package mhd.sosrota.controller;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
-import mhd.sosrota.util.FXMLLoaderHelper;
+import mhd.sosrota.navigation.Navigable;
+import mhd.sosrota.navigation.Navigator;
+import mhd.sosrota.navigation.Screens;
 import org.girod.javafx.svgimage.SVGImage;
 import org.girod.javafx.svgimage.SVGLoader;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import static mhd.sosrota.SOSRota.*;
 
 /**
  *
@@ -26,7 +20,7 @@ import static mhd.sosrota.SOSRota.*;
  * @date 17/11/2025
  * @brief Class DashboardController
  */
-public class SidebarController {
+public class SidebarController implements Navigable {
     @FXML
     private StackPane contentArea;
     @FXML
@@ -37,6 +31,8 @@ public class SidebarController {
     private Label bemVindoLabel;
 
     private List<HBox> navButtons;
+
+    private Navigator navigator;
 
     @FXML
     public void initialize() {
@@ -60,24 +56,6 @@ public class SidebarController {
         navButtons.add(equipesHbox);
         navButtons.add(relatoriosHbox);
 
-        handleDashboardClick(); //como o dashboard é a tela que o programa abre, ja carregamos no initialize
-    }
-
-    /**
-     * Carrega um FXML para a área de conteúdo principal do Dashboard.
-     *
-     * @param fxmlPath O caminho relativo do arquivo FXML a ser carregado.
-     */
-    private void setContent(String fxmlPath) {
-        try {
-            FXMLLoader loader = FXMLLoaderHelper.loadFXML(fxmlPath);
-            Node view = loader.getRoot();
-            contentArea.getChildren().setAll(view);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Erro ao carregar a tela: " + fxmlPath);
-            // Implementar lógica para exibir uma mensagem de erro na UI
-        }
     }
 
     /**
@@ -99,44 +77,41 @@ public class SidebarController {
     @FXML
     public void handleDashboardClick() {
         setActiveButton(dashboardHbox);
-        setContent(DASHBOARD_OVERVIEW);
+        navigator.setContent(contentArea, Screens.DASHBOARD_OVERVIEW);
     }
 
     @FXML
     public void handleOcorrenciasClick() {
         setActiveButton(ocorrenciasHbox);
-        setContent(DASHBOARD_OCCORRENCIAS);
+        navigator.setContent(contentArea, Screens.DASHBOARD_OCCORRENCIAS);
     }
 
     @FXML
     public void handleAmbulanciasClick() {
         setActiveButton(ambulanciasHbox);
-        setContent(DASHBOARD_AMBULANCIAS);
+        navigator.setContent(contentArea, Screens.DASHBOARD_AMBULANCIAS);
     }
 
     @FXML
     public void handleProfissionaisClick() {
         setActiveButton(equipesHbox);
-        setContent(DASHBOARD_EQUIPES);
+        navigator.setContent(contentArea, Screens.DASHBOARD_EQUIPES);
     }
 
     @FXML
     public void handleRelatoriosClick() {
         setActiveButton(relatoriosHbox);
-        setContent(DASHBOARD_RELATORIOS);
+        navigator.setContent(contentArea, Screens.DASHBOARD_RELATORIOS);
     }
 
     @FXML
     public void handleLogout() {
-        try {
-            Stage stage = (Stage) contentArea.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(TELA_LOGIN));
-            Parent root = loader.load();
-            Scene scene = FXMLLoaderHelper.createScene(root);
-            stage.setScene(scene);
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        navigator.navigate(Screens.TELA_LOGIN);
+    }
+
+    @Override
+    public void setNavigator(Navigator navigator) {
+        this.navigator = navigator;
+        handleDashboardClick();
     }
 }

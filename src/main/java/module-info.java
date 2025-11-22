@@ -4,7 +4,6 @@ module mhd.sosrota {
     requires javafx.graphics;
     requires org.girod.javafx.svgimage;
 
-
     opens mhd.sosrota to javafx.fxml;
     exports mhd.sosrota;
     opens mhd.sosrota.controller to javafx.fxml;
