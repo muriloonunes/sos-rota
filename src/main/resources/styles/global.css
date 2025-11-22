@@ -1,0 +1,234 @@
+@import "colors.css";
+
+.root {
+    -background-dark-700: derive(-background-dark, -25%);
+    -background-dark-800: derive(-background-dark, -50%);
+}
+
+/*Login Screen:*/
+.brand-panel {
+    -fx-background-color: linear-gradient(to bottom left, -background-dark-700, -background-dark-800);
+    -fx-border-color: rgba(255, 255, 255, 0.06);
+    -fx-border-width: 0 1px 0 0;
+}
+
+.brand-title, .brand-desc {
+    -fx-text-fill: -text-on-primary;
+}
+
+.form-area {
+    -fx-background-color: -background-dark;
+}
+
+.title-label {
+    -fx-text-fill: -secondary-color-500;
+}
+
+.btn-primary {
+    -fx-background-color: -primary-color-500;
+    -fx-text-fill: -text-on-primary;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover {
+    -fx-background-color: -primary-color-700;
+}
+
+.btn-secondary {
+    -fx-background-color: transparent;
+    -fx-text-fill: -secondary-color-500;
+    -fx-border-color: -secondary-color-500;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: -background-light;
+}
+
+.login-card {
+    -fx-background-color: white;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.12), 30, 0.2, 0, 6);
+}
+
+.input-field {
+    -fx-background-color: #fdfdfd;
+    -fx-border-color: #d9dde2;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.input-field:focused {
+    -fx-border-color: -primary-color-500;
+}
+
+.toggle-password-btn {
+    -fx-background-color: transparent;
+    -fx-cursor: hand;
+}
+
+.error-label {
+    -fx-text-fill: -danger-color;
+}
+
+.link {
+    -fx-text-fill: -primary-color-500;
+    -fx-underline: false;
+}
+
+.link:hover {
+    -fx-text-fill: -primary-color-700;
+    -fx-underline: true;
+}
+
+/*Dashboard Sidebar*/
+.sidebar {
+    -fx-background-color: -background-dark;
+}
+
+.sidebar-titulo {
+    -fx-text-fill: -text-on-primary;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-on-primary;
+    -fx-font-size: 18;
+    -fx-cursor: hand;
+}
+
+.nav-button:hover {
+    -fx-text-fill: -text-on-primary;
+}
+
+.hbox-button:hover {
+    -fx-background-color: -primary-color-700;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.hbox-button-active {
+    -fx-background-color: -primary-color-700;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.nav-button-active {
+    -fx-background-color: -primary-color-700;
+    -fx-text-fill: -text-on-primary;
+}
+
+.hbox-logout {
+    -fx-background-color: -danger-color;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.hbox-logout:hover {
+    -fx-background-color: -danger-color-700;
+}
+
+.profile-button {
+    -fx-text-fill: -text-on-primary;
+    -fx-font-size: 18;
+}
+
+.logout-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: -text-on-primary;
+    -fx-font-size: 18;
+}
+
+.logout-button:hover {
+    -fx-text-fill: -text-on-primary;
+}
+
+/*Dashboard*/
+.main-content-area {
+    -fx-background-color: -background-light;
+}
+
+.ocorrencias-card {
+    -fx-border-color: -danger-color;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-background-color: -danger-color;
+}
+
+.title-card {
+    -fx-text-fill: -text-on-primary;
+    -fx-font-size: 20;
+}
+
+.quantidade-card {
+    -fx-text-fill: -text-on-primary;
+    -fx-font-size: 28;
+    -fx-font-weight: bold;
+}
+
+.btn-ocorrencia {
+    -fx-background-color: -danger-color;
+    -fx-border-color: -danger-color;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-text-fill: -text-on-primary;
+    -fx-cursor: hand;
+}
+
+.btn-ocorrencia:hover {
+    -fx-background-color: -danger-color-700;
+}
+
+.ambulancias-disponiveis-card {
+    -fx-border-color: -success-color;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-background-color: -success-color;
+}
+
+.ambulancias-atendimento-card {
+    -fx-border-color: -primary-color-500;
+    -fx-border-radius: 12;
+    -fx-background-radius: 12;
+    -fx-background-color: -primary-color-500;
+}
+
+.vbox-container {
+    -fx-background-color: -white;
+    -fx-background-radius: 12;
+}
+
+.vbox-container-titulo {
+    -fx-text-fill: -secondary-color-500;
+    -fx-font-size: 18;
+    -fx-font-weight: bold;
+}
+
+.mapa-pane {
+    -fx-background-color: -background-light;
+    -fx-background-radius: 12;
+}
+
+.table-view {
+    -fx-border-color: transparent;
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header {
+    -fx-background-color: -background-light;
+}
+
+.table-row-cell {
+    -fx-border-color: red;
+    -fx-table-cell-border-color: red;
+}
+

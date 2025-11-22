@@ -1,8 +1,13 @@
 package mhd.sosrota.util;
 
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 
 import java.io.IOException;
+
+import static mhd.sosrota.SOSRota.APP_HEIGHT;
+import static mhd.sosrota.SOSRota.APP_WIDTH;
 
 /**
  *
@@ -15,5 +20,9 @@ public class FXMLLoaderHelper {
         FXMLLoader loader = new FXMLLoader(FXMLLoaderHelper.class.getResource(fxmlPath));
         loader.load();
         return loader;
+    }
+
+    public static Scene createScene(Parent root) {
+        return new Scene(root, APP_WIDTH, APP_HEIGHT);
     }
 }

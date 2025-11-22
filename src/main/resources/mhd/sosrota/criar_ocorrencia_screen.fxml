@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<VBox alignment="TOP_CENTER" spacing="20" styleClass="main-content-area" stylesheets="@../../styles/cadastrar_ocorrencia_screen.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.CadastrarOcorrenciaController">
+<VBox alignment="TOP_CENTER" spacing="20" styleClass="main-content-area" stylesheets="@../../styles/cadastrar_ocorrencia_screen.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.OcorrenciaController">
     <padding>
         <Insets bottom="30" left="40" right="40" top="30" />
     </padding>
