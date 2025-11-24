@@ -8,7 +8,7 @@ import javafx.fxml.FXML;
  * @date 17/11/2025
  * @brief Class CadastrarAmbulanciaController
  */
-public class CadastrarAmbulanciaController {
+public class AmbulanciaController {
     @FXML
     private void handleClearFields() {
 

@@ -1,6 +1,9 @@
 package mhd.sosrota.controller;
 
 import javafx.fxml.FXML;
+import mhd.sosrota.navigation.Navigable;
+import mhd.sosrota.navigation.Navigator;
+import mhd.sosrota.navigation.Screens;
 
 /**
  *
@@ -8,7 +11,9 @@ import javafx.fxml.FXML;
  * @date 17/11/2025
  * @brief Class CadastrarOcorrenciaController
  */
-public class OcorrenciaController {
+public class OcorrenciaController implements Navigable {
+    private Navigator navigator;
+
     @FXML
     private void handleClearFields() {
 
@@ -17,5 +22,15 @@ public class OcorrenciaController {
     @FXML
     private void handleRegisterOccurrence() {
 
+    }
+
+    @FXML
+    private void criarOcorrencia() {
+        navigator.showModal(Screens.CRIAR_OCORRENCIA, "Criar Ocorrência");
+    }
+
+    @Override
+    public void setNavigator(Navigator navigator) {
+        this.navigator = navigator;
     }
 }

@@ -8,7 +8,7 @@ import javafx.fxml.FXML;
  * @date 17/11/2025
  * @brief Class GerenciarEquipeController
  */
-public class GerenciarEquipeController {
+public class EquipeController {
     @FXML
     private void handleClearProfessionalFields() {
 

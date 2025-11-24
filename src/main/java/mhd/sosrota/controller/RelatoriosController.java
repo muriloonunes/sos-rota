@@ -18,4 +18,9 @@ public class RelatoriosController {
     private void handleExportToCSV() {
 
     }
+
+    @FXML
+    private void handleClearFilters() {
+
+    }
 }

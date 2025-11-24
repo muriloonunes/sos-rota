@@ -11,7 +11,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox alignment="TOP_CENTER" spacing="20" styleClass="main-content-area" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.OcorrenciaController">
+<VBox alignment="TOP_CENTER" spacing="20" styleClass="main-content-area" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.OcorrenciaController">
     <padding>
         <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
     </padding>
@@ -44,7 +44,7 @@
          <VBox>
             <children>
          
-                 <Label styleClass="label" text="Observações:" />
+                 <Label styleClass="title-label" text="Observações:" />
                  <TextArea fx:id="observationsTextArea" promptText="Detalhes adicionais sobre a ocorrência" styleClass="observacao-textfield" />
             </children>
          </VBox>

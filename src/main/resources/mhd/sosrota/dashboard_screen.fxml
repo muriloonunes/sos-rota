@@ -17,9 +17,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToWidth="true" styleClass="main-content-area" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.DashboardController">
+<ScrollPane fitToWidth="true" styleClass="main-content-area" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.DashboardController">
    <content>
-      <VBox alignment="CENTER" spacing="20">
+      <VBox alignment="CENTER" spacing="20" styleClass="main-content-area">
           <padding>
               <Insets bottom="20" left="30" right="30" top="20" />
           </padding>
@@ -30,7 +30,7 @@
                   <ColumnConstraints percentWidth="33.33" />
                   <ColumnConstraints percentWidth="33.33" />
               </columnConstraints>
-            <HBox styleClass="ocorrencias-card">
+            <HBox fx:id="ocorrenciasAbertasHbox" alignment="CENTER_LEFT" styleClass="ocorrencias-card">
                <children>
             
                     <VBox>
@@ -40,24 +40,44 @@
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                      </padding>
                     </VBox>
+                  <Region HBox.hgrow="ALWAYS" />
                </children>
+               <padding>
+                  <Insets right="10.0" />
+               </padding>
             </HBox>
-      
-              <VBox styleClass="ambulancias-disponiveis-card" GridPane.columnIndex="1" GridPane.rowIndex="0">
-                  <Label styleClass="title-card" text="Ambulâncias Disponíveis" />
-                  <Label fx:id="ambulanciasDisponiveisQtd" styleClass="quantidade-card" text="8" />
+            <HBox fx:id="ambulanciasDisponiveisHbox" alignment="CENTER_LEFT" styleClass="ambulancias-disponiveis-card" GridPane.columnIndex="1">
+               <children>
+            
+                    <VBox>
+                        <Label styleClass="title-card" text="Ambulâncias Disponíveis" />
+                        <Label fx:id="ambulanciasDisponiveisQtd" styleClass="quantidade-card" text="8" />
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                    </VBox>
+                  <Region HBox.hgrow="ALWAYS" />
+               </children>
                <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  <Insets right="10.0" />
                </padding>
-              </VBox>
-      
-              <VBox styleClass="ambulancias-atendimento-card" GridPane.columnIndex="2" GridPane.rowIndex="0">
-                  <Label styleClass="title-card" text="Ambulâncias em atendimento" />
-                  <Label fx:id="averageSLATime" styleClass="quantidade-card" text="2" />
+            </HBox>
+            <HBox fx:id="ambulanciasAtendimentoHbox" alignment="CENTER_LEFT" styleClass="ambulancias-atendimento-card" GridPane.columnIndex="2">
+               <children>
+            
+                    <VBox>
+                        <Label styleClass="title-card" text="Ambulâncias em atendimento" />
+                        <Label fx:id="averageSLATime" styleClass="quantidade-card" text="2" />
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                    </VBox>
+                  <Region HBox.hgrow="ALWAYS" />
+               </children>
                <padding>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                  <Insets right="10.0" />
                </padding>
-              </VBox>
+            </HBox>
             <rowConstraints>
                <RowConstraints />
             </rowConstraints>

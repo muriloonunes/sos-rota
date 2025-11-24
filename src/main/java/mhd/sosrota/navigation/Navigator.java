@@ -16,7 +16,7 @@ import java.io.IOException;
  * @brief Class Navigator
  */
 public class Navigator {
-    private final int APP_WIDTH = 1400;
+    private final int APP_WIDTH = 1430;
     private final int APP_HEIGHT = 810;
 
     private final Stage stage;
@@ -72,30 +72,6 @@ public class Navigator {
         }
     }
 
-    public void showModal(Screens screen, String title, double width, double height) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(screen.getFxmlPath()));
-            Parent root = loader.load();
-
-            // Injeta o Navigator no controller, se implementar Navigable
-            Object controller = loader.getController();
-            if (controller instanceof Navigable navController) {
-                navController.setNavigator(this);
-            }
-
-            // Cria um novo Stage modal
-            Stage modalStage = new Stage();
-            modalStage.initOwner(stage); // stage é o Stage principal
-            modalStage.initModality(Modality.WINDOW_MODAL);
-            modalStage.setTitle(title);
-            modalStage.setScene(new Scene(root, width, height));
-            modalStage.showAndWait(); // bloqueia o Stage principal até fechar
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Erro ao abrir modal: " + screen);
-        }
-    }
     public void showModal(Screens screen, String title) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(screen.getFxmlPath()));
