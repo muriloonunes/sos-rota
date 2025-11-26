@@ -35,6 +35,19 @@
             <artifactId>javafx-fxml</artifactId>
             <version>25.0.1</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.8</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.github.cdimascio/dotenv-java -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+        <!-- Carregar SVG no JavaFX -->
         <dependency>
             <groupId>com.github.hervegirod</groupId>
             <artifactId>fxsvgimage</artifactId>

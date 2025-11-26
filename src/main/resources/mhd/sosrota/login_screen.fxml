@@ -28,7 +28,7 @@
     </rowConstraints>
      <VBox alignment="CENTER" spacing="16" styleClass="brand-panel">
          <ImageView fitHeight="146.0" fitWidth="150.0" preserveRatio="true">
-             <Image url="@../../images/logo_colorida.png"/>
+             <Image url="@../../images/logo_colorida.png" />
          </ImageView>
 
             <Label styleClass="brand-title" text="Bem-vindo ao SOS-Rota">
@@ -49,7 +49,7 @@
      </VBox>
 
     <StackPane styleClass="form-area" GridPane.columnIndex="1">
-        <VBox alignment="CENTER" maxHeight="400.0" maxWidth="410.0" spacing="18" styleClass="login-card">
+        <VBox fx:id="loginForm" alignment="CENTER" maxHeight="400.0" maxWidth="410.0" spacing="18" styleClass="login-card">
             <padding>
                 <Insets bottom="16" left="16" right="16" top="10" />
             </padding>
@@ -67,7 +67,7 @@
                     </font>
                 </Label>
 
-                <TextField fx:id="usernameField" promptText="Seu usuário" styleClass="input-field">
+                <TextField fx:id="loginUsernameField" promptText="Seu usuário" styleClass="input-field">
                     <padding>
                         <Insets bottom="12" left="5" top="12" />
                     </padding>
@@ -83,23 +83,23 @@
 
                 <HBox alignment="CENTER">
                     <StackPane HBox.hgrow="ALWAYS">
-                        <PasswordField fx:id="passwordField" promptText="********" styleClass="input-field">
+                        <PasswordField fx:id="loginPasswordField" minHeight="45.5" promptText="********">
                             <padding>
                                 <Insets bottom="12" left="5" top="12" />
                             </padding>
                         </PasswordField>
 
-                        <TextField fx:id="passwordVisibleField" managed="false" promptText="********" styleClass="input-field" visible="false">
+                        <TextField fx:id="loginPasswordVisibleField" managed="false" promptText="********" styleClass="input-field" visible="false">
                             <padding>
                                 <Insets bottom="12" left="5" top="12" />
                             </padding>
                         </TextField>
                     </StackPane>
 
-                    <Button onAction="#togglePassword" styleClass="toggle-password-btn">
+                    <Button onAction="#toggleLoginPassword" styleClass="toggle-password-btn">
                         <graphic>
-                            <ImageView fx:id="buttonImageView" fitHeight="24" fitWidth="24" preserveRatio="true">
-                                <Image url="@../../images/visibility_off.png"/>
+                            <ImageView fx:id="loginButtonImageView" fitHeight="24" fitWidth="24" preserveRatio="true">
+                                <Image url="@../../images/visibility_off.png" />
                             </ImageView>
                         </graphic>
                     </Button>
@@ -110,24 +110,120 @@
                 <Hyperlink onAction="#handleForgotPasswordAction" styleClass="link" text="Esqueci minha senha" />
             </HBox>
 
-            <Button fx:id="btnLogin" maxWidth="Infinity" onAction="#handleLoginButtonAction" styleClass="login-btn-primary" text="Entrar">
+            <Button fx:id="loginButton" defaultButton="true" maxWidth="Infinity" onAction="#handleLoginButtonAction" styleClass="login-btn-primary" text="Entrar">
                 <font>
                     <Font size="18" />
                 </font>
             </Button>
 
-            <Button fx:id="btnCadastrar" maxWidth="Infinity" onAction="#handleCadastrarButtonAction" styleClass="login-btn-secondary" text="Cadastrar">
+            <Button maxWidth="Infinity" onAction="#handleMostrarCadastro" styleClass="login-btn-secondary" text="Cadastrar">
                 <font>
                     <Font size="18" />
                 </font>
             </Button>
 
-            <Label fx:id="errorMessageLabel" styleClass="error-label" text="erro!">
+            <Label fx:id="loginErrorMessageLabel" styleClass="error-label" text="erro!">
                 <font>
                     <Font size="14" />
                 </font>
             </Label>
         </VBox>
+      <VBox fx:id="cadastrarForm" alignment="CENTER" layoutX="129.0" layoutY="124.0" maxHeight="400.0" maxWidth="410.0" spacing="18" styleClass="login-card">
+         <padding>
+            <Insets bottom="16" left="16" right="16" top="10" />
+         </padding>
+         <children>
+            <Label styleClass="login-title" text="Criar Conta">
+               <font>
+                  <Font name="System Bold" size="24" />
+               </font>
+            </Label>
+            <VBox layoutX="26.0" layoutY="74.0" spacing="5">
+               <children>
+                  <Label styleClass="title-label" text="Nome">
+                     <font>
+                        <Font size="14" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="cadastrarNomeField" promptText="Seu nome" styleClass="input-field">
+                     <padding>
+                        <Insets bottom="12" left="5" top="12" />
+                     </padding>
+                  </TextField>
+               </children>
+            </VBox>
+            <VBox spacing="5">
+               <children>
+                  <Label styleClass="title-label" text="Usuário">
+                     <font>
+                        <Font size="14" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="cadastrarUsernameField" promptText="Seu usuário" styleClass="input-field">
+                     <padding>
+                        <Insets bottom="12" left="5" top="12" />
+                     </padding>
+                  </TextField>
+               </children>
+            </VBox>
+            <VBox spacing="5">
+               <children>
+                  <Label styleClass="title-label" text="Senha">
+                     <font>
+                        <Font size="14" />
+                     </font>
+                  </Label>
+                  <HBox alignment="CENTER">
+                     <children>
+                        <StackPane HBox.hgrow="ALWAYS">
+                           <children>
+                              <PasswordField fx:id="cadastrarPasswordField" minHeight="45.5" promptText="********">
+                                 <padding>
+                                    <Insets bottom="12" left="5" top="12" />
+                                 </padding>
+                              </PasswordField>
+                              <TextField fx:id="cadastrarPasswordVisibleField" managed="false" promptText="********" styleClass="input-field" visible="false">
+                                 <padding>
+                                    <Insets bottom="12" left="5" top="12" />
+                                 </padding>
+                              </TextField>
+                           </children>
+                        </StackPane>
+                        <Button onAction="#toggleCadastrarPassword" styleClass="toggle-password-btn">
+                           <graphic>
+                              <ImageView fx:id="cadastrarButtonImageView" fitHeight="24" fitWidth="24" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../images/visibility_off.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+            <HBox alignment="CENTER_RIGHT">
+               <children>
+                  <Hyperlink onAction="#handleForgotPasswordAction" styleClass="link" text="Esqueci minha senha" />
+               </children>
+            </HBox>
+            <Button fx:id="cadastrarButton" defaultButton="true" maxWidth="Infinity" onAction="#handleCadastrar" styleClass="login-btn-primary" text="Cadastrar">
+               <font>
+                  <Font size="18" />
+               </font>
+            </Button>
+            <Button fx:id="btnVoltarLogin" maxWidth="Infinity" onAction="#handleVoltarParaLogin" styleClass="login-btn-secondary" text="Voltar para o login">
+               <font>
+                  <Font size="18" />
+               </font>
+            </Button>
+            <Label fx:id="cadastrarErrorMessageLabel" styleClass="error-label" text="erro!">
+               <font>
+                  <Font size="14" />
+               </font>
+            </Label>
+         </children>
+      </VBox>
     </StackPane>
 
 </GridPane>
