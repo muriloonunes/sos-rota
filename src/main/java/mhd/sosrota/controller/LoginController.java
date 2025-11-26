@@ -1,5 +1,8 @@
 package mhd.sosrota.controller;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
@@ -12,6 +15,7 @@ import mhd.sosrota.navigation.Screens;
 import mhd.sosrota.presentation.PasswordToggle;
 import mhd.sosrota.repository.UsuarioRepositoryImpl;
 import mhd.sosrota.service.UsuarioService;
+import mhd.sosrota.util.AlertUtil;
 
 import java.sql.SQLException;
 
@@ -38,7 +42,7 @@ public class LoginController implements Navigable {
     private VBox cadastrarForm, loginForm;
 
     @FXML
-    private Button loginButton, cadastrarButton;
+    private Button loginButton, cadastrarButton, voltarLoginButton, abrirCadastrarButton;
 
     private PasswordToggle loginToggle, cadastrarToggle;
 
@@ -48,6 +52,9 @@ public class LoginController implements Navigable {
             new UsuarioService(
                     new UsuarioRepositoryImpl()
             );
+
+    private final BooleanProperty loading = new SimpleBooleanProperty(false);
+
 
     public void initialize() {
         loginToggle = new PasswordToggle(loginPasswordField, loginPasswordVisibleField, loginButtonImageView);
@@ -64,6 +71,10 @@ public class LoginController implements Navigable {
                                 .or(cadastrarPasswordField.textProperty().isEmpty()))
         );
 
+        voltarLoginButton.disableProperty().bind(loading);
+
+        abrirCadastrarButton.disableProperty().bind(loading);
+
         handleVoltarParaLogin();
     }
 
@@ -73,16 +84,39 @@ public class LoginController implements Navigable {
         loginErrorMessageLabel.setManaged(false);
         String username = loginUsernameField.getText();
         String senha = loginPasswordField.getText();
-        try {
-            Usuario usuario = service.autenticar(username, senha);
-            System.out.println(usuario);
-        } catch (AuthenticationException e) {
-            mostrarErroLogin(e.getMessage());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            mostrarErroLogin("Erro ao conectar ao banco de dados");
-        }
-        //        loadDashboardScreen();
+
+        setLoading(true, loginButton);
+
+        Task<Usuario> task = new Task<>() {
+            @Override
+            protected Usuario call() throws Exception {
+                return service.autenticar(username, senha);
+            }
+
+            @Override
+            protected void succeeded() {
+                setLoading(false, loginButton);
+                Usuario usuario = getValue();
+                service.salvarUsuario(usuario.getNome(), usuario.getUsername());
+
+                loadDashboardScreen();
+            }
+
+            @Override
+            protected void failed() {
+                setLoading(false, loginButton);
+
+                Throwable e = getException();
+                if (e instanceof AuthenticationException) {
+                    mostrarErroLogin(e.getMessage());
+                } else {
+                    e.printStackTrace();
+                    mostrarErroLogin("Erro ao conectar ao banco de dados");
+                }
+            }
+        };
+
+        new Thread(task).start();
     }
 
     @FXML
@@ -93,22 +127,43 @@ public class LoginController implements Navigable {
         String nome = cadastrarNomeField.getText();
         String username = cadastrarUsernameField.getText();
         String senha = cadastrarPasswordField.getText();
-        try {
-            boolean cadastro = service.cadastrarUsuario(nome, username, senha);
-            if (cadastro) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Cadastro realizado");
-                alert.setHeaderText(null);
-                alert.setContentText("Usuário cadastrado com sucesso!");
-                alert.showAndWait();
-                handleVoltarParaLogin();
+
+        setLoading(true, cadastrarButton);
+
+        Task<Boolean> task = new Task<>() {
+            @Override
+            protected Boolean call() throws Exception {
+                return service.cadastrarUsuario(nome, username, senha);
             }
-        } catch (AuthenticationException e) {
-            mostrarErroCadastro(e.getMessage());
-        } catch (SQLException e) {
-            e.printStackTrace();
-            mostrarErroCadastro("Erro no sistema.");
-        }
+
+            @Override
+            protected void succeeded() {
+                setLoading(false, cadastrarButton);
+                boolean cadastro = getValue();
+                if (cadastro) {
+                    AlertUtil.showInfo("Cadastro realizado", "Usuário cadastrado com sucesso!");
+                    handleVoltarParaLogin();
+                }
+            }
+
+            @Override
+            protected void failed() {
+                setLoading(false, cadastrarButton);
+
+                Throwable e = getException();
+                if (e instanceof AuthenticationException) {
+                    mostrarErroCadastro(e.getMessage());
+                } else if (e instanceof SQLException) {
+                    e.printStackTrace();
+                    mostrarErroCadastro("Erro no sistema.");
+                } else {
+                    e.printStackTrace();
+                    mostrarErroCadastro("Algo deu errado.");
+                }
+            }
+        };
+
+        new Thread(task).start();
     }
 
     @FXML
@@ -145,7 +200,34 @@ public class LoginController implements Navigable {
 
         loginUsernameField.clear();
         loginPasswordField.clear();
+    }
 
+    private void loadDashboardScreen() {
+        navigator.navigate(Screens.TELA_APP);
+    }
+
+    private void setLoading(boolean isLoading, Button button) {
+        loading.set(isLoading);
+        if (isLoading) {
+            button.setUserData(button.getText());
+            ProgressIndicator pi = new ProgressIndicator();
+
+            pi.setPrefSize(16, 16);
+
+            button.setText(null);
+            button.setGraphic(pi);
+            button.setMouseTransparent(true);
+            button.setFocusTraversable(true);
+        } else {
+            String originalText = (String) button.getUserData();
+
+            button.setText(originalText);
+            button.setGraphic(null);
+
+            button.setUserData(null);
+            button.setMouseTransparent(false);
+            button.setFocusTraversable(false);
+        }
     }
 
     @FXML
@@ -156,11 +238,6 @@ public class LoginController implements Navigable {
     @FXML
     private void toggleCadastrarPassword() {
         cadastrarToggle.toggle();
-    }
-
-    private void loadDashboardScreen() {
-        //TODO
-        navigator.navigate(Screens.TELA_APP);
     }
 
     @Override

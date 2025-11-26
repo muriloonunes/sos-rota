@@ -1,6 +1,6 @@
 package mhd.sosrota.repository;
 
-import mhd.sosrota.database.DatabaseConnection;
+import mhd.sosrota.infrastructure.database.DatabaseConnection;
 import mhd.sosrota.model.Usuario;
 
 import java.sql.PreparedStatement;

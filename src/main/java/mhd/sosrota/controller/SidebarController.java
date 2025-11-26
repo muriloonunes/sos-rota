@@ -8,11 +8,14 @@ import javafx.scene.layout.StackPane;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
+import mhd.sosrota.repository.UsuarioRepositoryImpl;
+import mhd.sosrota.service.UsuarioService;
 import org.girod.javafx.svgimage.SVGImage;
 import org.girod.javafx.svgimage.SVGLoader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -34,14 +37,19 @@ public class SidebarController implements Navigable {
 
     private Navigator navigator;
 
+    private final UsuarioService service =
+            new UsuarioService(
+                    new UsuarioRepositoryImpl()
+            );
+
     @FXML
     public void initialize() {
-        SVGImage dashboardIcon = SVGLoader.load(getClass().getResource("/images/home.svg")).scaleTo(24);
-        SVGImage ocorrenciasIcon = SVGLoader.load(getClass().getResource("/images/ocorrencias.svg")).scaleTo(24);
-        SVGImage ambulanciasIcon = SVGLoader.load(getClass().getResource("/images/ambulancias.svg")).scaleTo(24);
-        SVGImage equipesIcon = SVGLoader.load(getClass().getResource("/images/equipes.svg")).scaleTo(24);
-        SVGImage relatoriosIcon = SVGLoader.load(getClass().getResource("/images/relatorios.svg")).scaleTo(24);
-        SVGImage logoutIcon = SVGLoader.load(getClass().getResource("/images/logout.svg")).scaleTo(18);
+        SVGImage dashboardIcon = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/home.svg"))).scaleTo(24);
+        SVGImage ocorrenciasIcon = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/ocorrencias.svg"))).scaleTo(24);
+        SVGImage ambulanciasIcon = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/ambulancias.svg"))).scaleTo(24);
+        SVGImage equipesIcon = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/equipes.svg"))).scaleTo(24);
+        SVGImage relatoriosIcon = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/relatorios.svg"))).scaleTo(24);
+        SVGImage logoutIcon = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/logout.svg"))).scaleTo(18);
         dashboardHbox.getChildren().addFirst(dashboardIcon);
         ocorrenciasHbox.getChildren().addFirst(ocorrenciasIcon);
         ambulanciasHbox.getChildren().addFirst(ambulanciasIcon);
@@ -56,6 +64,7 @@ public class SidebarController implements Navigable {
         navButtons.add(equipesHbox);
         navButtons.add(relatoriosHbox);
 
+        bemVindoLabel.setText("Bem vindo, " + service.obterUsuarioSalvo().getNome());
     }
 
     /**
@@ -106,6 +115,7 @@ public class SidebarController implements Navigable {
 
     @FXML
     public void handleLogout() {
+        service.limparDados();
         navigator.navigate(Screens.TELA_LOGIN);
     }
 

@@ -6,6 +6,7 @@ module mhd.sosrota {
     requires java.sql;
     requires io.github.cdimascio.dotenv.java;
     requires org.postgresql.jdbc;
+    requires java.prefs;
 
     opens mhd.sosrota to javafx.fxml;
     exports mhd.sosrota;

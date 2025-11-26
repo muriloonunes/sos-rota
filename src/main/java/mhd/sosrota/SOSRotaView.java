@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.scene.image.Image;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import mhd.sosrota.infrastructure.UserPrefs;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
 
@@ -15,7 +16,13 @@ public class SOSRotaView extends Application {
         System.setProperty("prism.lcdtext", "false");
         loadFonts();
         Navigator navigator = new Navigator(stage);
-        navigator.navigate(Screens.TELA_LOGIN);
+
+        UserPrefs prefs = new UserPrefs();
+        if (prefs.existeUsuarioSalvo()) {
+            navigator.navigate(Screens.TELA_APP);
+        } else {
+            navigator.navigate(Screens.TELA_LOGIN);
+        }
         stage.getIcons().add(new Image(Objects.requireNonNull(SOSRotaView.class.getResourceAsStream("/images/icon.png"))));
         stage.setTitle("SOS Rota");
         stage.show();

@@ -35,7 +35,6 @@ public class Usuario {
         this.username = username;
     }
 
-
     public String getSenha() {
         return senha;
     }

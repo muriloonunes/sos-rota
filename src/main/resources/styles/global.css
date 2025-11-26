@@ -143,6 +143,11 @@
     -fx-underline: true;
 }
 
+.progress-indicator {
+    -fx-progress-color: -text-on-primary;
+    -fx-control-inner-background: transparent;
+}
+
 /*Dashboard Sidebar*/
 .sidebar {
     -fx-background-color: -background-dark;

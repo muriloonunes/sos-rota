@@ -1,4 +1,4 @@
-package mhd.sosrota.database;
+package mhd.sosrota.infrastructure.database;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

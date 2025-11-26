@@ -1,5 +1,6 @@
 package mhd.sosrota.service;
 
+import mhd.sosrota.infrastructure.UserPrefs;
 import mhd.sosrota.model.Usuario;
 import mhd.sosrota.model.exceptions.AuthenticationException;
 import mhd.sosrota.repository.UsuarioRepository;
@@ -16,6 +17,7 @@ import java.sql.SQLException;
  */
 public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
+    private final UserPrefs prefs = new UserPrefs();
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
@@ -34,6 +36,12 @@ public class UsuarioService {
     }
 
     public boolean cadastrarUsuario(String nome, String username, String senha) throws SQLException, AuthenticationException {
+        if (username.length() > 20) {
+            throw new AuthenticationException("O nome de usuário não pode ter mais de 20 caracteres");
+        }
+        if (nome.length() > 50) {
+            throw new AuthenticationException("O nome não pode ter mais de 50 caracteres");
+        }
         try {
             Usuario novoUsuario = new Usuario();
             novoUsuario.setNome(nome);
@@ -48,5 +56,19 @@ public class UsuarioService {
                 throw e;
             }
         }
+    }
+
+    public void salvarUsuario(String nome, String username) {
+        prefs.salvarUsuario(nome, username);
+    }
+
+    public Usuario obterUsuarioSalvo() {
+        String nome  = prefs.getNome();
+        String username = prefs.getUsername();
+        return new Usuario(nome, username);
+    }
+
+    public void limparDados() {
+        prefs.limparDados();
     }
 }
