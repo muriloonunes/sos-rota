@@ -41,11 +41,11 @@
             <artifactId>postgresql</artifactId>
             <version>42.7.8</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.github.cdimascio/dotenv-java -->
+        <!-- https://mvnrepository.com/artifact/org.hibernate.orm/hibernate-core -->
         <dependency>
-            <groupId>io.github.cdimascio</groupId>
-            <artifactId>dotenv-java</artifactId>
-            <version>3.2.0</version>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>7.1.10.Final</version>
         </dependency>
         <!-- Carregar SVG no JavaFX -->
         <dependency>

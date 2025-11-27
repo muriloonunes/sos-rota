@@ -2,8 +2,6 @@ package mhd.sosrota.repository;
 
 import mhd.sosrota.model.Usuario;
 
-import java.sql.SQLException;
-
 /**
  *
  * @author Murilo Nunes <murilo_no@outlook.com>
@@ -11,6 +9,6 @@ import java.sql.SQLException;
  * @brief Interface UsuarioRepository
  */
 public interface UsuarioRepository {
-    Usuario encontrarPorUsername(String username) throws SQLException;
-    boolean salvar(Usuario usuario) throws SQLException;
+    Usuario encontrarPorUsername(String username);
+    boolean salvar(Usuario usuario);
 }

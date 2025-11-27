@@ -1,13 +1,12 @@
 package mhd.sosrota.service;
 
+import jakarta.persistence.PersistenceException;
 import mhd.sosrota.infrastructure.UserPrefs;
 import mhd.sosrota.model.Usuario;
 import mhd.sosrota.model.exceptions.AuthenticationException;
 import mhd.sosrota.repository.UsuarioRepository;
 import mhd.sosrota.util.PasswordUtil;
-import org.postgresql.util.PSQLException;
-
-import java.sql.SQLException;
+import org.hibernate.exception.ConstraintViolationException;
 
 /**
  *
@@ -23,7 +22,7 @@ public class UsuarioService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public Usuario autenticar(String username, String senha) throws SQLException, AuthenticationException {
+    public Usuario autenticar(String username, String senha) throws AuthenticationException {
         Usuario usuarioEncontrado = usuarioRepository.encontrarPorUsername(username);
         if (usuarioEncontrado == null) {
             throw new AuthenticationException("Usuário ou senha inválidos");
@@ -35,7 +34,7 @@ public class UsuarioService {
         return usuarioEncontrado;
     }
 
-    public boolean cadastrarUsuario(String nome, String username, String senha) throws SQLException, AuthenticationException {
+    public boolean cadastrarUsuario(String nome, String username, String senha) throws AuthenticationException {
         if (username.length() > 20) {
             throw new AuthenticationException("O nome de usuário não pode ter mais de 20 caracteres");
         }
@@ -49,12 +48,11 @@ public class UsuarioService {
             String hashSenha = PasswordUtil.criarHash(senha);
             novoUsuario.setSenha(hashSenha);
             return usuarioRepository.salvar(novoUsuario);
-        } catch (PSQLException e) {
-            if (e.getSQLState().equals("23505")) {
+        } catch (PersistenceException e) {
+            if (e.getCause() instanceof ConstraintViolationException) {
                 throw new AuthenticationException("Esse nome de usuário já está em uso.");
-            } else {
-                throw e;
             }
+            throw e;
         }
     }
 

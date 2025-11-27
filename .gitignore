@@ -3,7 +3,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 .kotlin
-.env
+src/main/resources/META-INF/persistence.xml
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

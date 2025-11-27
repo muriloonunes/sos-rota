@@ -4,12 +4,14 @@ module mhd.sosrota {
     requires javafx.graphics;
     requires org.girod.javafx.svgimage;
     requires java.sql;
-    requires io.github.cdimascio.dotenv.java;
     requires org.postgresql.jdbc;
     requires java.prefs;
+    requires jakarta.persistence;
+    requires org.hibernate.orm.core;
 
     opens mhd.sosrota to javafx.fxml;
     exports mhd.sosrota;
     opens mhd.sosrota.controller to javafx.fxml;
     exports mhd.sosrota.controller;
+    opens mhd.sosrota.model to org.hibernate.orm.core;
 }

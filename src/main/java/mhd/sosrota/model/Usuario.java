@@ -1,14 +1,25 @@
 package mhd.sosrota.model;
 
+import jakarta.persistence.*;
+
 /**
  *
  * @author Murilo Nunes <murilo_no@outlook.com>
+ * @author Hartur Sales <hartursalesxavier@gmail.com>
  * @date 25/11/2025
  * @brief Class Usuario
  */
+@Entity
+@Table(name = "users")
 public class Usuario {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column(name = "nome", length = 50, nullable = false)
     private String nome;
+    @Column(name = "username", length = 20, nullable = false, unique = true)
     private String username;
+    @Column(name = "senha", nullable = false)
     private String senha;
 
     public Usuario() {
@@ -45,10 +56,6 @@ public class Usuario {
 
     @Override
     public String toString() {
-        return "Usuario{" +
-                "nome='" + nome + '\'' +
-                ", username='" + username + '\'' +
-                ", senha='" + senha + '\'' +
-                '}';
+        return "User [id=" + id + ", username=" + username + ", nome=" + nome + "]";
     }
 }

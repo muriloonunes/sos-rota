@@ -1,11 +1,9 @@
 package mhd.sosrota.repository;
 
-import mhd.sosrota.infrastructure.database.DatabaseConnection;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import mhd.sosrota.infrastructure.database.JpaManager;
 import mhd.sosrota.model.Usuario;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  *
@@ -15,31 +13,23 @@ import java.sql.SQLException;
  */
 public class UsuarioRepositoryImpl implements UsuarioRepository {
     @Override
-    public Usuario encontrarPorUsername(String username) throws SQLException {
-        String sql = "SELECT * FROM users WHERE username = ?";
-        Usuario usuario = null;
-        try (PreparedStatement stmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
-            stmt.setString(1, username);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                usuario = new Usuario();
-                usuario.setNome(rs.getString("nome"));
-                usuario.setUsername(rs.getString("username"));
-                usuario.setSenha(rs.getString("senha"));
-                return usuario;
-            }
+    public Usuario encontrarPorUsername(String username) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
+            return em.createQuery(
+                            "SELECT u FROM Usuario u WHERE u.username = :username", Usuario.class)
+                    .setParameter("username", username)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
         }
-        return usuario;
     }
 
     @Override
-    public boolean salvar(Usuario usuario) throws SQLException {
-        String sql = "INSERT INTO users (nome, username, senha) VALUES (?, ?, ?)";
-        try (PreparedStatement stmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
-            stmt.setString(1, usuario.getNome());
-            stmt.setString(2, usuario.getUsername());
-            stmt.setString(3, usuario.getSenha());
-            stmt.executeUpdate();
+    public boolean salvar(Usuario usuario) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
+            em.getTransaction().begin();
+            em.persist(usuario);
+            em.getTransaction().commit();
             return true;
         }
     }
