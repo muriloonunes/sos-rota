@@ -4,9 +4,11 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.HBox;
+import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
+import mhd.sosrota.service.GrafoBairroService;
 import org.girod.javafx.svgimage.SVGImage;
 import org.girod.javafx.svgimage.SVGLoader;
 
@@ -28,6 +30,8 @@ public class DashboardController implements Navigable {
 
     private Navigator navigator;
 
+    private final GrafoBairroService grafoService = AppContext.getInstance().getGrafoService();
+
     @FXML
     public void initialize() {
         SVGImage exclamationIcon = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/exclamacao.svg"))).scaleTo(48);
@@ -36,6 +40,8 @@ public class DashboardController implements Navigable {
         ocorrenciasAbertasHbox.getChildren().add(exclamationIcon);
         ambulanciasDisponiveisHbox.getChildren().add(ambulanciasIcon);
         ambulanciasAtendimentoHbox.getChildren().add(pulsoIcon);
+
+//        GrafoBairro grafo = grafoBairroService.carregarGrafo();
     }
 
     @FXML

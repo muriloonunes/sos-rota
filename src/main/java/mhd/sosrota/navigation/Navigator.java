@@ -48,7 +48,7 @@ public class Navigator {
     }
 
     /**
-     * Carrega um FXML para a área de conteúdo principal do Dashboard.
+     * Carrega um FXML para a área de conteúdo principal da AppBar.
      *
      * @param screen A tela que será carregada.
      */

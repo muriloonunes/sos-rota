@@ -7,13 +7,13 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Usuario;
 import mhd.sosrota.model.exceptions.AuthenticationException;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
 import mhd.sosrota.presentation.PasswordToggle;
-import mhd.sosrota.repository.UsuarioRepositoryImpl;
 import mhd.sosrota.service.UsuarioService;
 import mhd.sosrota.util.AlertUtil;
 
@@ -48,10 +48,7 @@ public class LoginController implements Navigable {
 
     private Navigator navigator;
 
-    private final UsuarioService service =
-            new UsuarioService(
-                    new UsuarioRepositoryImpl()
-            );
+    private final UsuarioService service = AppContext.getInstance().getUsuarioService();
 
     private final BooleanProperty loading = new SimpleBooleanProperty(false);
 
