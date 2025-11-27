@@ -16,13 +16,21 @@ public class Bairro {
     @Column(name = "tem_base", nullable = false)
     private Boolean temBase;
 
+    @Column(name = "pos_x", nullable = false)
+    private double x;
+
+    @Column(name = "pos_y", nullable = false)
+    private double y;
+
     public Bairro() {
     }
 
-    public Bairro(Long id, String nome, boolean temBase) {
+    public Bairro(Long id, String nome, boolean temBase, double x, double y) {
         this.id = id;
         this.nome = nome;
         this.temBase = temBase;
+        this.x = x;
+        this.y = y;
     }
 
     public Long getId() {
@@ -47,6 +55,30 @@ public class Bairro {
 
     public void setTemBase(boolean temBase) {
         this.temBase = temBase;
+    }
+
+    public Boolean temBase() {
+        return temBase;
+    }
+
+    public void setTemBase(Boolean temBase) {
+        this.temBase = temBase;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
     }
 
     @Override

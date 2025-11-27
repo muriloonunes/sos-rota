@@ -25,7 +25,6 @@ public class GrafoBairro {
     }
 
     public List<Bairro> menorCaminho(GrafoBairro grafo, Bairro origem, Bairro destino) {
-
         Map<Bairro, Double> dist = new HashMap<>();
         Map<Bairro, Bairro> anterior = new HashMap<>();
         Set<Bairro> visitados = new HashSet<>();

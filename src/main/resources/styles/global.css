@@ -281,6 +281,18 @@
     -fx-background-radius: 12;
 }
 
+.bairro-circle {
+    -fx-fill: #3498db;
+    -fx-stroke: #1b69a6;
+    -fx-stroke-width: 2;
+}
+
+.bairro-label {
+    -fx-text-fill: #000000;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+}
+
 .table-view {
     -fx-border-color: transparent;
     -fx-background-color: transparent;

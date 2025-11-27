@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -18,52 +19,41 @@
 
     <Text styleClass="vbox-container-titulo" text="Cadastrar Ocorrência" />
     <Separator />
-   <VBox spacing="10.0" styleClass="vbox-container">
-      <children>
-         <VBox>
-            <children>
-         
-                 <Label styleClass="title-label" text="Bairro:" />
-               <ComboBox maxWidth="1.7976931348623157E308" promptText="Selecione o bairro" styleClass="info-selectors" />
-            </children>
-         </VBox>
-         <VBox>
-            <children>
-         
-                 <Label styleClass="title-label" text="Tipo de Ocorrência:" />
-                 <ComboBox fx:id="occurrenceTypeComboBox" maxWidth="Infinity" promptText="Selecione o tipo" styleClass="info-selectors" />
-            </children>
-         </VBox>
-         <VBox>
-            <children>
-         
-                 <Label styleClass="title-label" text="Gravidade:" />
-                 <ComboBox fx:id="severityComboBox" maxWidth="Infinity" promptText="Selecione a gravidade" styleClass="info-selectors" />
-            </children>
-         </VBox>
-         <VBox>
-            <children>
-         
-                 <Label styleClass="title-label" text="Observações:" />
-                 <TextArea fx:id="observationsTextArea" promptText="Detalhes adicionais sobre a ocorrência" styleClass="observacao-textfield" />
-            </children>
-         </VBox>
-      
-          <HBox alignment="CENTER_LEFT" spacing="15" styleClass="button-bar">
-              <Button onAction="#handleRegisterOccurrence" styleClass="btn-primary" text="Registrar Ocorrência">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Button>
-              <Button onAction="#handleClearFields" styleClass="btn-secondary" text="Limpar Campos">
-               <font>
-                  <Font size="14.0" />
-               </font>
-            </Button>
-          </HBox>
-      </children>
-      <padding>
-         <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
-      </padding>
-   </VBox>
+    <VBox spacing="10.0" styleClass="vbox-container">
+        <padding>
+            <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
+        </padding>
+        <VBox>
+            <Label styleClass="title-label" text="Bairro:"/>
+            <ComboBox fx:id="bairroComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o bairro"
+                      styleClass="info-selectors"/>
+        </VBox>
+        <VBox>
+            <Label styleClass="title-label" text="Gravidade:"/>
+            <ComboBox fx:id="gravidadeComboBox" maxWidth="Infinity" promptText="Selecione a gravidade"
+                      styleClass="info-selectors"/>
+        </VBox>
+        <VBox>
+            <Label styleClass="title-label" text="Tipo de Ocorrência:"/>
+            <TextField fx:id="tipoOcorrenciaTextField" promptText="Acidente de trânsito" styleClass="info-selectors"/>
+        </VBox>
+        <VBox>
+            <Label styleClass="title-label" text="Observações:"/>
+            <TextArea fx:id="obsTextArea" promptText="Detalhes adicionais sobre a ocorrência"
+                      styleClass="observacao-textfield"/>
+        </VBox>
+
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <Button onAction="#handleRegisterOccurrence" styleClass="btn-primary" text="Registrar Ocorrência">
+                <font>
+                    <Font size="14.0"/>
+                </font>
+          </Button>
+            <Button onAction="#handleClearFields" styleClass="btn-secondary" text="Limpar Campos">
+                <font>
+                    <Font size="14.0"/>
+                </font>
+          </Button>
+        </HBox>
+    </VBox>
 </VBox>
