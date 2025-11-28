@@ -1,12 +1,13 @@
 package mhd.sosrota.service;
 
-import jakarta.persistence.PersistenceException;
 import mhd.sosrota.infrastructure.UserPrefs;
 import mhd.sosrota.model.Usuario;
 import mhd.sosrota.model.exceptions.AuthenticationException;
 import mhd.sosrota.repository.UsuarioRepository;
 import mhd.sosrota.util.PasswordUtil;
 import org.hibernate.exception.ConstraintViolationException;
+
+import java.sql.SQLException;
 
 /**
  *
@@ -47,11 +48,22 @@ public class UsuarioService {
             novoUsuario.setUsername(username);
             String hashSenha = PasswordUtil.criarHash(senha);
             novoUsuario.setSenha(hashSenha);
-            return usuarioRepository.salvar(novoUsuario);
-        } catch (PersistenceException e) {
-            if (e.getCause() instanceof ConstraintViolationException) {
-                throw new AuthenticationException("Esse nome de usuário já está em uso.");
+            usuarioRepository.salvar(novoUsuario);
+            return true;
+        } catch (Exception e) {
+            Throwable causaAtual = e;
+            while (causaAtual != null) {
+                if (causaAtual instanceof ConstraintViolationException) {
+                    throw new AuthenticationException("Esse nome de usuário já está em uso.");
+                }
+                if (causaAtual instanceof SQLException) {
+                    if ("23505".equals(((SQLException) causaAtual).getSQLState())) {
+                        throw new AuthenticationException("Esse nome de usuário já está em uso.");
+                    }
+                }
+                causaAtual = causaAtual.getCause();
             }
+
             throw e;
         }
     }
@@ -61,7 +73,7 @@ public class UsuarioService {
     }
 
     public Usuario obterUsuarioSalvo() {
-        String nome  = prefs.getNome();
+        String nome = prefs.getNome();
         String username = prefs.getUsername();
         return new Usuario(nome, username);
     }

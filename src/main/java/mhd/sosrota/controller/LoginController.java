@@ -165,7 +165,7 @@ public class LoginController implements Navigable {
 
     @FXML
     private void handleForgotPasswordAction() {
-
+        //TODO
     }
 
     @FXML

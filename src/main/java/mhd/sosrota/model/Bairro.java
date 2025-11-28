@@ -92,4 +92,9 @@ public class Bairro {
         if (!(o instanceof Bairro other)) return false;
         return id != null && id.equals(other.id);
     }
+
+    @Override
+    public String toString() {
+        return nome;
+    }
 }

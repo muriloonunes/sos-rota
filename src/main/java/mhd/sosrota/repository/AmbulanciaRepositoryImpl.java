@@ -29,7 +29,7 @@ public class AmbulanciaRepositoryImpl implements AmbulanciaRepository {
     @Override
     public List<Ambulancia> listarTodasAmbulancias() {
         try (EntityManager em = JpaManager.getEntityManager()) {
-            return em.createQuery("SELECT a FROM Ambulancia a", Ambulancia.class)
+            return em.createQuery("SELECT a FROM Ambulancia a JOIN FETCH a.bairroBase", Ambulancia.class)
                     .getResultList();
         } catch (NoResultException e) {
             return null;
@@ -37,14 +37,11 @@ public class AmbulanciaRepositoryImpl implements AmbulanciaRepository {
     }
 
     @Override
-    public boolean salvar(Ambulancia ambulancia) {
+    public void salvar(Ambulancia ambulancia) {
         try (EntityManager em = JpaManager.getEntityManager()) {
             em.getTransaction().begin();
             em.persist(ambulancia);
             em.getTransaction().commit();
-            return true;
-        } catch (Exception e) {
-            return false;
         }
     }
 

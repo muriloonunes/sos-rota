@@ -15,7 +15,7 @@ public interface AmbulanciaRepository {
 
     List<Ambulancia> listarTodasAmbulancias();
 
-    boolean salvar(Ambulancia ambulancia);
+    void salvar(Ambulancia ambulancia);
 
     Ambulancia atualizarAmbulancia(Ambulancia ambulancia);
 

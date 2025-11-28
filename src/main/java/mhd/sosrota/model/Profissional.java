@@ -2,6 +2,8 @@ package mhd.sosrota.model;
 
 import jakarta.persistence.*;
 import mhd.sosrota.model.enums.FuncaoProfissional;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
 import java.io.Serializable;
 
@@ -19,16 +21,18 @@ public class Profissional implements Serializable {
     @Column(name = "id_profissional")
     private Long id;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "nome", nullable = false, length = 100)
     private String nome;
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated()
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(name = "funcao", nullable = false)
     private FuncaoProfissional funcaoProfissional;
 
-    @Column(length = 50)
+    @Column(name = "email_contato", length = 50)
     private String contato;
 
-    @Column(nullable = false)
+    @Column(name = "ativo", nullable = false)
     private boolean ativo = true;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -13,9 +13,9 @@ import java.util.List;
 public interface UsuarioRepository {
     Usuario encontrarPorUsername(String username);
 
-    List<Usuario> listarTodosUsuários();
+    List<Usuario> listarTodosUsuarios();
 
-    boolean salvar(Usuario usuario);
+    void salvar(Usuario usuario);
 
     Usuario atualizarUsuario(Usuario usuario);
 

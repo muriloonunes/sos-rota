@@ -46,21 +46,21 @@
                     <VBox spacing="4">
                         <children>
                             <Label styleClass="title-label" text="Gravidade" />
-                            <ComboBox fx:id="gravidadeFilterCombo" maxWidth="1.7976931348623157E308" promptText="Selecione a gravidade" styleClass="info-selectors" />
+                            <ComboBox fx:id="gravidadeComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione a gravidade" styleClass="info-selectors" />
                         </children>
                     </VBox>
       
                     <VBox spacing="4" GridPane.columnIndex="1">
                         <children>
                             <Label styleClass="title-label" text="Bairro" />
-                     <ComboBox fx:id="bairroFilterField" maxWidth="1.7976931348623157E308" promptText="Selecione o bairro" styleClass="info-selectors" />
+                     <ComboBox fx:id="bairroComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o bairro" styleClass="info-selectors" />
                         </children>
                     </VBox>
       
                     <VBox spacing="4" GridPane.columnIndex="2">
                         <children>
                             <Label styleClass="title-label" text="Status" />
-                            <ComboBox fx:id="statusFilterCombo" maxWidth="1.7976931348623157E308" promptText="Selecione o status" styleClass="info-selectors" />
+                            <ComboBox fx:id="statusComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o status" styleClass="info-selectors" />
                         </children>
                     </VBox>
                <rowConstraints>
@@ -71,7 +71,7 @@
                 <HBox alignment="CENTER_RIGHT" spacing="8">
                     <children>
                         <Region HBox.hgrow="ALWAYS" />
-                        <Button fx:id="limparFiltrosButton" mnemonicParsing="false" styleClass="btn-secondary" text="Limpar filtros">
+                        <Button mnemonicParsing="false" onAction="#handleClearFields" styleClass="btn-secondary" text="Limpar filtros">
                      <font>
                         <Font size="14.0" />
                      </font>

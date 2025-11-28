@@ -322,10 +322,10 @@
     -fx-background-color: -background-light;
 }
 
-.table-row-cell {
-    -fx-border-color: red;
-    -fx-table-cell-border-color: red;
-}
+/*.table-row-cell {*/
+/*    -fx-border-color: red;*/
+/*    -fx-table-cell-border-color: red;*/
+/*}*/
 
 /*Cadastrar ocorrencia*/
 .observacao-textfield {

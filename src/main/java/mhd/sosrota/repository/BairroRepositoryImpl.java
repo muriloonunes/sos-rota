@@ -20,4 +20,14 @@ public class BairroRepositoryImpl implements BairroRepository {
             return em.find(Bairro.class, id);
         }
     }
+
+    @Override
+    public Bairro encontrarPorNome(String nome) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
+            return em.createQuery(
+                            "SELECT b FROM Bairro b WHERE LOWER(b.nome) = LOWER(:nome) ", Bairro.class)
+                    .setParameter("nome", nome)
+                    .getSingleResult();
+        }
+    }
 }

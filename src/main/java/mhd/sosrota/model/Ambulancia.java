@@ -3,6 +3,8 @@ package mhd.sosrota.model;
 import jakarta.persistence.*;
 import mhd.sosrota.model.enums.StatusAmbulancia;
 import mhd.sosrota.model.enums.TipoAmbulancia;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
 /**
  *
@@ -21,22 +23,25 @@ public class Ambulancia {
     @Column(nullable = false, unique = true, length = 7)
     private String placa;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Enumerated()
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(name = "tipo", nullable = false)
     private TipoAmbulancia tipoAmbulancia;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Enumerated()
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(name = "status", nullable = false)
     private StatusAmbulancia statusAmbulancia;
-    //TODO chave estrangeira bairroBase
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "bairro_base_id", nullable = false)
-//    private Bairro bairroBase;
 
-    public Ambulancia( StatusAmbulancia statusAmbulancia, TipoAmbulancia tipoAmbulancia, String placa) {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bairro_base_id", nullable = false)
+    private Bairro bairroBase;
+
+    public Ambulancia(StatusAmbulancia statusAmbulancia, TipoAmbulancia tipoAmbulancia, String placa, Bairro bairroBase) {
         this.statusAmbulancia = statusAmbulancia;
         this.tipoAmbulancia = tipoAmbulancia;
         this.placa = placa;
+        this.bairroBase = bairroBase;
     }
 
     public Ambulancia() {
@@ -64,5 +69,21 @@ public class Ambulancia {
 
     public void setPlaca(String placa) {
         this.placa = placa;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Bairro getBairroBase() {
+        return bairroBase;
+    }
+
+    public void setBairroBase(Bairro bairroBase) {
+        this.bairroBase = bairroBase;
     }
 }

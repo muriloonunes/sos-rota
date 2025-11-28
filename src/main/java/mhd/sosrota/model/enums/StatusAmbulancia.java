@@ -7,6 +7,7 @@ package mhd.sosrota.model.enums;
  * @date 26/11/2025
  * @brief Enum StatusAmbulancia
  */
+
 public enum StatusAmbulancia {
     DISPONIVEL("Disponível"),
     EM_ATENDIMENTO("Em Atendimento"),
@@ -23,4 +24,12 @@ public enum StatusAmbulancia {
         return descricao;
     }
 
+    public static StatusAmbulancia fromDescricao(String descricao) {
+        for (StatusAmbulancia status : StatusAmbulancia.values()) {
+            if (status.getDescricao().equalsIgnoreCase(descricao)) {
+                return status;
+            }
+        }
+        throw new IllegalArgumentException("Descrição inválida: " + descricao);
+    }
 }

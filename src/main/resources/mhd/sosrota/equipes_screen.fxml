@@ -18,9 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="main-content-area" stylesheets="@../../styles/global.css"
-            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="mhd.sosrota.controller.EquipeController">
+<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="main-content-area" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.EquipeController">
 
     <VBox alignment="TOP_CENTER" spacing="20" styleClass="main-content-area" VBox.vgrow="ALWAYS">
 
@@ -29,72 +27,80 @@
                 <VBox alignment="TOP_CENTER" spacing="20" VBox.vgrow="ALWAYS">
                     <VBox spacing="10.0" styleClass="vbox-container">
                         <padding>
-                            <Insets bottom="20" left="20" right="20" top="20"/>
+                            <Insets bottom="20" left="20" right="20" top="20" />
                         </padding>
 
                         <Label styleClass="vbox-container-titulo" text="Cadastrar Profissional">
                             <font>
-                                <Font size="18.0"/>
+                                <Font size="18.0" />
                             </font>
                         </Label>
-                        <HBox spacing="10.0">
-                            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                                <Label styleClass="title-label" text="Nome completo"/>
-                                <TextField fx:id="professionalNameField" promptText="Ex: Dr. João Silva"
-                                           styleClass="observacao-textfield"/>
-                            </VBox>
-
-                            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                                <Label styleClass="title-label" text="Função"/>
-                                <ComboBox fx:id="roleComboBox" maxWidth="1.7976931348623157E308"
-                                          promptText="Selecione a função" styleClass="info-selectors"/>
-                            </VBox>
-
-                            <VBox spacing="4" HBox.hgrow="ALWAYS">
-                                <Label styleClass="title-label" text="Contato (Telefone/Email)"/>
-                                <TextField fx:id="contactField" promptText="Ex: (62) 99999-9999"
-                                           styleClass="observacao-textfield"/>
-                            </VBox>
-                        </HBox>
+                  <GridPane hgap="10.0" vgap="10.0">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.0" />
+                      <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.0" />
+                        <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                      <RowConstraints percentHeight="100.0" vgrow="SOMETIMES" />
+                    </rowConstraints>
+                     <children>
+                        <VBox maxWidth="1.7976931348623157E308" spacing="4">
+                           <children>
+                              <Label styleClass="title-label" text="Nome completo" />
+                              <TextField fx:id="nomeTextField" maxWidth="1.7976931348623157E308" promptText="Ex: Dr. João Silva" styleClass="observacao-textfield" />
+                           </children>
+                        </VBox>
+                        <VBox maxWidth="1.7976931348623157E308" spacing="4" GridPane.columnIndex="1">
+                           <children>
+                              <Label styleClass="title-label" text="Função" />
+                              <ComboBox fx:id="funcaoComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione a função" styleClass="info-selectors" />
+                           </children>
+                        </VBox>
+                        <VBox maxWidth="1.7976931348623157E308" spacing="4" GridPane.columnIndex="2">
+                           <children>
+                              <Label styleClass="title-label" text="Email" />
+                              <TextField fx:id="contatoTextField" maxWidth="1.7976931348623157E308" promptText="Ex: drjoaozinho@gmail.com" styleClass="observacao-textfield" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </GridPane>
 
                         <HBox alignment="CENTER_RIGHT" spacing="15">
-                            <Button onAction="#handleClearProfessionalFields" styleClass="btn-secondary"
-                                    text="Limpar"/>
-                            <Button onAction="#handleRegisterProfessional" styleClass="btn-primary"
-                                    text="Cadastrar profissional"/>
+                            <Button onAction="#handleClearFields" styleClass="btn-secondary" text="Limpar" />
+                            <Button fx:id="cadastrarButton" onAction="#handleRegisterProfessional" styleClass="btn-primary" text="Cadastrar profissional" />
                         </HBox>
                     </VBox>
 
                     <VBox spacing="16" styleClass="vbox-container" VBox.vgrow="ALWAYS">
                         <padding>
-                            <Insets bottom="20" left="20" right="20" top="20"/>
+                            <Insets bottom="20" left="20" right="20" top="20" />
                         </padding>
 
                         <Label styleClass="vbox-container-titulo" text="Profissionais cadastrados">
                             <font>
-                                <Font size="18.0"/>
+                                <Font size="18.0" />
                             </font>
                         </Label>
 
                         <VBox alignment="CENTER_LEFT" spacing="10" VBox.vgrow="ALWAYS">
                             <TableView fx:id="professionalsTable" styleClass="table-view" VBox.vgrow="ALWAYS">
                                 <columns>
-                                    <TableColumn prefWidth="200" text="Nome"/>
-                                    <TableColumn prefWidth="150" text="Função"/>
-                                    <TableColumn prefWidth="180" text="Contato"/>
-                                    <TableColumn prefWidth="100" text="Ações"/>
+                                    <TableColumn prefWidth="200" text="Nome" />
+                                    <TableColumn prefWidth="150" text="Função" />
+                                    <TableColumn prefWidth="180" text="Contato" />
+                                    <TableColumn prefWidth="100" text="Ações" />
                                 </columns>
                                 <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                 </columnResizePolicy>
                             </TableView>
 
-                            <Pagination fx:id="professionalsPagination" prefHeight="40.0"
-                                        VBox.vgrow="NEVER"/>
+                            <Pagination fx:id="professionalsPagination" prefHeight="40.0" VBox.vgrow="NEVER" />
                         </VBox>
                     </VBox>
                     <padding>
-                        <Insets top="10.0"/>
+                        <Insets top="10.0" />
                     </padding>
                 </VBox>
             </Tab>
@@ -103,101 +109,93 @@
                 <VBox alignment="TOP_CENTER" spacing="20" VBox.vgrow="ALWAYS">
                     <VBox spacing="10.0" styleClass="vbox-container">
                         <padding>
-                            <Insets bottom="20" left="20" right="20" top="20"/>
+                            <Insets bottom="20" left="20" right="20" top="20" />
                         </padding>
 
                         <Label styleClass="vbox-container-titulo" text="Montar Equipes">
                             <font>
-                                <Font size="18.0"/>
+                                <Font size="18.0" />
                             </font>
                         </Label>
                         <GridPane hgap="10.0">
                             <columnConstraints>
-                                <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0"/>
-                                <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0"/>
+                                <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
+                                <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
                             </columnConstraints>
                             <rowConstraints>
-                                <RowConstraints vgrow="SOMETIMES"/>
+                                <RowConstraints vgrow="SOMETIMES" />
                             </rowConstraints>
                             <VBox spacing="5.0">
                                 <VBox spacing="4">
-                                    <Label styleClass="title-label" text="Ambulância"/>
-                                    <ComboBox fx:id="ambulanceComboBox" maxWidth="1.7976931348623157E308"
-                                              promptText="Selecione a ambulância"
-                                              styleClass="info-selectors"/>
+                                    <Label styleClass="title-label" text="Ambulância" />
+                                    <ComboBox fx:id="ambulanceComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione a ambulância" styleClass="info-selectors" />
                                 </VBox>
 
                                 <VBox spacing="4">
-                                    <Label styleClass="title-label" text="Médico"/>
-                                    <ComboBox fx:id="doctorComboBox" maxWidth="1.7976931348623157E308"
-                                              promptText="Selecione o médico" styleClass="info-selectors"/>
+                                    <Label styleClass="title-label" text="Médico" />
+                                    <ComboBox fx:id="doctorComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o médico" styleClass="info-selectors" />
                                 </VBox>
                             </VBox>
 
                             <VBox spacing="5.0" GridPane.columnIndex="1">
 
                                 <VBox spacing="4">
-                                    <Label styleClass="title-label" text="Enfermeiro(a)"/>
-                                    <ComboBox fx:id="nurseComboBox" maxWidth="1.7976931348623157E308"
-                                              promptText="Selecione o enfermeiro(a)"
-                                              styleClass="info-selectors"/>
+                                    <Label styleClass="title-label" text="Enfermeiro(a)" />
+                                    <ComboBox fx:id="nurseComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o enfermeiro(a)" styleClass="info-selectors" />
                                 </VBox>
 
                                 <VBox spacing="4">
-                                    <Label styleClass="title-label" text="Condutor(a)"/>
-                                    <ComboBox fx:id="driverComboBox" maxWidth="1.7976931348623157E308"
-                                              promptText="Selecione o condutor(a)" styleClass="info-selectors"/>
+                                    <Label styleClass="title-label" text="Condutor(a)" />
+                                    <ComboBox fx:id="driverComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o condutor(a)" styleClass="info-selectors" />
                                 </VBox>
                             </VBox>
                         </GridPane>
 
                         <HBox alignment="CENTER_RIGHT" spacing="15">
-                            <Button onAction="#handleClearTeamFields" styleClass="btn-secondary"
-                                    text="Limpar equipe"/>
-                            <Button onAction="#handleSaveTeam" styleClass="btn-primary" text="Salvar equipe"/>
+                            <Button onAction="#handleClearTeamFields" styleClass="btn-secondary" text="Limpar equipe" />
+                            <Button onAction="#handleSaveTeam" styleClass="btn-primary" text="Salvar equipe" />
                         </HBox>
                     </VBox>
 
                     <VBox spacing="16" styleClass="vbox-container" VBox.vgrow="ALWAYS">
                         <padding>
-                            <Insets bottom="20" left="20" right="20" top="20"/>
+                            <Insets bottom="20" left="20" right="20" top="20" />
                         </padding>
 
                         <Label styleClass="vbox-container-titulo" text="Equipes ativas">
                             <font>
-                                <Font size="18.0"/>
+                                <Font size="18.0" />
                             </font>
                         </Label>
 
                         <VBox alignment="CENTER_LEFT" spacing="10" VBox.vgrow="ALWAYS">
                             <TableView fx:id="activeTeamsTable" styleClass="table-view" VBox.vgrow="ALWAYS">
                                 <columns>
-                                    <TableColumn prefWidth="120" text="Ambulância"/>
-                                    <TableColumn prefWidth="150" text="Médico"/>
-                                    <TableColumn prefWidth="150" text="Enfermeiro"/>
-                                    <TableColumn prefWidth="150" text="Condutor"/>
-                                    <TableColumn text="Ações"/>
+                                    <TableColumn prefWidth="120" text="Ambulância" />
+                                    <TableColumn prefWidth="150" text="Médico" />
+                                    <TableColumn prefWidth="150" text="Enfermeiro" />
+                                    <TableColumn prefWidth="150" text="Condutor" />
+                                    <TableColumn text="Ações" />
                                 </columns>
                                 <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                 </columnResizePolicy>
                             </TableView>
 
-                            <Pagination fx:id="teamsPagination" prefHeight="40.0"
-                                        VBox.vgrow="NEVER"/>
+                            <Pagination fx:id="teamsPagination" prefHeight="40.0" VBox.vgrow="NEVER" />
                         </VBox>
                     </VBox>
                     <padding>
-                        <Insets top="10.0"/>
+                        <Insets top="10.0" />
                     </padding>
                 </VBox>
             </Tab>
             <VBox.margin>
-                <Insets/>
+                <Insets />
             </VBox.margin>
         </TabPane>
         <padding>
-            <Insets bottom="20.0" left="30.0" right="30.0" top="20.0"/>
+            <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
         </padding>
     </VBox>
 </ScrollPane>

@@ -20,4 +20,13 @@ public enum TipoAmbulancia {
     public String getDescricao() {
         return descricao;
     }
+
+    public static TipoAmbulancia fromDescricao(String descricao) {
+        for (TipoAmbulancia tipo : TipoAmbulancia.values()) {
+            if (tipo.getDescricao().equalsIgnoreCase(descricao)) {
+                return tipo;
+            }
+        }
+        throw new IllegalArgumentException("Tipo inválido: " + descricao);
+    }
 }

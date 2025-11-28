@@ -27,7 +27,7 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     }
 
     @Override
-    public List<Usuario> listarTodosUsuários() {
+    public List<Usuario> listarTodosUsuarios() {
         try (EntityManager em = JpaManager.getEntityManager()) {
             return em.createQuery("SELECT u FROM Usuario u", Usuario.class)
                     .getResultList();
@@ -37,14 +37,11 @@ public class UsuarioRepositoryImpl implements UsuarioRepository {
     }
 
     @Override
-    public boolean salvar(Usuario usuario) {
+    public void salvar(Usuario usuario) {
         try (EntityManager em = JpaManager.getEntityManager()) {
             em.getTransaction().begin();
             em.persist(usuario);
             em.getTransaction().commit();
-            return true;
-        } catch (Exception e) {
-            return false;
         }
     }
 
