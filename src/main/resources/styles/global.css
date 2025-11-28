@@ -281,16 +281,36 @@
     -fx-background-radius: 12;
 }
 
-.bairro-circle {
+.bairro {
     -fx-fill: #3498db;
     -fx-stroke: #1b69a6;
     -fx-stroke-width: 2;
+    -fx-cursor: default;
+}
+
+.bairro-base {
+    -fx-fill: #db3434;
+    -fx-stroke: #a61b1b;
+    -fx-stroke-width: 2;
+    -fx-cursor: default;
 }
 
 .bairro-label {
     -fx-text-fill: #000000;
     -fx-font-size: 11px;
     -fx-font-weight: bold;
+}
+
+.escurecido {
+    -fx-opacity: 0.15;
+}
+
+.bairro-destacado {
+    -fx-stroke-width: 3;
+}
+
+.rua-destacada {
+    -fx-stroke-width: 4;
 }
 
 .table-view {

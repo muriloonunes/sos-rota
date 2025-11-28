@@ -1,13 +1,13 @@
 package mhd.sosrota.infrastructure;
 
 import mhd.sosrota.repository.*;
-import mhd.sosrota.service.GrafoBairroService;
+import mhd.sosrota.service.GrafoCidadeService;
 import mhd.sosrota.service.UsuarioService;
 
 public class AppContext {
     private static AppContext instance;
     private final UsuarioService usuarioService;
-    private final GrafoBairroService grafoService;
+    private final GrafoCidadeService grafoService;
 
     private AppContext() {
         UsuarioRepository usuarioRepository = new UsuarioRepositoryImpl();
@@ -15,7 +15,7 @@ public class AppContext {
 
         BairroRepository bairroRepository = new BairroRepositoryImpl();
         RuaRepository ruaRepository = new RuaRepositoryImpl();
-        this.grafoService = new GrafoBairroService(bairroRepository, ruaRepository);
+        this.grafoService = new GrafoCidadeService(bairroRepository, ruaRepository);
     }
 
     public static synchronized AppContext getInstance() {
@@ -29,7 +29,7 @@ public class AppContext {
         return usuarioService;
     }
 
-    public GrafoBairroService getGrafoService() {
+    public GrafoCidadeService getGrafoService() {
         return grafoService;
     }
 }

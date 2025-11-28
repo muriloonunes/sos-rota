@@ -5,6 +5,7 @@ import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -17,12 +18,12 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Translate;
 import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Bairro;
-import mhd.sosrota.model.GrafoBairro;
+import mhd.sosrota.model.GrafoCidade;
 import mhd.sosrota.model.Rua;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
-import mhd.sosrota.service.GrafoBairroService;
+import mhd.sosrota.service.GrafoCidadeService;
 import org.girod.javafx.svgimage.SVGImage;
 import org.girod.javafx.svgimage.SVGLoader;
 
@@ -46,8 +47,8 @@ public class DashboardController implements Navigable {
 
     private Navigator navigator;
 
-    private GrafoBairroService grafoService;
-    private GrafoBairro grafo;
+    private GrafoCidadeService grafoService;
+    private GrafoCidade grafo;
 
     private double mouseAnchorX;
     private double mouseAnchorY;
@@ -75,9 +76,9 @@ public class DashboardController implements Navigable {
         pi.setLayoutX(mapaPane.getWidth() / 2 - 25);
         pi.setLayoutY(mapaPane.getHeight() / 2 - 25);
 
-        Task<GrafoBairro> task = new Task<>() {
+        Task<GrafoCidade> task = new Task<>() {
             @Override
-            protected GrafoBairro call() {
+            protected GrafoCidade call() {
                 return grafoService.obterGrafo();
             }
 
@@ -133,6 +134,7 @@ public class DashboardController implements Navigable {
                     destino.getX() + offsetX,
                     destino.getY() + offsetY
             );
+            linha.setUserData(rua);
 
             mundoGroup.getChildren().add(linha);
         }
@@ -142,16 +144,19 @@ public class DashboardController implements Navigable {
             double finalY = b.getY() + offsetY;
 
             Circle circulo = new Circle(finalX, finalY, 15);
+            circulo.getStyleClass().add("bairro");
 
-            circulo.getStyleClass().add("bairro-circle");
+            if (b.temBase()) {
+                circulo.getStyleClass().add("bairro-base");
+            }
 
-//            if (b.temBase()) {
-//                circulo.getStyleClass().add("bairro-com-base");
-//            }
+            circulo.setUserData(b);
 
             Text texto = new Text(finalX + 17, finalY + 4, b.getNome());
 
             mundoGroup.getChildren().addAll(circulo, texto);
+
+            configurarHoverBairro(circulo, mundoGroup);
         }
         double zoom = 0.9;
         mundoGroup.setScaleX(zoom);
@@ -164,6 +169,51 @@ public class DashboardController implements Navigable {
         mapaPane.getChildren().add(mundoGroup);
         configurarNavegacao(mundoGroup);
         configurarRecorte();
+    }
+
+    private void configurarHoverBairro(Circle circulo, Group mundoGroup) {
+        circulo.setOnMouseEntered(_ -> {
+            Bairro b = (Bairro) circulo.getUserData();
+
+            mundoGroup.getChildren().forEach(node -> {
+                node.getStyleClass().add("escurecido");
+            });
+
+            circulo.getStyleClass().remove("escurecido");
+            circulo.getStyleClass().add("bairro-destacado");
+
+            for (Node n : mundoGroup.getChildren()) {
+                if (n instanceof Line line) {
+                    Rua rua = (Rua) line.getUserData();
+                    if (rua != null &&
+                            (rua.getOrigem().equals(b) || rua.getDestino().equals(b))) {
+
+                        line.getStyleClass().remove("escurecido");
+                        line.getStyleClass().add("rua-destacada");
+                    }
+                }
+            }
+
+            for (Node n : mundoGroup.getChildren()) {
+                if (n instanceof Text texto) {
+                    if (texto.getText().equals(b.getNome())) {
+                        texto.getStyleClass().remove("escurecido");
+                        texto.getStyleClass().add("bairro-label-destacado");
+                    }
+                }
+            }
+        });
+
+        circulo.setOnMouseExited(e -> {
+            mundoGroup.getChildren().forEach(node -> {
+                node.getStyleClass().removeAll(
+                        "escurecido",
+                        "bairro-destacado",
+                        "bairro-label-destacado",
+                        "rua-destacada"
+                );
+            });
+        });
     }
 
     private void configurarNavegacao(Group mundoGroup) {
@@ -181,8 +231,36 @@ public class DashboardController implements Navigable {
             double deltaX = event.getSceneX() - mouseAnchorX;
             double deltaY = event.getSceneY() - mouseAnchorY;
 
-            mundoGroup.setTranslateX(translateAnchorX + deltaX);
-            mundoGroup.setTranslateY(translateAnchorY + deltaY);
+            double novoX = translateAnchorX + deltaX;
+            double novoY = translateAnchorY + deltaY;
+
+            double scale = mundoGroup.getScaleX();
+            double graphWidth = mundoGroup.getBoundsInLocal().getWidth() * scale;
+            double graphHeight = mundoGroup.getBoundsInLocal().getHeight() * scale;
+
+            double viewWidth = mapaPane.getWidth();
+            double viewHeight = mapaPane.getHeight();
+            double margin = 300.0;
+            double minX = viewWidth - graphWidth - margin;
+            double maxX = margin;
+
+            double minY = viewHeight - graphHeight - margin;
+            double maxY = margin;
+
+            if (graphWidth < viewWidth) {
+                minX = 0;
+                maxX = viewWidth - graphWidth;
+            }
+            if (graphHeight < viewHeight) {
+                minY = 0;
+                maxY = viewHeight - graphHeight;
+            }
+
+            novoX = Math.max(minX, Math.min(novoX, maxX));
+            novoY = Math.max(minY, Math.min(novoY, maxY));
+
+            mundoGroup.setTranslateX(novoX);
+            mundoGroup.setTranslateY(novoY);
         });
 
 

@@ -2,11 +2,14 @@ package mhd.sosrota.model;
 
 import java.util.*;
 
-public class GrafoBairro {
+public class GrafoCidade {
     private List<Bairro> bairros;
     private List<Rua> ruas;
 
-    public GrafoBairro(List<Bairro> bairros, List<Rua> ruas) {
+    public GrafoCidade() {
+    }
+
+    public GrafoCidade(List<Bairro> bairros, List<Rua> ruas) {
         this.bairros = bairros;
         this.ruas = ruas;
     }
@@ -24,7 +27,7 @@ public class GrafoBairro {
         return vizinhos;
     }
 
-    public List<Bairro> menorCaminho(GrafoBairro grafo, Bairro origem, Bairro destino) {
+    public List<Bairro> menorCaminho(GrafoCidade grafo, Bairro origem, Bairro destino) {
         Map<Bairro, Double> dist = new HashMap<>();
         Map<Bairro, Bairro> anterior = new HashMap<>();
         Set<Bairro> visitados = new HashSet<>();
