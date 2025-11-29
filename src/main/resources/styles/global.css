@@ -327,6 +327,10 @@
 /*    -fx-table-cell-border-color: red;*/
 /*}*/
 
+.table-row-cell:selected {
+    -fx-background-color: #6ab8f6;
+}
+
 /*Cadastrar ocorrencia*/
 .observacao-textfield {
     -fx-background-color: -white;

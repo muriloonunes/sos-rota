@@ -86,4 +86,15 @@ public class Ambulancia {
     public void setBairroBase(Bairro bairroBase) {
         this.bairroBase = bairroBase;
     }
+
+    @Override
+    public String toString() {
+        return "Ambulancia{" +
+                "id=" + id +
+                ", placa='" + placa + '\'' +
+                ", tipoAmbulancia=" + tipoAmbulancia +
+                ", statusAmbulancia=" + statusAmbulancia +
+                ", bairroBase=" + bairroBase +
+                '}';
+    }
 }

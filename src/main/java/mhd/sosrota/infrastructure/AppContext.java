@@ -1,5 +1,6 @@
 package mhd.sosrota.infrastructure;
 
+import mhd.sosrota.presentation.model.AmbulanciaRow;
 import mhd.sosrota.repository.*;
 import mhd.sosrota.service.AmbulanciaService;
 import mhd.sosrota.service.GrafoCidadeService;
@@ -10,6 +11,8 @@ public class AppContext {
     private final UsuarioService usuarioService;
     private final GrafoCidadeService grafoService;
     private final AmbulanciaService ambulanciaService;
+
+    private AmbulanciaRow ambulanciaEmEdicao;
 
     private AppContext() {
         UsuarioRepository usuarioRepository = new UsuarioRepositoryImpl();
@@ -40,5 +43,13 @@ public class AppContext {
 
     public AmbulanciaService getAmbulanciaService() {
         return ambulanciaService;
+    }
+
+    public AmbulanciaRow getAmbulanciaEmEdicao() {
+        return ambulanciaEmEdicao;
+    }
+
+    public void setAmbulanciaEmEdicao(AmbulanciaRow ambulanciaEmEdicao) {
+        this.ambulanciaEmEdicao = ambulanciaEmEdicao;
     }
 }

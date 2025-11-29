@@ -32,7 +32,7 @@ public class AmbulanciaRow {
         a.setId(getId());
         a.setPlaca(getPlaca());
         a.setTipoAmbulancia(TipoAmbulancia.fromDescricao(getTipo()));
-        a.setStatusAmbulancia(StatusAmbulancia.fromDescricao(getTipo()));
+        a.setStatusAmbulancia(StatusAmbulancia.fromDescricao(getStatus()));
         a.setBairroBase(getBairroBase());
         return a;
     }

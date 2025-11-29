@@ -54,4 +54,10 @@ public class AmbulanciaService {
             throw e;
         }
     }
+
+    public boolean deletarAmbulancia(Ambulancia ambulancia) {
+        //TODO ver quais regras de negocio impedem uma ambulancia de ser deletada
+        System.out.println(ambulancia.toString());
+        return repo.deletarAmbulancia(ambulancia);
+    }
 }

@@ -5,21 +5,27 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
 import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Ambulancia;
 import mhd.sosrota.model.Bairro;
-import mhd.sosrota.model.enums.StatusAmbulancia;
-import mhd.sosrota.model.enums.TipoAmbulancia;
 import mhd.sosrota.model.exceptions.CadastroException;
+import mhd.sosrota.navigation.Navigable;
+import mhd.sosrota.navigation.Navigator;
+import mhd.sosrota.navigation.Screens;
+import mhd.sosrota.presentation.AmbulanciaSetup;
 import mhd.sosrota.presentation.model.AmbulanciaRow;
 import mhd.sosrota.service.AmbulanciaService;
 import mhd.sosrota.util.AlertUtil;
+import org.girod.javafx.svgimage.SVGImage;
+import org.girod.javafx.svgimage.SVGLoader;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -27,7 +33,7 @@ import java.util.List;
  * @date 17/11/2025
  * @brief Class CadastrarAmbulanciaController
  */
-public class AmbulanciaController {
+public class AmbulanciaController implements Navigable {
     @FXML
     private ComboBox<String> tipoComboBox, statusComboBox;
     @FXML
@@ -43,12 +49,15 @@ public class AmbulanciaController {
     @FXML
     private TableColumn<AmbulanciaRow, String> colunaPlaca, colunaTipo, colunaStatus, colunaBase;
     @FXML
+    private TableColumn<AmbulanciaRow, Void> colunaAcoes;
+    @FXML
     private Pagination paginacaoAmbulancias;
 
     private final AmbulanciaService service = AppContext.getInstance().getAmbulanciaService();
     private ObservableList<AmbulanciaRow> ambulancias = FXCollections.observableArrayList();
 
     private int itensPorPagina = 8;
+    private Navigator navigator;
 
     @FXML
     private void initialize() {
@@ -59,34 +68,43 @@ public class AmbulanciaController {
         colunaTipo.setCellValueFactory(new PropertyValueFactory<>("tipo"));
         colunaStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colunaBase.setCellValueFactory(new PropertyValueFactory<>("bairroBase"));
+        colunaAcoes.setCellFactory(c -> new TableCell<>() {
+            private final HBox acoesBox = new HBox(10);
+            final SVGImage editarImage = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/editar.svg"))).scaleTo(12);
+            final SVGImage deleteImage = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/deletar.svg"))).scaleTo(12);
+            private final Button editarButton = new Button();
+            private final Button deletarButton = new Button();
+
+            {
+                editarButton.setGraphic(editarImage);
+                deletarButton.setGraphic(deleteImage);
+
+                editarButton.getStyleClass().add("btn-primary");
+                deletarButton.getStyleClass().add("btn-ocorrencia");
+
+                editarButton.setOnAction(_ -> {
+                    AmbulanciaRow row = getTableView().getItems().get(getIndex());
+                    abrirEditarAmbulancias(row);
+                });
+
+                acoesBox.getChildren().addAll(editarButton, deletarButton);
+                acoesBox.setAlignment(Pos.CENTER);
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    setGraphic(acoesBox);
+                }
+            }
+        });
 
         carregarAmbulancias();
 
-        List<Bairro> bases = AppContext.getInstance().getGrafoService().obterBairros().stream().filter(
-                Bairro::temBase
-        ).toList();
-
-        tipoComboBox.getItems().addAll(
-                Arrays.stream(TipoAmbulancia.values())
-                        .map(TipoAmbulancia::getDescricao)
-                        .toList()
-        );
-
-        statusComboBox.getItems().addAll(
-                Arrays.stream(StatusAmbulancia.values())
-                        .map(StatusAmbulancia::getDescricao)
-                        .toList()
-        );
-
-        baseComboBox.getItems().addAll(
-                bases
-        );
-
-        placaTextField.textProperty().addListener((_, _, newValue) -> {
-            if (placaTextField.getText().length() > 7) {
-                placaTextField.setText(newValue.substring(0, 7));
-            }
-        });
+        AmbulanciaSetup.configurarCampos(placaTextField, tipoComboBox, statusComboBox, baseComboBox);
 
         cadastrarAmbulanciaButton.disableProperty().bind(
                 placaTextField.textProperty().isEmpty()
@@ -214,6 +232,11 @@ public class AmbulanciaController {
         erroLabel.setManaged(true);
     }
 
+    private void abrirEditarAmbulancias(AmbulanciaRow row) {
+        AppContext.getInstance().setAmbulanciaEmEdicao(row);
+        navigator.showModal(Screens.EDITAR_AMBULANCIA, "Editar Ambulância");
+    }
+
     private void recalcularItens(double alturaTabela) {
         if (alturaTabela <= 0) return;
         int novosItensPorPagina = (int) Math.floor((alturaTabela - 25) / 25);
@@ -254,5 +277,10 @@ public class AmbulanciaController {
 
         List<AmbulanciaRow> paginaAtual = ambulancias.subList(fromIndex, toIndex);
         tabelaAmbulancias.setItems(FXCollections.observableArrayList(paginaAtual));
+    }
+
+    @Override
+    public void setNavigator(Navigator navigator) {
+        this.navigator = navigator;
     }
 }
