@@ -55,9 +55,38 @@ public class AmbulanciaService {
         }
     }
 
-    public boolean deletarAmbulancia(Ambulancia ambulancia) {
+    public Ambulancia atualizarAmbulancia(String placa, String statusDesc, String tipoDesc, Bairro base, long id) {
+        if (!placa.matches("^[A-Z]{3}[0-9][A-Z][0-9]{2}$")) {
+            throw new CadastroException("A placa deve estar no formato ABC1D23.");
+        }
+        if (base == null) {
+            throw new CadastroException("Selecione uma base válida.");
+        }
+        try {
+            StatusAmbulancia status = StatusAmbulancia.fromDescricao(statusDesc);
+            TipoAmbulancia tipo = TipoAmbulancia.fromDescricao(tipoDesc);
+            Ambulancia ambulancia = new Ambulancia(status, tipo, placa, base);
+            ambulancia.setId(id);
+            return repo.atualizarAmbulancia(ambulancia);
+        } catch (Exception e) {
+            Throwable causaAtual = e;
+            while (causaAtual != null) {
+                if (causaAtual instanceof ConstraintViolationException) {
+                    throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
+                }
+                if (causaAtual instanceof SQLException) {
+                    if ("23505".equals(((SQLException) causaAtual).getSQLState())) {
+                        throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
+                    }
+                }
+                causaAtual = causaAtual.getCause();
+            }
+            throw e;
+        }
+    }
+
+    public boolean deletarAmbulancia(long id) {
         //TODO ver quais regras de negocio impedem uma ambulancia de ser deletada
-        System.out.println(ambulancia.toString());
-        return repo.deletarAmbulancia(ambulancia);
+        return repo.deletarAmbulancia(id);
     }
 }

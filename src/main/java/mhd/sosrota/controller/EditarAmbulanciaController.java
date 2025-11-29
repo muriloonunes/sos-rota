@@ -1,20 +1,18 @@
 package mhd.sosrota.controller;
 
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Bairro;
-import mhd.sosrota.navigation.Navigable;
-import mhd.sosrota.navigation.Navigator;
-import mhd.sosrota.presentation.AmbulanciaSetup;
+import mhd.sosrota.model.exceptions.CadastroException;
+import mhd.sosrota.presentation.UiUtils;
 import mhd.sosrota.presentation.model.AmbulanciaRow;
 import mhd.sosrota.service.AmbulanciaService;
+import mhd.sosrota.util.AlertUtil;
 
-import static java.lang.IO.println;
+import java.sql.SQLException;
 
 /**
  *
@@ -22,7 +20,7 @@ import static java.lang.IO.println;
  * @date 29/11/2025
  * @brief Class EditarAmbulanciaController
  */
-public class EditarAmbulanciaController implements Navigable {
+public class EditarAmbulanciaController {
     @FXML
     private TextField placaField;
     @FXML
@@ -36,14 +34,13 @@ public class EditarAmbulanciaController implements Navigable {
 
     private final AmbulanciaService service = AppContext.getInstance().getAmbulanciaService();
     private AmbulanciaRow ambulancia;
-    private Navigator navigator;
 
     @FXML
     private void initialize() {
         erroLabel.setManaged(false);
         erroLabel.setVisible(false);
 
-        AmbulanciaSetup.configurarCampos(placaField, tipoComboBox, statusComboBox, baseComboBox);
+        UiUtils.configurarCamposAmbulancia(placaField, tipoComboBox, statusComboBox, baseComboBox);
         preencherCampos();
     }
 
@@ -65,23 +62,69 @@ public class EditarAmbulanciaController implements Navigable {
 
     @FXML
     private void handleSalvar() {
-        //TODO salvar as alteracoes e atualizar a lista na outra tela
+        erroLabel.setVisible(false);
+        erroLabel.setManaged(false);
+        String placa = placaField.getText().toUpperCase();
+        String tipo = tipoComboBox.getValue();
+        String status = statusComboBox.getValue();
+        Bairro base = baseComboBox.getValue();
+
+        UiUtils.setButtonLoading(salvarModalButton, true, "Salvar alterações");
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                service.atualizarAmbulancia(placa, status, tipo, base, ambulancia.getId());
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                UiUtils.setButtonLoading(salvarModalButton, false, "Salvar alterações");
+                AlertUtil.showInfo("Sucesso", "Dados editados com sucesso!");
+                AppContext.getInstance().setAmbulanciaEmEdicao(null);
+                handleCancelar();
+            }
+
+            @Override
+            protected void failed() {
+                UiUtils.setButtonLoading(salvarModalButton, false, "Salvar alterações");
+                Throwable e = getException();
+
+                if (e instanceof CadastroException) {
+                    mostrarErro(e.getMessage());
+                } else if (e instanceof SQLException) {
+                    e.printStackTrace();
+                    mostrarErro("Erro no sistema.");
+                } else {
+                    e.printStackTrace();
+                    mostrarErro("Algo deu errado.");
+                }
+            }
+        };
+
+        new Thread(task).start();
     }
 
     @FXML
     private void handleDeletar() {
-        println(service.deletarAmbulancia(ambulancia.toEntity()));
-        //TODO checar pq nao deleta (retorna false)
+        var result = AlertUtil.showConfirmation("Deletar ambulância", "Tem certeza que deseja deletar a ambulância?");
+        if (result.get() == ButtonType.OK) {
+            service.deletarAmbulancia(ambulancia.getId());
+            handleCancelar(); //pra fechar o modal de edição
+        }
     }
 
     @FXML
     private void handleCancelar() {
+        AppContext.getInstance().setAmbulanciaEmEdicao(null);
         Stage stage = (Stage) cancelarButton.getScene().getWindow();
         stage.close();
     }
 
-    @Override
-    public void setNavigator(Navigator navigator) {
-        this.navigator = navigator;
+    private void mostrarErro(String mensagem) {
+        erroLabel.setText(mensagem);
+        erroLabel.setVisible(true);
+        erroLabel.setManaged(true);
     }
 }

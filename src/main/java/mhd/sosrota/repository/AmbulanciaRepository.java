@@ -19,5 +19,5 @@ public interface AmbulanciaRepository {
 
     Ambulancia atualizarAmbulancia(Ambulancia ambulancia);
 
-    boolean deletarAmbulancia(Ambulancia ambulancia);
+    boolean deletarAmbulancia(long id);
 }

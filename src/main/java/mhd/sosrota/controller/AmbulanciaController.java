@@ -16,7 +16,7 @@ import mhd.sosrota.model.exceptions.CadastroException;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
-import mhd.sosrota.presentation.AmbulanciaSetup;
+import mhd.sosrota.presentation.UiUtils;
 import mhd.sosrota.presentation.model.AmbulanciaRow;
 import mhd.sosrota.service.AmbulanciaService;
 import mhd.sosrota.util.AlertUtil;
@@ -54,7 +54,7 @@ public class AmbulanciaController implements Navigable {
     private Pagination paginacaoAmbulancias;
 
     private final AmbulanciaService service = AppContext.getInstance().getAmbulanciaService();
-    private ObservableList<AmbulanciaRow> ambulancias = FXCollections.observableArrayList();
+    private final ObservableList<AmbulanciaRow> ambulancias = FXCollections.observableArrayList();
 
     private int itensPorPagina = 8;
     private Navigator navigator;
@@ -68,7 +68,7 @@ public class AmbulanciaController implements Navigable {
         colunaTipo.setCellValueFactory(new PropertyValueFactory<>("tipo"));
         colunaStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
         colunaBase.setCellValueFactory(new PropertyValueFactory<>("bairroBase"));
-        colunaAcoes.setCellFactory(c -> new TableCell<>() {
+        colunaAcoes.setCellFactory(_ -> new TableCell<>() {
             private final HBox acoesBox = new HBox(10);
             final SVGImage editarImage = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/editar.svg"))).scaleTo(12);
             final SVGImage deleteImage = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/deletar.svg"))).scaleTo(12);
@@ -85,6 +85,16 @@ public class AmbulanciaController implements Navigable {
                 editarButton.setOnAction(_ -> {
                     AmbulanciaRow row = getTableView().getItems().get(getIndex());
                     abrirEditarAmbulancias(row);
+                    carregarAmbulancias();
+                });
+
+                deletarButton.setOnAction(_ -> {
+                    var result = AlertUtil.showConfirmation("Deletar ambulância", "Tem certeza que deseja deletar a ambulância?");
+                    if (result.get() == ButtonType.OK) {
+                        AmbulanciaRow row = getTableView().getItems().get(getIndex());
+                        service.deletarAmbulancia(row.toEntity().getId());
+                    }
+                    carregarAmbulancias();
                 });
 
                 acoesBox.getChildren().addAll(editarButton, deletarButton);
@@ -104,13 +114,14 @@ public class AmbulanciaController implements Navigable {
 
         carregarAmbulancias();
 
-        AmbulanciaSetup.configurarCampos(placaTextField, tipoComboBox, statusComboBox, baseComboBox);
+        UiUtils.configurarCamposAmbulancia(placaTextField, tipoComboBox, statusComboBox, baseComboBox);
 
         cadastrarAmbulanciaButton.disableProperty().bind(
-                placaTextField.textProperty().isEmpty()
+                (placaTextField.textProperty().isEmpty()
                         .or(tipoComboBox.valueProperty().isNull())
                         .or(statusComboBox.valueProperty().isNull())
-                        .or(baseComboBox.valueProperty().isNull())
+                        .or(baseComboBox.valueProperty().isNull()))
+                        .or(placaTextField.textProperty().length().lessThan(7))
         );
 
         paginacaoAmbulancias.currentPageIndexProperty().addListener(
@@ -118,8 +129,6 @@ public class AmbulanciaController implements Navigable {
 
         tabelaAmbulancias.heightProperty().addListener(
                 (_, _, newHeight) -> recalcularItens(newHeight.doubleValue()));
-
-        //TODO terminar a coluna de ações pra completar o CRUD de ambulancias
     }
 
     @FXML
@@ -130,6 +139,9 @@ public class AmbulanciaController implements Navigable {
                 List<Ambulancia> ambulancias = service.listarTodasAmbulancias();
                 if (ambulancias == null) {
                     throw new IllegalStateException("Erro ao carregar");
+                }
+                if (ambulancias.isEmpty()) {
+                    tabelaAmbulancias.setPlaceholder(new Label("Não há conteúdo na tabela"));
                 }
                 return FXCollections.observableArrayList(
                         ambulancias.stream().map(AmbulanciaRow::new).toList()
@@ -166,12 +178,12 @@ public class AmbulanciaController implements Navigable {
         erroLabel.setVisible(false);
         erroLabel.setManaged(false);
 
-        String placa = placaTextField.getText();
+        String placa = placaTextField.getText().toUpperCase();
         String tipoDesc = tipoComboBox.getValue();
         String statusDesc = statusComboBox.getValue();
         Bairro base = baseComboBox.getValue();
 
-        setLoading(true);
+        UiUtils.setButtonLoading(cadastrarAmbulanciaButton, true, "Registrar Ambulância");
 
         Task<Void> task = new Task<>() {
             @Override
@@ -182,7 +194,7 @@ public class AmbulanciaController implements Navigable {
 
             @Override
             protected void succeeded() {
-                setLoading(false);
+                UiUtils.setButtonLoading(cadastrarAmbulanciaButton, true, "Registrar Ambulância");
                 AlertUtil.showInfo("Sucesso", "Ambulância registrada com sucesso!");
                 handleClearFields();
 
@@ -191,7 +203,7 @@ public class AmbulanciaController implements Navigable {
 
             @Override
             protected void failed() {
-                setLoading(false);
+                UiUtils.setButtonLoading(cadastrarAmbulanciaButton, true, "Registrar Ambulância");
                 Throwable e = getException();
 
                 if (e instanceof CadastroException) {
@@ -207,23 +219,6 @@ public class AmbulanciaController implements Navigable {
         };
 
         new Thread(task).start();
-    }
-
-    private void setLoading(boolean loading) {
-        if (loading) {
-            ProgressIndicator pi = new ProgressIndicator();
-            pi.setPrefSize(16, 16);
-
-            cadastrarAmbulanciaButton.setGraphic(pi);
-            cadastrarAmbulanciaButton.setText(null);
-            cadastrarAmbulanciaButton.setMouseTransparent(true);
-            cadastrarAmbulanciaButton.setFocusTraversable(true);
-        } else {
-            cadastrarAmbulanciaButton.setGraphic(null);
-            cadastrarAmbulanciaButton.setText("Registrar Ambulância");
-            cadastrarAmbulanciaButton.setMouseTransparent(false);
-            cadastrarAmbulanciaButton.setFocusTraversable(false);
-        }
     }
 
     private void mostrarErro(String mensagem) {

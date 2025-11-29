@@ -2,6 +2,9 @@ package mhd.sosrota.util;
 
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+
+import java.util.Optional;
 
 public class AlertUtil {
     public static void showInfo(String title, String message) {
@@ -24,6 +27,17 @@ public class AlertUtil {
         styleAlert(alert);
 
         alert.showAndWait();
+    }
+
+    public static Optional<ButtonType> showConfirmation(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        styleAlert(alert);
+
+        return alert.showAndWait();
     }
 
     private static void styleAlert(Alert alert) {

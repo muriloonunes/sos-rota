@@ -29,7 +29,7 @@ public class AmbulanciaRepositoryImpl implements AmbulanciaRepository {
     @Override
     public List<Ambulancia> listarTodasAmbulancias() {
         try (EntityManager em = JpaManager.getEntityManager()) {
-            return em.createQuery("SELECT a FROM Ambulancia a JOIN FETCH a.bairroBase", Ambulancia.class)
+            return em.createQuery("SELECT a FROM Ambulancia a JOIN FETCH a.bairroBase ORDER BY a.id", Ambulancia.class)
                     .getResultList();
         } catch (NoResultException e) {
             return null;
@@ -46,22 +46,28 @@ public class AmbulanciaRepositoryImpl implements AmbulanciaRepository {
     }
 
     @Override
-    public Ambulancia atualizarAmbulancia(Ambulancia ambulancia) {
+    public Ambulancia atualizarAmbulancia(Ambulancia dados) {
         try (EntityManager em = JpaManager.getEntityManager()) {
             em.getTransaction().begin();
-            Ambulancia atualizado = em.merge(ambulancia);
+
+            Ambulancia original = em.find(Ambulancia.class, dados.getId());
+            if (original == null) throw new IllegalArgumentException("Houve um erro ao editar a ambulância");
+
+            original.setPlaca(dados.getPlaca());
+            original.setTipoAmbulancia(dados.getTipoAmbulancia());
+            original.setStatusAmbulancia(dados.getStatusAmbulancia());
+            original.setBairroBase(dados.getBairroBase());
             em.getTransaction().commit();
-            return atualizado;
-        } catch (Exception e) {
-            return null;
+
+            return original;
         }
     }
 
     @Override
-    public boolean deletarAmbulancia(Ambulancia ambulancia) {
+    public boolean deletarAmbulancia(long id) {
         try (EntityManager em = JpaManager.getEntityManager()) {
             em.getTransaction().begin();
-            Ambulancia ambulanciaDeletar = em.find(Ambulancia.class, ambulancia.getPlaca());
+            Ambulancia ambulanciaDeletar = em.find(Ambulancia.class, id);
             if (ambulanciaDeletar == null) {
                 return false;
             }
@@ -69,6 +75,7 @@ public class AmbulanciaRepositoryImpl implements AmbulanciaRepository {
             em.getTransaction().commit();
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

@@ -1,6 +1,8 @@
 package mhd.sosrota.presentation;
 
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
 import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Bairro;
@@ -16,8 +18,8 @@ import java.util.List;
  * @date 29/11/2025
  * @brief Class AmbulanciaSetup
  */
-public class AmbulanciaSetup {
-    public static void configurarCampos(TextField placaField, ComboBox<String> tipoComboBox, ComboBox<String> statusComboBox, ComboBox<Bairro> baseComboBox) {
+public class UiUtils {
+    public static void configurarCamposAmbulancia(TextField placaField, ComboBox<String> tipoComboBox, ComboBox<String> statusComboBox, ComboBox<Bairro> baseComboBox) {
         List<Bairro> bases = AppContext.getInstance().getGrafoService().obterBairros().stream().filter(
                 Bairro::temBase
         ).toList();
@@ -43,5 +45,22 @@ public class AmbulanciaSetup {
                 placaField.setText(newValue.substring(0, 7));
             }
         });
+    }
+    
+    public static void setButtonLoading(Button button, boolean isLoading, String originalText) {
+        if (isLoading) {
+            ProgressIndicator pi = new ProgressIndicator();
+            pi.setPrefSize(16, 16);
+
+            button.setGraphic(pi);
+            button.setText(null);
+            button.setMouseTransparent(true);
+            button.setFocusTraversable(true);
+        } else {
+            button.setGraphic(null);
+            button.setText(originalText);
+            button.setMouseTransparent(false);
+            button.setFocusTraversable(false);
+        }
     }
 }
