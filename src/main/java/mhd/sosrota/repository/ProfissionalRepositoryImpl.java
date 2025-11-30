@@ -34,7 +34,7 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
 
     @Override
     public Profissional buscarPorNome(String nome) {
-        try(EntityManager em = JpaManager.getEntityManager()) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
             TypedQuery<Profissional> q = em.createQuery(
                     "SELECT p FROM Profissional p WHERE p.nome = :nome", Profissional.class);
             q.setParameter("nome", nome);
@@ -46,11 +46,11 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
 
     @Override
     public List<Profissional> listarTodos() {
-        try(EntityManager em = JpaManager.getEntityManager()) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
             TypedQuery<Profissional> q = em.createQuery(
                     "SELECT p FROM Profissional p ORDER BY p.nome", Profissional.class);
             return q.getResultList();
-        }catch (NoResultException e) {
+        } catch (NoResultException e) {
             return Collections.emptyList();
         }
     }
@@ -58,20 +58,20 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
     @Override
     public List<Profissional> listarPorFuncao(FuncaoProfissional funcao) {
         if (funcao == null) return Collections.emptyList();
-        try (EntityManager em = JpaManager.getEntityManager()){
+        try (EntityManager em = JpaManager.getEntityManager()) {
             TypedQuery<Profissional> q = em.createQuery(
                     "SELECT p FROM Profissional p WHERE p.funcaoProfissional = :funcao ORDER BY p.nome",
                     Profissional.class);
             q.setParameter("funcao", funcao);
             return q.getResultList();
-        }catch (NoResultException e) {
+        } catch (NoResultException e) {
             return Collections.emptyList();
         }
     }
 
     @Override
     public List<Profissional> listarAtivos() {
-        try(EntityManager em = JpaManager.getEntityManager()) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
             TypedQuery<Profissional> q = em.createQuery(
                     "SELECT p FROM Profissional p WHERE p.ativo = true ORDER BY p.nome",
                     Profissional.class);
@@ -83,7 +83,7 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
 
     @Override
     public Profissional atualizar(Profissional profissional) {
-        try(EntityManager em = JpaManager.getEntityManager()) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
             em.getTransaction().begin();
             Profissional atualizado = em.merge(profissional);
             em.getTransaction().commit();
@@ -95,9 +95,9 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
 
     @Override
     public boolean deletar(Profissional profissional) {
-        try(EntityManager em = JpaManager.getEntityManager()) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
             em.getTransaction().begin();
-            Profissional profissionalDeletar = em.find(Profissional.class, profissional.getNome());
+            Profissional profissionalDeletar = em.find(Profissional.class, profissional.getId());
             if (profissionalDeletar == null) {
                 return false;
             }
