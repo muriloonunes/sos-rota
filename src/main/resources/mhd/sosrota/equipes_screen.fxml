@@ -65,10 +65,15 @@
                         </VBox>
                      </children>
                   </GridPane>
+                  <HBox alignment="CENTER_RIGHT">
+                     <children>
+                        <Label fx:id="erroLabelProfissionais" styleClass="error-label" text="Erro!" />
+                     </children>
+                  </HBox>
 
                         <HBox alignment="CENTER_RIGHT" spacing="15">
                             <Button onAction="#handleClearFields" styleClass="btn-secondary" text="Limpar" />
-                            <Button fx:id="cadastrarButton" onAction="#handleRegisterProfessional" styleClass="btn-primary" text="Cadastrar profissional" />
+                            <Button fx:id="cadastrarProfissonalButton" onAction="#handleRegisterProfessional" styleClass="btn-primary" text="Cadastrar profissional" />
                         </HBox>
                     </VBox>
 
@@ -105,7 +110,7 @@
                 </VBox>
             </Tab>
 
-            <Tab text="Equipes">
+            <Tab fx:id="equipesTab" text="Equipes">
                 <VBox alignment="TOP_CENTER" spacing="20" VBox.vgrow="ALWAYS">
                     <VBox spacing="10.0" styleClass="vbox-container">
                         <padding>
@@ -128,12 +133,12 @@
                             <VBox spacing="5.0">
                                 <VBox spacing="4">
                                     <Label styleClass="title-label" text="Ambulância" />
-                                    <ComboBox fx:id="ambulanceComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione a ambulância" styleClass="info-selectors" />
+                                    <ComboBox fx:id="ambulanciaComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione a ambulância" styleClass="info-selectors" />
                                 </VBox>
 
                                 <VBox spacing="4">
                                     <Label styleClass="title-label" text="Médico" />
-                                    <ComboBox fx:id="doctorComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o médico" styleClass="info-selectors" />
+                                    <ComboBox fx:id="medicoComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o médico" styleClass="info-selectors" />
                                 </VBox>
                             </VBox>
 
@@ -141,12 +146,12 @@
 
                                 <VBox spacing="4">
                                     <Label styleClass="title-label" text="Enfermeiro(a)" />
-                                    <ComboBox fx:id="nurseComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o enfermeiro(a)" styleClass="info-selectors" />
+                                    <ComboBox fx:id="enfermeiroComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o enfermeiro(a)" styleClass="info-selectors" />
                                 </VBox>
 
                                 <VBox spacing="4">
                                     <Label styleClass="title-label" text="Condutor(a)" />
-                                    <ComboBox fx:id="driverComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o condutor(a)" styleClass="info-selectors" />
+                                    <ComboBox fx:id="condutorComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o condutor(a)" styleClass="info-selectors" />
                                 </VBox>
                             </VBox>
                         </GridPane>

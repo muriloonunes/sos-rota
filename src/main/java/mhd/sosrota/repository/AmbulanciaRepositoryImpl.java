@@ -38,6 +38,21 @@ public class AmbulanciaRepositoryImpl implements AmbulanciaRepository {
     }
 
     @Override
+    public List<Ambulancia> listarDisponiveis() {
+        try (EntityManager em = JpaManager.getEntityManager()) {
+            return em.createQuery(
+                    "SELECT a FROM Ambulancia a JOIN FETCH a.bairroBase " +
+                            "WHERE a.id NOT IN (" +
+                            "   SELECT e.ambulancia.id FROM Equipe e WHERE e.ativo = true" +
+                            ")",
+                    Ambulancia.class
+            ).getResultList();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    @Override
     public void salvar(Ambulancia ambulancia) {
         try (EntityManager em = JpaManager.getEntityManager()) {
             em.getTransaction().begin();

@@ -15,7 +15,8 @@ public enum Screens {
     DASHBOARD_AMBULANCIAS("/mhd/sosrota/ambulancias_screen.fxml"),
     DASHBOARD_EQUIPES("/mhd/sosrota/equipes_screen.fxml"),
     DASHBOARD_RELATORIOS("/mhd/sosrota/relatorios_screen.fxml"),
-    EDITAR_AMBULANCIA("/mhd/sosrota/editar_ambulancia_screen.fxml");
+    EDITAR_AMBULANCIA("/mhd/sosrota/editar_ambulancia_screen.fxml"),
+    EDITAR_PROFISSIONAL("/mhd/sosrota/editar_profissional_screen.fxml"),;
     private final String fxmlPath;
 
     Screens(String fxmlPath) {

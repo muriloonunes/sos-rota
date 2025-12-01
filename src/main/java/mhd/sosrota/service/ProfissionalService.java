@@ -29,7 +29,7 @@ public record ProfissionalService(ProfissionalRepository repo) {
             throw new CadastroException("O email não pode ter mais de 50 caracteres.");
         }
         if (!email.contains("@") && !email.trim().isEmpty()) {
-            throw new CadastroException("O email informado é inválido.");
+            throw new CadastroException("Digite um email válido.");
         }
 
         try {
@@ -68,7 +68,11 @@ public record ProfissionalService(ProfissionalRepository repo) {
         return repo.listarPorFuncao(funcao);
     }
 
-    public Profissional atualizarProfissional(Long id, String nome, String funcaoDesc, String email) {
+    public List<Profissional> listarProfissionaisDisponiveis() {
+        return repo.listarDisponiveis();
+    }
+
+    public void atualizarProfissional(Long id, String nome, String funcaoDesc, String email) {
         if (nome == null || nome.trim().isEmpty()) {
             throw new CadastroException("O nome do profissional é obrigatório.");
         }
@@ -88,7 +92,7 @@ public record ProfissionalService(ProfissionalRepository repo) {
             profissional.setFuncaoProfissional(funcao);
             profissional.setContato(email);
 
-            return repo.atualizar(profissional);
+            repo.atualizar(profissional);
         } catch (Exception e) {
             e.printStackTrace();
             throw new CadastroException("Erro ao atualizar profissional.");
@@ -96,6 +100,7 @@ public record ProfissionalService(ProfissionalRepository repo) {
     }
 
     public boolean deletarProfissional(Long id) {
+        //TODO ver quais regras de negócio impedem um profissional de ser deletado
         Profissional profissional = new Profissional();
         profissional.setId(id);
         return repo.deletar(profissional);

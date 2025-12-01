@@ -16,6 +16,8 @@ public interface AmbulanciaRepository {
 
     List<Ambulancia> listarTodasAmbulancias();
 
+    List<Ambulancia> listarDisponiveis();
+
     void salvar(Ambulancia ambulancia);
 
     Ambulancia atualizarAmbulancia(Ambulancia ambulancia);

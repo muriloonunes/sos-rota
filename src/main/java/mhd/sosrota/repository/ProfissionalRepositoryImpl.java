@@ -70,10 +70,10 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
     }
 
     @Override
-    public List<Profissional> listarAtivos() {
+    public List<Profissional> listarDisponiveis() {
         try (EntityManager em = JpaManager.getEntityManager()) {
             TypedQuery<Profissional> q = em.createQuery(
-                    "SELECT p FROM Profissional p WHERE p.ativo = true ORDER BY p.nome",
+                    "SELECT p FROM Profissional p WHERE p.ativo = true AND p.equipe IS NULL",
                     Profissional.class);
             return q.getResultList();
         } catch (NoResultException e) {

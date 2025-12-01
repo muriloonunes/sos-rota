@@ -3,12 +3,13 @@ package mhd.sosrota.controller;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
 import mhd.sosrota.infrastructure.AppContext;
+import mhd.sosrota.model.Ambulancia;
 import mhd.sosrota.model.Bairro;
 import mhd.sosrota.model.exceptions.CadastroException;
+import mhd.sosrota.navigation.Navigable;
+import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.presentation.UiUtils;
-import mhd.sosrota.presentation.model.AmbulanciaRow;
 import mhd.sosrota.service.AmbulanciaService;
 import mhd.sosrota.util.AlertUtil;
 
@@ -20,7 +21,7 @@ import java.sql.SQLException;
  * @date 29/11/2025
  * @brief Class EditarAmbulanciaController
  */
-public class EditarAmbulanciaController {
+public class EditarAmbulanciaController implements Navigable {
     @FXML
     private TextField placaField;
     @FXML
@@ -33,7 +34,8 @@ public class EditarAmbulanciaController {
     private Button salvarModalButton, cancelarButton;
 
     private final AmbulanciaService service = AppContext.getInstance().getAmbulanciaService();
-    private AmbulanciaRow ambulancia;
+    private Ambulancia ambulancia;
+    private Navigator navigator;
 
     @FXML
     private void initialize() {
@@ -47,14 +49,14 @@ public class EditarAmbulanciaController {
     private void preencherCampos() {
         this.ambulancia = AppContext.getInstance().getAmbulanciaEmEdicao();
         placaField.setText(ambulancia.getPlaca());
-        tipoComboBox.setValue(ambulancia.getTipo());
-        statusComboBox.setValue(ambulancia.getStatus());
+        tipoComboBox.setValue(ambulancia.getTipoAmbulancia().getDescricao());
+        statusComboBox.setValue(ambulancia.getStatusAmbulancia().getDescricao());
         baseComboBox.setValue(ambulancia.getBairroBase());
 
         salvarModalButton.disableProperty().bind(
                 (placaField.textProperty().isEqualTo(ambulancia.getPlaca())
-                        .and(tipoComboBox.valueProperty().isEqualTo(ambulancia.getTipo()))
-                        .and(statusComboBox.valueProperty().isEqualTo(ambulancia.getStatus()))
+                        .and(tipoComboBox.valueProperty().isEqualTo(ambulancia.getTipoAmbulancia().getDescricao()))
+                        .and(statusComboBox.valueProperty().isEqualTo(ambulancia.getStatusAmbulancia().getDescricao()))
                         .and(baseComboBox.valueProperty().isEqualTo(ambulancia.getBairroBase())))
                         .or(placaField.textProperty().length().lessThan(7))
         );
@@ -82,7 +84,6 @@ public class EditarAmbulanciaController {
             protected void succeeded() {
                 UiUtils.setButtonLoading(salvarModalButton, false, "Salvar alterações");
                 AlertUtil.showInfo("Sucesso", "Dados editados com sucesso!");
-                AppContext.getInstance().setAmbulanciaEmEdicao(null);
                 handleCancelar();
             }
 
@@ -118,13 +119,17 @@ public class EditarAmbulanciaController {
     @FXML
     private void handleCancelar() {
         AppContext.getInstance().setAmbulanciaEmEdicao(null);
-        Stage stage = (Stage) cancelarButton.getScene().getWindow();
-        stage.close();
+        navigator.closeStage(cancelarButton);
     }
 
     private void mostrarErro(String mensagem) {
         erroLabel.setText(mensagem);
         erroLabel.setVisible(true);
         erroLabel.setManaged(true);
+    }
+
+    @Override
+    public void setNavigator(Navigator navigator) {
+        this.navigator = navigator;
     }
 }

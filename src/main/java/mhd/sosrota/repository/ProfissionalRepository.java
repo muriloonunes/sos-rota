@@ -20,7 +20,7 @@ public interface ProfissionalRepository {
 
     List<Profissional> listarPorFuncao(FuncaoProfissional funcao);
 
-    List<Profissional> listarAtivos();
+    List<Profissional> listarDisponiveis();
 
     Profissional atualizar(Profissional profissional);
 

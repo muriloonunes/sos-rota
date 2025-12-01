@@ -28,6 +28,10 @@ public class AmbulanciaService {
         return repo.listarTodasAmbulancias();
     }
 
+    public List<Ambulancia> listarDisponiveis() {
+        return repo.listarDisponiveis();
+    }
+
     public void cadastrarAmbulancia(String placa, String statusDesc, String tipoDesc, Bairro base) {
         if (!placa.matches("^[A-Z]{3}[0-9][A-Z][0-9]{2}$")) {
             throw new CadastroException("A placa deve estar no formato ABC1D23.");

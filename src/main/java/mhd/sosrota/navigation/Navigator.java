@@ -1,6 +1,7 @@
 package mhd.sosrota.navigation;
 
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -95,5 +96,10 @@ public class Navigator {
             e.printStackTrace();
             System.err.println("Erro ao abrir modal: " + screen);
         }
+    }
+
+    public void closeStage(Node node) {
+        Stage stage = (Stage) node.getScene().getWindow();
+        stage.close();
     }
 }
