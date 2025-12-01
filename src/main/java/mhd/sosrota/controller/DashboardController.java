@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -20,9 +21,11 @@ import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Bairro;
 import mhd.sosrota.model.GrafoCidade;
 import mhd.sosrota.model.Rua;
+import mhd.sosrota.model.enums.StatusAmbulancia;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
+import mhd.sosrota.service.AmbulanciaService;
 import mhd.sosrota.service.GrafoCidadeService;
 import org.girod.javafx.svgimage.SVGImage;
 import org.girod.javafx.svgimage.SVGLoader;
@@ -39,6 +42,8 @@ public class DashboardController implements Navigable {
     @FXML
     private HBox ocorrenciasAbertasHbox, ambulanciasDisponiveisHbox, ambulanciasAtendimentoHbox;
     @FXML
+    private Label ambulanciasDisponiveisQtd, ambulanciasAtendimentoQtd;
+    @FXML
     private TableView<String> ocorrenciasTableView;
     @FXML
     private TableColumn<String, String> idColumn, localColumn, gravidadeColumn, tipoColumn, statusColumn, aberturaColumn, acoesColumn;
@@ -47,6 +52,7 @@ public class DashboardController implements Navigable {
 
     private Navigator navigator;
 
+    private AmbulanciaService ambulanciaService;
     private GrafoCidadeService grafoService;
     private GrafoCidade grafo;
 
@@ -57,8 +63,12 @@ public class DashboardController implements Navigable {
 
     @FXML
     public void initialize() {
+        ambulanciasDisponiveisQtd.setText("0");
+        ambulanciasAtendimentoQtd.setText("0");
+
         this.grafoService = AppContext.getInstance().getGrafoService();
-        Platform.runLater(this::carregarGrafo);
+        this.ambulanciaService = AppContext.getInstance().getAmbulanciaService();
+        Platform.runLater(this::carregarDados);
 
         SVGImage exclamationIcon = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/exclamacao.svg"))).scaleTo(48);
         SVGImage ambulanciasIcon = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/ambulancias.svg"))).scaleTo(48);
@@ -66,6 +76,12 @@ public class DashboardController implements Navigable {
         ocorrenciasAbertasHbox.getChildren().add(exclamationIcon);
         ambulanciasDisponiveisHbox.getChildren().add(ambulanciasIcon);
         ambulanciasAtendimentoHbox.getChildren().add(pulsoIcon);
+    }
+
+    private void carregarDados() {
+        carregarGrafo();
+        carregarAmbulanciasDisponiveis();
+        carregarAmbulanciasAtendimento();
     }
 
     private void carregarGrafo() {
@@ -95,6 +111,49 @@ public class DashboardController implements Navigable {
                 getException().printStackTrace();
             }
         };
+        new Thread(task).start();
+    }
+
+    private void carregarAmbulanciasDisponiveis() {
+        Task<Long> task = new Task<>() {
+            @Override
+            protected Long call() {
+                return ambulanciaService.obterAmbulanciaStatus(StatusAmbulancia.DISPONIVEL);
+            }
+
+            @Override
+            protected void succeeded() {
+                long resultado = getValue();
+                ambulanciasDisponiveisQtd.setText(String.valueOf(resultado));
+            }
+
+            @Override
+            protected void failed() {
+                ambulanciasDisponiveisQtd.setText("0");
+            }
+        };
+
+        new Thread(task).start();
+    }
+    private void carregarAmbulanciasAtendimento() {
+        Task<Long> task = new Task<>() {
+            @Override
+            protected Long call() {
+                return ambulanciaService.obterAmbulanciaStatus(StatusAmbulancia.EM_ATENDIMENTO);
+            }
+
+            @Override
+            protected void succeeded() {
+                long resultado = getValue();
+                ambulanciasAtendimentoQtd.setText(String.valueOf(resultado));
+            }
+
+            @Override
+            protected void failed() {
+                ambulanciasAtendimentoQtd.setText("0");
+            }
+        };
+
         new Thread(task).start();
     }
 

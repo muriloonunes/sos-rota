@@ -89,4 +89,8 @@ public class AmbulanciaService {
         //TODO ver quais regras de negocio impedem uma ambulancia de ser deletada
         return repo.deletarAmbulancia(id);
     }
+
+    public long obterAmbulanciaStatus(StatusAmbulancia status) {
+        return repo.obterAmbulanciaStatus(status);
+    }
 }

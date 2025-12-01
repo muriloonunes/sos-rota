@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import mhd.sosrota.infrastructure.database.JpaManager;
 import mhd.sosrota.model.Ambulancia;
+import mhd.sosrota.model.enums.StatusAmbulancia;
 
 import java.util.List;
 
@@ -77,6 +78,18 @@ public class AmbulanciaRepositoryImpl implements AmbulanciaRepository {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    @Override
+    public long obterAmbulanciaStatus(StatusAmbulancia status) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
+            return em.createQuery("SELECT COUNT(a) FROM Ambulancia a WHERE a.statusAmbulancia = :status", Long.class)
+                    .setParameter("status", status)
+                    .getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0;
         }
     }
 }

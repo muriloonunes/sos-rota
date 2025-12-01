@@ -1,6 +1,7 @@
 package mhd.sosrota.repository;
 
 import mhd.sosrota.model.Ambulancia;
+import mhd.sosrota.model.enums.StatusAmbulancia;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface AmbulanciaRepository {
     Ambulancia atualizarAmbulancia(Ambulancia ambulancia);
 
     boolean deletarAmbulancia(long id);
+
+    long obterAmbulanciaStatus(StatusAmbulancia status);
 }

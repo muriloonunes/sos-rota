@@ -17,112 +17,107 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToWidth="true" styleClass="main-content-area" stylesheets="@../../styles/global.css"
-            xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="mhd.sosrota.controller.DashboardController">
+<ScrollPane fitToWidth="true" styleClass="main-content-area" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.DashboardController">
     <VBox alignment="CENTER" spacing="20" styleClass="main-content-area">
         <padding>
-            <Insets bottom="20" left="30" right="30" top="20"/>
+            <Insets bottom="20" left="30" right="30" top="20" />
         </padding>
 
         <GridPane hgap="20" vgap="20" VBox.vgrow="ALWAYS">
             <columnConstraints>
-                <ColumnConstraints percentWidth="33.33"/>
-                <ColumnConstraints percentWidth="33.33"/>
-                <ColumnConstraints percentWidth="33.33"/>
+                <ColumnConstraints percentWidth="33.33" />
+                <ColumnConstraints percentWidth="33.33" />
+                <ColumnConstraints percentWidth="33.33" />
             </columnConstraints>
             <HBox fx:id="ocorrenciasAbertasHbox" alignment="CENTER_LEFT" styleClass="ocorrencias-card">
                 <padding>
-                    <Insets right="10.0"/>
+                    <Insets right="10.0" />
                 </padding>
 
                 <VBox>
-                    <Label styleClass="title-card" text="Ocorrências Abertas"/>
-                    <Label fx:id="ocorrenciasAbertasQtd" styleClass="quantidade-card" text="15"/>
+                    <Label styleClass="title-card" text="Ocorrências Abertas" />
+                    <Label fx:id="ocorrenciasAbertasQtd" styleClass="quantidade-card" text="15" />
                     <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                     </padding>
                 </VBox>
-                <Region HBox.hgrow="ALWAYS"/>
+                <Region HBox.hgrow="ALWAYS" />
             </HBox>
-            <HBox fx:id="ambulanciasDisponiveisHbox" alignment="CENTER_LEFT" styleClass="ambulancias-disponiveis-card"
-                  GridPane.columnIndex="1">
+            <HBox fx:id="ambulanciasDisponiveisHbox" alignment="CENTER_LEFT" styleClass="ambulancias-disponiveis-card" GridPane.columnIndex="1">
                 <padding>
-                    <Insets right="10.0"/>
+                    <Insets right="10.0" />
                 </padding>
 
                 <VBox>
-                    <Label styleClass="title-card" text="Ambulâncias Disponíveis"/>
-                    <Label fx:id="ambulanciasDisponiveisQtd" styleClass="quantidade-card" text="8"/>
+                    <Label styleClass="title-card" text="Ambulâncias Disponíveis" />
+                    <Label fx:id="ambulanciasDisponiveisQtd" styleClass="quantidade-card" text="8" />
                     <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                     </padding>
                 </VBox>
-                <Region HBox.hgrow="ALWAYS"/>
+                <Region HBox.hgrow="ALWAYS" />
             </HBox>
-            <HBox fx:id="ambulanciasAtendimentoHbox" alignment="CENTER_LEFT" styleClass="ambulancias-atendimento-card"
-                  GridPane.columnIndex="2">
+            <HBox fx:id="ambulanciasAtendimentoHbox" alignment="CENTER_LEFT" styleClass="ambulancias-atendimento-card" GridPane.columnIndex="2">
                 <padding>
-                    <Insets right="10.0"/>
+                    <Insets right="10.0" />
                 </padding>
 
                 <VBox>
-                    <Label styleClass="title-card" text="Ambulâncias em atendimento"/>
-                    <Label fx:id="averageSLATime" styleClass="quantidade-card" text="2"/>
+                    <Label styleClass="title-card" text="Ambulâncias em atendimento" />
+                    <Label fx:id="ambulanciasAtendimentoQtd" styleClass="quantidade-card" text="2" />
                     <padding>
-                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                     </padding>
                 </VBox>
-                <Region HBox.hgrow="ALWAYS"/>
+                <Region HBox.hgrow="ALWAYS" />
             </HBox>
           <rowConstraints>
-              <RowConstraints/>
+              <RowConstraints />
           </rowConstraints>
         </GridPane>
 
         <VBox alignment="CENTER_LEFT" spacing="10" styleClass="vbox-container" VBox.vgrow="ALWAYS">
             <HBox alignment="CENTER_LEFT">
-                <Label styleClass="vbox-container-titulo" text="Ocorrências Recentes"/>
-                <Region HBox.hgrow="ALWAYS"/>
-                <Button mnemonicParsing="false" onAction="#criarOcorrencia" styleClass="btn-ocorrencia"
-                        text="Criar ocorrência">
+                <Label styleClass="vbox-container-titulo" text="Ocorrências Recentes" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button mnemonicParsing="false" onAction="#criarOcorrencia" styleClass="btn-ocorrencia" text="Criar ocorrência">
                     <font>
-                        <Font size="14.0"/>
+                        <Font size="14.0" />
                     </font>
                     <graphic>
                         <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true">
-                            <Image url="@../../images/add.png"/>
+                            <Image url="@../../images/add.png" />
                         </ImageView>
                     </graphic>
                 </Button>
             </HBox>
             <TableView fx:id="ocorrenciasTableView" styleClass="table-view" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="idColumn" prefWidth="50" text="ID"/>
-                    <TableColumn fx:id="localColumn" prefWidth="150" text="Local"/>
-                    <TableColumn fx:id="gravidadeColumn" prefWidth="100" text="Gravidade"/>
-                    <TableColumn fx:id="tipoColumn" prefWidth="100" text="Tipo"/>
-                    <TableColumn fx:id="statusColumn" prefWidth="120" text="Status"/>
-                    <TableColumn fx:id="aberturaColumn" prefWidth="150" text="Abertura"/>
-                    <TableColumn fx:id="acoesColumn" prefWidth="100" text="Ações"/>
+                    <TableColumn fx:id="idColumn" prefWidth="50" text="ID" />
+                    <TableColumn fx:id="localColumn" prefWidth="150" text="Local" />
+                    <TableColumn fx:id="gravidadeColumn" prefWidth="100" text="Gravidade" />
+                    <TableColumn fx:id="tipoColumn" prefWidth="100" text="Tipo" />
+                    <TableColumn fx:id="statusColumn" prefWidth="120" text="Status" />
+                    <TableColumn fx:id="aberturaColumn" prefWidth="150" text="Abertura" />
+                    <TableColumn fx:id="acoesColumn" prefWidth="100" text="Ações" />
                 </columns>
                 <placeholder>
-                    <Label text="Nenhuma ocorrência ativa no momento."/>
+                    <Label text="Nenhuma ocorrência ativa no momento." />
                 </placeholder>
                 <columnResizePolicy>
-                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                 </columnResizePolicy>
             </TableView>
           <padding>
-              <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
+              <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
           </padding>
         </VBox>
         <VBox alignment="CENTER_LEFT" layoutX="40.0" layoutY="132.0" spacing="10" styleClass="vbox-container">
             <padding>
-                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0"/>
+                <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
             </padding>
-            <Label styleClass="vbox-container-titulo" text="Mapa"/>
-            <Pane fx:id="mapaPane" prefHeight="500.0" prefWidth="200.0" styleClass="mapa-pane"/>
+            <Label styleClass="vbox-container-titulo" text="Mapa" />
+            <Pane fx:id="mapaPane" prefHeight="500.0" prefWidth="200.0" styleClass="mapa-pane" />
         </VBox>
     </VBox>
 </ScrollPane>

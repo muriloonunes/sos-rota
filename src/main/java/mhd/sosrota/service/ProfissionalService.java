@@ -28,9 +28,9 @@ public record ProfissionalService(ProfissionalRepository repo) {
         if (email != null && !email.trim().isEmpty() && email.length() > 50) {
             throw new CadastroException("O email não pode ter mais de 50 caracteres.");
         }
-//        if (!email.contains("@") && !email.trim().isEmpty()) {
-//            throw new CadastroException("O email informado é inválido.");
-//        }
+        if (!email.contains("@") && !email.trim().isEmpty()) {
+            throw new CadastroException("O email informado é inválido.");
+        }
 
         try {
             FuncaoProfissional funcao = FuncaoProfissional.fromNome(funcaoDesc);

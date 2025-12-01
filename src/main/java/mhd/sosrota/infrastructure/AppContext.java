@@ -1,5 +1,6 @@
 package mhd.sosrota.infrastructure;
 
+import mhd.sosrota.model.Profissional;
 import mhd.sosrota.presentation.model.AmbulanciaRow;
 import mhd.sosrota.repository.*;
 import mhd.sosrota.service.AmbulanciaService;
@@ -15,7 +16,7 @@ public class AppContext {
     private final ProfissionalService profissionalService;
 
     private AmbulanciaRow ambulanciaEmEdicao;
-    //private Profissional profissionalEmEdicao;
+    private Profissional profissionalEmEdicao;
 
     private AppContext() {
         UsuarioRepository usuarioRepository = new UsuarioRepositoryImpl();
@@ -63,7 +64,7 @@ public class AppContext {
         return profissionalService;
     }
 
-    //public void setProfissionalEmEdicao(Profissional profissionalEmEdicao) {
-    //        this.profissionalEmEdicao = profissionalEmEdicao;
-    //    }
+    public void setProfissionalEmEdicao(Profissional profissionalEmEdicao) {
+            this.profissionalEmEdicao = profissionalEmEdicao;
+        }
 }
