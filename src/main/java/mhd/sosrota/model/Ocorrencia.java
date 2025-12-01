@@ -1,32 +1,50 @@
 package mhd.sosrota.model;
 
+import jakarta.persistence.*;
 import mhd.sosrota.model.enums.GravidadeOcorrencia;
 import mhd.sosrota.model.enums.StatusOcorrencia;
 
 import java.time.LocalDateTime;
 
-/**
- *
- * @author Murilo Nunes <murilo_no@outlook.com>
- * @author Hartur Sales <hartursalesxavier@gmail.com>
- * @date 26/11/2025
- * @brief Class Ocorrencia
- */
+@Entity
+@Table(name = "ocorrencias")
 public class Ocorrencia {
-    private StatusOcorrencia statusOcorrencia;
-    private GravidadeOcorrencia gravidadeOcorrencia;
-    private LocalDateTime dataHoraOcorrencia;
-    private String tipoOcorrencia;
-    //private String descricaoOcorrencia;
 
-    public Ocorrencia(StatusOcorrencia statusOcorrencia, GravidadeOcorrencia gravidadeOcorrencia, LocalDateTime dataHoraOcorrencia, String tipoOcorrencia) {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_ocorrencia")
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private StatusOcorrencia statusOcorrencia;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private GravidadeOcorrencia gravidadeOcorrencia;
+
+    @Column(name = "data_hora", nullable = false)
+    private LocalDateTime dataHoraOcorrencia;
+
+    @Column(name = "tipo_ocorrencia", nullable = false)
+    private String tipoOcorrencia;
+
+    public Ocorrencia() {}
+
+    public Ocorrencia(StatusOcorrencia statusOcorrencia,
+                      GravidadeOcorrencia gravidadeOcorrencia,
+                      LocalDateTime dataHoraOcorrencia,
+                      String tipoOcorrencia) {
+
         this.statusOcorrencia = statusOcorrencia;
         this.gravidadeOcorrencia = gravidadeOcorrencia;
         this.dataHoraOcorrencia = dataHoraOcorrencia;
         this.tipoOcorrencia = tipoOcorrencia;
     }
 
-    public Ocorrencia(){}
+    public Long getId() {
+        return id;
+    }
 
     public StatusOcorrencia getStatusOcorrencia() {
         return statusOcorrencia;
