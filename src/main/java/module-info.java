@@ -9,6 +9,7 @@ module mhd.sosrota {
     requires jakarta.persistence;
     requires org.hibernate.orm.core;
     requires com.google.gson;
+    requires javafx.base;
 
     opens mhd.sosrota to javafx.fxml;
     exports mhd.sosrota;

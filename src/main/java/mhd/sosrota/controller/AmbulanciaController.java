@@ -6,10 +6,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.HBox;
 import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Ambulancia;
 import mhd.sosrota.model.Bairro;
@@ -20,12 +18,9 @@ import mhd.sosrota.navigation.Screens;
 import mhd.sosrota.presentation.UiUtils;
 import mhd.sosrota.service.AmbulanciaService;
 import mhd.sosrota.util.AlertUtil;
-import org.girod.javafx.svgimage.SVGImage;
-import org.girod.javafx.svgimage.SVGLoader;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 
 /**
  *
@@ -96,49 +91,18 @@ public class AmbulanciaController implements Navigable {
                 cellData.getValue().getStatusAmbulancia().getDescricao()
         ));
 
-        colunaAcoes.setCellFactory(_ -> new TableCell<>() {
-            private final HBox acoesBox = new HBox(10);
-            final SVGImage editarImage = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/editar.svg"))).scaleTo(12);
-            final SVGImage deleteImage = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/deletar.svg"))).scaleTo(12);
-            private final Button editarButton = new Button();
-            private final Button deletarButton = new Button();
-
-            {
-                editarButton.setGraphic(editarImage);
-                deletarButton.setGraphic(deleteImage);
-
-                editarButton.getStyleClass().add("btn-primary");
-                deletarButton.getStyleClass().add("btn-ocorrencia");
-
-                editarButton.setOnAction(_ -> {
-                    Ambulancia row = getTableView().getItems().get(getIndex());
-                    abrirEditarAmbulancias(row);
+        colunaAcoes.setCellFactory(UiUtils.criarColunaAcoes(
+                (ambulancia) -> {
+                    abrirEditarAmbulancias(ambulancia);
                     carregarAmbulancias();
-                });
-
-                deletarButton.setOnAction(_ -> {
-                    var result = AlertUtil.showConfirmation("Deletar ambulância", "Tem certeza que deseja deletar a ambulância?");
-                    if (result.get() == ButtonType.OK) {
-                        Ambulancia row = getTableView().getItems().get(getIndex());
-                        service.deletarAmbulancia(row.getId());
-                    }
+                },
+                (ambulancia) -> {
+                    service.deletarAmbulancia(ambulancia.getId());
                     carregarAmbulancias();
-                });
-
-                acoesBox.getChildren().addAll(editarButton, deletarButton);
-                acoesBox.setAlignment(Pos.CENTER);
-            }
-
-            @Override
-            protected void updateItem(Void item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty) {
-                    setGraphic(null);
-                } else {
-                    setGraphic(acoesBox);
-                }
-            }
-        });
+                },
+                "Deletar ambulância",
+                "Tem certeza que deseja deletar a ambulância?"
+        ));
     }
 
     @FXML

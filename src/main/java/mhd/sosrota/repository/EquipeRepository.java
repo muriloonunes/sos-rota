@@ -16,5 +16,5 @@ public interface EquipeRepository {
 
     Boolean updateEquipe(Equipe equipe);
 
-    Boolean deleteEquipe(Equipe equipe);
+    Boolean deleteEquipe(long id);
 }

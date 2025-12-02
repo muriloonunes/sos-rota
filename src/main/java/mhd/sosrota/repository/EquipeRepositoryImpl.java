@@ -30,7 +30,8 @@ public class EquipeRepositoryImpl implements EquipeRepository {
         try (EntityManager em = JpaManager.getEntityManager()) {
             TypedQuery<Equipe> q = em.createQuery(
                     "SELECT e FROM Equipe e " +
-                            "JOIN e.ambulancia a " +
+                            "JOIN FETCH e.ambulancia a " +
+                            "LEFT JOIN FETCH e.profissionais " +
                             "WHERE a.placa = :placa",
                     Equipe.class
             );
@@ -46,7 +47,8 @@ public class EquipeRepositoryImpl implements EquipeRepository {
         try (EntityManager em = JpaManager.getEntityManager()) {
             TypedQuery<Equipe> q = em.createQuery(
                     "SELECT DISTINCT e FROM Equipe e " +
-                            "JOIN e.profissionais p " +
+                            "JOIN FETCH e.profissionais p " +
+                            "LEFT JOIN FETCH e.ambulancia " +
                             "WHERE LOWER(p.nome) LIKE LOWER(:nome)",
                     Equipe.class
             );
@@ -61,7 +63,10 @@ public class EquipeRepositoryImpl implements EquipeRepository {
     public List<Equipe> findAllEquipes() {
         try (EntityManager em = JpaManager.getEntityManager()) {
             TypedQuery<Equipe> q = em.createQuery(
-                    "SELECT e FROM Equipe e ORDER BY e.id",
+                    "SELECT DISTINCT e FROM Equipe e " +
+                            "LEFT JOIN FETCH e.ambulancia " +
+                            "LEFT JOIN FETCH e.profissionais " +
+                            "ORDER BY e.id",
                     Equipe.class
             );
             return q.getResultList();
@@ -83,21 +88,20 @@ public class EquipeRepositoryImpl implements EquipeRepository {
     }
 
     @Override
-    public Boolean deleteEquipe(Equipe equipe) {
+    public Boolean deleteEquipe(long id) {
         try (EntityManager em = JpaManager.getEntityManager()) {
             em.getTransaction().begin();
 
-            Equipe equipeBD = em.find(Equipe.class, equipe.getId());
+            Equipe equipeBD = em.find(Equipe.class, id);
             if (equipeBD == null) {
-                return (Boolean) false;
+                return false;
             }
 
             em.remove(equipeBD);
             em.getTransaction().commit();
-            return (Boolean) true;
-
+            return true;
         } catch (RuntimeException e) {
-            return (Boolean) false;
+            return false;
         }
     }
 }

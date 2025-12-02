@@ -151,6 +151,8 @@ public class DashboardController implements Navigable {
             @Override
             protected void failed() {
                 ambulanciasAtendimentoQtd.setText("0");
+
+                getException().printStackTrace();
             }
         };
 

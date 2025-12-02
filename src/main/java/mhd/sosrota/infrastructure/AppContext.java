@@ -1,12 +1,10 @@
 package mhd.sosrota.infrastructure;
 
 import mhd.sosrota.model.Ambulancia;
+import mhd.sosrota.model.Equipe;
 import mhd.sosrota.model.Profissional;
 import mhd.sosrota.repository.*;
-import mhd.sosrota.service.AmbulanciaService;
-import mhd.sosrota.service.GrafoCidadeService;
-import mhd.sosrota.service.ProfissionalService;
-import mhd.sosrota.service.UsuarioService;
+import mhd.sosrota.service.*;
 
 public class AppContext {
     private static AppContext instance;
@@ -14,9 +12,11 @@ public class AppContext {
     private final GrafoCidadeService grafoService;
     private final AmbulanciaService ambulanciaService;
     private final ProfissionalService profissionalService;
+    private final EquipeService equipeService;
 
     private Ambulancia ambulanciaEmEdicao;
     private Profissional profissionalEmEdicao;
+    private Equipe equipeEmEdicao;
 
     private AppContext() {
         UsuarioRepository usuarioRepository = new UsuarioRepositoryImpl();
@@ -31,6 +31,9 @@ public class AppContext {
 
         ProfissionalRepository profissionalRepository = new ProfissionalRepositoryImpl();
         this.profissionalService = new ProfissionalService(profissionalRepository);
+
+        EquipeRepository equipeRepository = new EquipeRepositoryImpl();
+        this.equipeService = new EquipeService(equipeRepository);
     }
 
     public static synchronized AppContext getInstance() {
@@ -52,6 +55,14 @@ public class AppContext {
         return ambulanciaService;
     }
 
+    public ProfissionalService getProfissionalService() {
+        return profissionalService;
+    }
+
+    public EquipeService getEquipeService() {
+        return equipeService;
+    }
+
     public Ambulancia getAmbulanciaEmEdicao() {
         return ambulanciaEmEdicao;
     }
@@ -60,15 +71,19 @@ public class AppContext {
         return profissionalEmEdicao;
     }
 
-    public ProfissionalService getProfissionalService() {
-        return profissionalService;
-    }
-
     public void setAmbulanciaEmEdicao(Ambulancia ambulanciaEmEdicao) {
         this.ambulanciaEmEdicao = ambulanciaEmEdicao;
     }
 
     public void setProfissionalEmEdicao(Profissional profissionalEmEdicao) {
         this.profissionalEmEdicao = profissionalEmEdicao;
+    }
+
+    public Equipe getEquipeEmEdicao() {
+        return equipeEmEdicao;
+    }
+
+    public void setEquipeEmEdicao(Equipe equipeEmEdicao) {
+        this.equipeEmEdicao = equipeEmEdicao;
     }
 }

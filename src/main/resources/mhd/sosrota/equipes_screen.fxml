@@ -94,7 +94,7 @@
                                     <TableColumn fx:id="colunaNome" prefWidth="200" text="Nome" />
                                     <TableColumn fx:id="colunaFuncao" prefWidth="150" text="Função" />
                                     <TableColumn fx:id="colunaContato" prefWidth="180" text="Contato" />
-                                    <TableColumn fx:id="colunaAcoes" prefWidth="100" text="Ações" />
+                                    <TableColumn fx:id="colunaAcoesProfissional" prefWidth="100" text="Ações" />
                                 </columns>
                                 <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
@@ -155,10 +155,15 @@
                                 </VBox>
                             </VBox>
                         </GridPane>
+                  <HBox alignment="CENTER_RIGHT">
+                     <children>
+                        <Label fx:id="erroLabelEquipes" styleClass="error-label" text="Erro!" />
+                     </children>
+                  </HBox>
 
                         <HBox alignment="CENTER_RIGHT" spacing="15">
-                            <Button onAction="#handleClearTeamFields" styleClass="btn-secondary" text="Limpar equipe" />
-                            <Button onAction="#handleSaveTeam" styleClass="btn-primary" text="Salvar equipe" />
+                            <Button onAction="#handleLimparEquipe" styleClass="btn-secondary" text="Limpar equipe" />
+                            <Button fx:id="criarEquipeButton" onAction="#handleCriarEquipe" styleClass="btn-primary" text="Criar equipe" />
                         </HBox>
                     </VBox>
 
@@ -174,13 +179,13 @@
                         </Label>
 
                         <VBox alignment="CENTER_LEFT" spacing="10" VBox.vgrow="ALWAYS">
-                            <TableView fx:id="activeTeamsTable" styleClass="table-view" VBox.vgrow="ALWAYS">
+                            <TableView fx:id="equipesTable" styleClass="table-view" VBox.vgrow="ALWAYS">
                                 <columns>
-                                    <TableColumn prefWidth="120" text="Ambulância" />
-                                    <TableColumn prefWidth="150" text="Médico" />
-                                    <TableColumn prefWidth="150" text="Enfermeiro" />
-                                    <TableColumn prefWidth="150" text="Condutor" />
-                                    <TableColumn text="Ações" />
+                                    <TableColumn fx:id="colunaAmbulancia" prefWidth="120" text="Ambulância" />
+                                    <TableColumn fx:id="colunaMedico" prefWidth="150" text="Médico" />
+                                    <TableColumn fx:id="colunaEnfermeiro" prefWidth="150" text="Enfermeiro" />
+                                    <TableColumn fx:id="colunaCondutor" prefWidth="150" text="Condutor" />
+                                    <TableColumn fx:id="colunaAcoesEquipe" text="Ações" />
                                 </columns>
                                 <columnResizePolicy>
                                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

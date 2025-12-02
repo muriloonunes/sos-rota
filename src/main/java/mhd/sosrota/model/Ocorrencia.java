@@ -3,43 +3,66 @@ package mhd.sosrota.model;
 import jakarta.persistence.*;
 import mhd.sosrota.model.enums.GravidadeOcorrencia;
 import mhd.sosrota.model.enums.StatusOcorrencia;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
 import java.time.LocalDateTime;
 
+/**
+ *
+ * @author Murilo Nunes <murilo_no@outlook.com>
+ * @author Hartur Sales <hartursalesxavier@gmail.com>
+ * @date 26/11/2025
+ * @brief Class Ocorrencia
+ */
 @Entity
 @Table(name = "ocorrencias")
 public class Ocorrencia {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_ocorrencia")
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private StatusOcorrencia statusOcorrencia;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private GravidadeOcorrencia gravidadeOcorrencia;
-
-    @Column(name = "data_hora", nullable = false)
-    private LocalDateTime dataHoraOcorrencia;
-
-    @Column(name = "tipo_ocorrencia", nullable = false)
+    @Column(name = "tipo_ocorrencia", nullable = false, length = 50)
     private String tipoOcorrencia;
 
-    public Ocorrencia() {}
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(name = "gravidade", nullable = false)
+    private GravidadeOcorrencia gravidadeOcorrencia;
 
-    public Ocorrencia(StatusOcorrencia statusOcorrencia,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "local_bairro_id", nullable = false)
+    private Bairro bairro;
+
+    @Column(name = "data_hora_abertura", nullable = false, insertable = false, updatable = false)
+    private LocalDateTime dataHoraAbertura;
+
+    @Enumerated
+    @JdbcType(PostgreSQLEnumJdbcType.class)
+    @Column(name = "status", nullable = false)
+    private StatusOcorrencia statusOcorrencia;
+
+    @Column(name = "observacao", columnDefinition = "TEXT")
+    private String observacao;
+
+    public Ocorrencia() {
+    }
+
+    public Ocorrencia(Long id,
+                      String tipoOcorrencia,
                       GravidadeOcorrencia gravidadeOcorrencia,
-                      LocalDateTime dataHoraOcorrencia,
-                      String tipoOcorrencia) {
-
-        this.statusOcorrencia = statusOcorrencia;
-        this.gravidadeOcorrencia = gravidadeOcorrencia;
-        this.dataHoraOcorrencia = dataHoraOcorrencia;
+                      Bairro bairro,
+                      LocalDateTime dataHoraAbertura,
+                      StatusOcorrencia statusOcorrencia,
+                      String observacao) {
+        this.id = id;
         this.tipoOcorrencia = tipoOcorrencia;
+        this.gravidadeOcorrencia = gravidadeOcorrencia;
+        this.bairro = bairro;
+        this.dataHoraAbertura = dataHoraAbertura;
+        this.statusOcorrencia = statusOcorrencia;
+        this.observacao = observacao;
     }
 
     public Long getId() {
@@ -62,12 +85,12 @@ public class Ocorrencia {
         this.gravidadeOcorrencia = gravidadeOcorrencia;
     }
 
-    public LocalDateTime getDataHoraOcorrencia() {
-        return dataHoraOcorrencia;
+    public LocalDateTime getDataHoraAbertura() {
+        return dataHoraAbertura;
     }
 
-    public void setDataHoraOcorrencia(LocalDateTime dataHoraOcorrencia) {
-        this.dataHoraOcorrencia = dataHoraOcorrencia;
+    public void setDataHoraAbertura(LocalDateTime dataHoraOcorrencia) {
+        this.dataHoraAbertura = dataHoraOcorrencia;
     }
 
     public String getTipoOcorrencia() {
@@ -76,5 +99,25 @@ public class Ocorrencia {
 
     public void setTipoOcorrencia(String tipoOcorrencia) {
         this.tipoOcorrencia = tipoOcorrencia;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Bairro getBairro() {
+        return bairro;
+    }
+
+    public void setBairro(Bairro bairro) {
+        this.bairro = bairro;
+    }
+
+    public String getObservacao() {
+        return observacao;
+    }
+
+    public void setObservacao(String observacao) {
+        this.observacao = observacao;
     }
 }
