@@ -72,13 +72,14 @@ public class EquipeController implements Navigable {
 
     private final int itensPorPagina = 8;
     private Navigator navigator;
+    private boolean equipesAberta = false;
 
     @FXML
     public void initialize() {
         configurarProfissionaisTab();
 
         equipesTab.setOnSelectionChanged(_ -> {
-            if (equipesTab.isSelected()) {
+            if (equipesTab.isSelected() && equipesAberta == false) {
                 configurarEquipesTab();
             }
         });
@@ -110,7 +111,7 @@ public class EquipeController implements Navigable {
         erroLabelEquipes.setVisible(false);
 
         Callback<ListView<Ambulancia>, ListCell<Ambulancia>> ambulanciaFactory =
-                UiUtils.comboCellFactory(a -> a.getPlaca() + " - " + a.getTipoAmbulancia().getDescricao());
+                UiUtils.comboCellFactory(a -> a.getPlaca() + " (" + a.getBairroBase() + ")" + " - " + a.getTipoAmbulancia().getDescricao());
 
         ambulanciaComboBox.setCellFactory(ambulanciaFactory);
         medicoComboBox.setCellFactory(UiUtils.comboCellFactory(Profissional::getNome));
@@ -138,8 +139,15 @@ public class EquipeController implements Navigable {
 
             @Override
             protected void succeeded() {
-                ambulanciaComboBox.getItems().addAll(getValue().getKey());
+                var ambulancias = getValue().getKey();
                 var profissionais = getValue().getValue();
+
+                var idsAmbulancias = ambulanciaComboBox.getItems().stream()
+                        .map(Ambulancia::getId)
+                        .collect(java.util.stream.Collectors.toSet());
+                ambulancias.stream()
+                        .filter(a -> !idsAmbulancias.contains(a.getId()))
+                        .forEach(a -> ambulanciaComboBox.getItems().add(a));
 
                 List<Profissional> medicos = profissionais.stream()
                         .filter(p -> p.getFuncaoProfissional() == FuncaoProfissional.MEDICO)
@@ -153,9 +161,26 @@ public class EquipeController implements Navigable {
                         .filter(p -> p.getFuncaoProfissional() == FuncaoProfissional.CONDUTOR)
                         .toList();
 
-                medicoComboBox.getItems().addAll(medicos);
-                enfermeiroComboBox.getItems().addAll(enfermeiros);
-                condutorComboBox.getItems().addAll(condutores);
+                var idsMedicos = medicoComboBox.getItems().stream()
+                        .map(Profissional::getId)
+                        .collect(java.util.stream.Collectors.toSet());
+                medicos.stream()
+                        .filter(p -> !idsMedicos.contains(p.getId()))
+                        .forEach(p -> medicoComboBox.getItems().add(p));
+
+                var idsEnfermeiros = enfermeiroComboBox.getItems().stream()
+                        .map(Profissional::getId)
+                        .collect(java.util.stream.Collectors.toSet());
+                enfermeiros.stream()
+                        .filter(p -> !idsEnfermeiros.contains(p.getId()))
+                        .forEach(p -> enfermeiroComboBox.getItems().add(p));
+
+                var idsCondutores = condutorComboBox.getItems().stream()
+                        .map(Profissional::getId)
+                        .collect(java.util.stream.Collectors.toSet());
+                condutores.stream()
+                        .filter(p -> !idsCondutores.contains(p.getId()))
+                        .forEach(p -> condutorComboBox.getItems().add(p));
             }
 
             @Override
@@ -283,7 +308,7 @@ public class EquipeController implements Navigable {
     }
 
     @FXML
-    private void handleRegisterProfessional() {
+    private void handleRegistrarProfissional() {
         erroLabelProfissionais.setVisible(false);
         erroLabelProfissionais.setManaged(false);
 

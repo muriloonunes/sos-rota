@@ -1,7 +1,6 @@
 package mhd.sosrota.repository;
 
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import mhd.sosrota.infrastructure.database.JpaManager;
 import mhd.sosrota.model.Ocorrencia;
@@ -23,6 +22,8 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
         } catch (RuntimeException e) {
             if (em.getTransaction().isActive()) em.getTransaction().rollback();
             return false;
+        } finally {
+            em.close();
         }
     }
 
@@ -66,7 +67,7 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
         try (EntityManager em = JpaManager.getEntityManager()) {
             TypedQuery<Ocorrencia> q = em.createQuery(
                     "SELECT o FROM Ocorrencia o " +
-                            "WHERE o.dataHoraOcorrencia BETWEEN :inicio AND :fim",
+                            "WHERE o.dataHoraAbertura BETWEEN :inicio AND :fim",
                     Ocorrencia.class
             );
 
@@ -83,7 +84,7 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
     public List<Ocorrencia> listarTodas() {
         try (EntityManager em = JpaManager.getEntityManager()) {
             TypedQuery<Ocorrencia> q = em.createQuery(
-                    "SELECT o FROM Ocorrencia o ORDER BY o.dataHoraOcorrencia DESC",
+                    "SELECT o FROM Ocorrencia o ORDER BY o.dataHoraAbertura DESC",
                     Ocorrencia.class
             );
             return q.getResultList();

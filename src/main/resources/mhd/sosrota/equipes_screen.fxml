@@ -73,7 +73,7 @@
 
                         <HBox alignment="CENTER_RIGHT" spacing="15">
                             <Button onAction="#handleClearFields" styleClass="btn-secondary" text="Limpar" />
-                            <Button fx:id="cadastrarProfissonalButton" onAction="#handleRegisterProfessional" styleClass="btn-primary" text="Cadastrar profissional" />
+                            <Button fx:id="cadastrarProfissonalButton" onAction="#handleRegistrarProfissional" styleClass="btn-primary" text="Cadastrar profissional" />
                         </HBox>
                     </VBox>
 

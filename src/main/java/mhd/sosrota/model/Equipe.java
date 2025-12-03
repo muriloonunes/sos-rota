@@ -41,8 +41,10 @@ public class Equipe {
     }
 
     public void addProfissional(Profissional p) {
-        profissionais.add(p);
-        p.setEquipe(this);
+        if (p != null) {
+            profissionais.add(p);
+            p.setEquipe(this);
+        }
     }
 
     public void removeProfissional(Profissional p) {

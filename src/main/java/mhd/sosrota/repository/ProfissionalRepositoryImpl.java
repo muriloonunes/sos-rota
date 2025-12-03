@@ -29,6 +29,17 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
         } catch (RuntimeException e) {
             if (em.getTransaction().isActive()) em.getTransaction().rollback();
             return false;
+        } finally {
+            em.close();
+        }
+    }
+
+    @Override
+    public Profissional buscarPorId(long id) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
+            return em.find(Profissional.class, id);
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -48,7 +59,7 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
     public List<Profissional> listarTodos() {
         try (EntityManager em = JpaManager.getEntityManager()) {
             TypedQuery<Profissional> q = em.createQuery(
-                    "SELECT p FROM Profissional p ORDER BY p.nome", Profissional.class);
+                    "SELECT p FROM Profissional p ORDER BY p.id", Profissional.class);
             return q.getResultList();
         } catch (NoResultException e) {
             return Collections.emptyList();

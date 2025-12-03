@@ -16,6 +16,8 @@ public interface ProfissionalRepository {
 
     Profissional buscarPorNome(String nome);
 
+    Profissional buscarPorId(long id);
+
     List<Profissional> listarTodos();
 
     List<Profissional> listarPorFuncao(FuncaoProfissional funcao);

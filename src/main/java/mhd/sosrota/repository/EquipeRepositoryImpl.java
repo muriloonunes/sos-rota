@@ -5,6 +5,7 @@ import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import mhd.sosrota.infrastructure.database.JpaManager;
 import mhd.sosrota.model.Equipe;
+import mhd.sosrota.model.Profissional;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,11 +18,15 @@ public class EquipeRepositoryImpl implements EquipeRepository {
         try {
             em.getTransaction().begin();
             em.persist(equipe);
+            for (Profissional p : equipe.getProfissionais()) {
+                em.merge(p);
+            }
             em.getTransaction().commit();
-            return (Boolean) true;
+            return true;
         } catch (RuntimeException e) {
             if (em.getTransaction().isActive()) em.getTransaction().rollback();
-            return (Boolean) false;
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -70,20 +75,29 @@ public class EquipeRepositoryImpl implements EquipeRepository {
                     Equipe.class
             );
             return q.getResultList();
-        } catch (NoResultException e) {
-            return Collections.emptyList();
         }
     }
 
     @Override
-    public Boolean updateEquipe(Equipe equipe) {
+    public Boolean updateEquipe(Equipe equipeAlterada) {
         try (EntityManager em = JpaManager.getEntityManager()) {
             em.getTransaction().begin();
-            em.merge(equipe);
+
+            em.createQuery("UPDATE Profissional p SET p.equipe = NULL WHERE p.equipe.id = :id")
+                    .setParameter("id", equipeAlterada.getId())
+                    .executeUpdate();
+
+            Equipe equipe = em.merge(equipeAlterada);
+
+            for (Profissional p  : equipeAlterada.getProfissionais()) {
+                p.setEquipe(equipe);
+                em.merge(p);
+            }
+
             em.getTransaction().commit();
-            return (Boolean) true;
+            return true;
         } catch (RuntimeException e) {
-            return (Boolean) false;
+            return false;
         }
     }
 
@@ -97,10 +111,17 @@ public class EquipeRepositoryImpl implements EquipeRepository {
                 return false;
             }
 
+            for (Profissional p : equipeBD.getProfissionais()) {
+                p.setEquipe(null);
+            }
+
+            equipeBD.getProfissionais().clear();
+
             em.remove(equipeBD);
             em.getTransaction().commit();
             return true;
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
     }

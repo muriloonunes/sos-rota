@@ -1,5 +1,6 @@
 package mhd.sosrota.controller;
 
+import javafx.beans.binding.Bindings;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -9,6 +10,7 @@ import mhd.sosrota.model.Ambulancia;
 import mhd.sosrota.model.Equipe;
 import mhd.sosrota.model.Profissional;
 import mhd.sosrota.model.enums.FuncaoProfissional;
+import mhd.sosrota.model.enums.TipoAmbulancia;
 import mhd.sosrota.model.exceptions.CadastroException;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
@@ -20,6 +22,7 @@ import mhd.sosrota.util.AlertUtil;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -47,6 +50,11 @@ public class EditarEquipeController implements Navigable {
 
     private Navigator navigator;
     private Equipe equipeEmEdicao;
+
+    private Ambulancia ambulanciaOriginal;
+    private Profissional medicoOriginal;
+    private Profissional enfermeiroOriginal;
+    private Profissional condutorOriginal;
 
     @FXML
     public void initialize() {
@@ -90,13 +98,13 @@ public class EditarEquipeController implements Navigable {
                 var profissionaisDisponiveis = profissionalService.listarProfissionaisDisponiveis();
 
                 Ambulancia atual = equipeEmEdicao.getAmbulancia();
-                if (atual != null && ambulancias.stream().noneMatch(a -> a.getId() == atual.getId())) {
+                if (atual != null && ambulancias.stream().noneMatch(a -> Objects.equals(a.getId(), atual.getId()))) {
                     ambulancias.add(atual);
                 }
 
                 List<Profissional> atuais = equipeEmEdicao.getProfissionais();
                 for (Profissional p : atuais) {
-                    if (profissionaisDisponiveis.stream().noneMatch(dp -> dp.getId() == p.getId())) {
+                    if (profissionaisDisponiveis.stream().noneMatch(dp -> Objects.equals(dp.getId(), p.getId()))) {
                         profissionaisDisponiveis.add(p);
                     }
                 }
@@ -171,6 +179,23 @@ public class EditarEquipeController implements Navigable {
         if (condutor != null) {
             condutorComboBox.getSelectionModel().select(condutor);
         }
+
+        ambulanciaOriginal = ambulanciaComboBox.getValue();
+        medicoOriginal = medicoComboBox.getValue();
+        enfermeiroOriginal = enfermeiroComboBox.getValue();
+        condutorOriginal = condutorComboBox.getValue();
+
+        var unchangedBinding = Bindings.createBooleanBinding(() -> Objects.equals(ambulanciaComboBox.getValue(), ambulanciaOriginal)
+                        && Objects.equals(medicoComboBox.getValue(), medicoOriginal)
+                        && Objects.equals(enfermeiroComboBox.getValue(), enfermeiroOriginal)
+                        && Objects.equals(condutorComboBox.getValue(), condutorOriginal),
+                ambulanciaComboBox.valueProperty(),
+                medicoComboBox.valueProperty(),
+                enfermeiroComboBox.valueProperty(),
+                condutorComboBox.valueProperty()
+        );
+
+        salvarButton.disableProperty().bind(unchangedBinding);
     }
 
     @FXML
@@ -185,6 +210,11 @@ public class EditarEquipeController implements Navigable {
 
         if (ambulancia == null || enfermeiro == null || condutor == null) {
             mostrarErro("Ambulância, enfermeiro e condutor são obrigatórios.");
+            return;
+        }
+
+        if (ambulancia.getTipoAmbulancia() == TipoAmbulancia.UTI && medico == null) {
+            mostrarErro("Uma ambulância do tipo UTI deve ter um médico.");
             return;
         }
 
@@ -273,6 +303,15 @@ public class EditarEquipeController implements Navigable {
     @FXML
     private void handleCancelar() {
         navigator.closeStage(cancelarButton);
+    }
+
+    @FXML
+    private void handleLimparMedico() {
+        medicoComboBox.getSelectionModel().clearSelection();
+        medicoComboBox.setValue(null);
+
+        erroLabel.setVisible(false);
+        erroLabel.setManaged(false);
     }
 
     private void mostrarErro(String mensagem) {

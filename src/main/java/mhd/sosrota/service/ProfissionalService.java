@@ -86,13 +86,18 @@ public record ProfissionalService(ProfissionalRepository repo) {
                 throw new CadastroException("Função inválida.");
             }
 
-            Profissional profissional = new Profissional();
-            profissional.setId(id);
-            profissional.setNome(nome);
-            profissional.setFuncaoProfissional(funcao);
-            profissional.setContato(email);
+            Profissional profissionalExistente = repo.buscarPorId(id);
 
-            repo.atualizar(profissional);
+            if (profissionalExistente == null) {
+                throw new CadastroException("Profissional não encontrado.");
+            }
+
+            profissionalExistente.setId(id);
+            profissionalExistente.setNome(nome);
+            profissionalExistente.setFuncaoProfissional(funcao);
+            profissionalExistente.setContato(email);
+
+            repo.atualizar(profissionalExistente);
         } catch (Exception e) {
             e.printStackTrace();
             throw new CadastroException("Erro ao atualizar profissional.");

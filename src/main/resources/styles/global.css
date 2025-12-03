@@ -400,3 +400,18 @@
 .tab-pane:focused > .tab-header-area > .headers-region > .tab:selected .focus-indicator {
     -fx-border-color: transparent;
 }
+
+/*extras*/
+.remover-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: red;
+    -fx-border-color: -secondary-color-500;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+    -fx-font-size: 14;
+}
+
+.remover-button:hover {
+    -fx-background-color: -background-light;
+}
