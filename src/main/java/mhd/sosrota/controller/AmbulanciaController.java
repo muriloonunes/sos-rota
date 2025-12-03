@@ -1,6 +1,5 @@
 package mhd.sosrota.controller;
 
-import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -51,7 +50,7 @@ public class AmbulanciaController implements Navigable {
     private final AmbulanciaService service = AppContext.getInstance().getAmbulanciaService();
     private final ObservableList<Ambulancia> ambulancias = FXCollections.observableArrayList();
 
-    private int itensPorPagina = 8;
+    private final int itensPorPagina = 8;
     private Navigator navigator;
 
     @FXML
@@ -64,6 +63,7 @@ public class AmbulanciaController implements Navigable {
         carregarAmbulancias();
 
         UiUtils.configurarCamposAmbulancia(placaTextField, tipoComboBox, statusComboBox, baseComboBox);
+        tabelaAmbulancias.setItems(ambulancias);
 
         cadastrarAmbulanciaButton.disableProperty().bind(
                 (placaTextField.textProperty().isEmpty()
@@ -73,11 +73,15 @@ public class AmbulanciaController implements Navigable {
                         .or(placaTextField.textProperty().length().lessThan(7))
         );
 
-        paginacaoAmbulancias.currentPageIndexProperty().addListener(
-                (_, _, newValue) -> atualizarPag(newValue.intValue()));
-
-        tabelaAmbulancias.heightProperty().addListener(
-                (_, _, newHeight) -> recalcularItens(newHeight.doubleValue()));
+        paginacaoAmbulancias.currentPageIndexProperty().addListener((_, _, _) ->
+                UiUtils.atualizarPaginacao(
+                        paginacaoAmbulancias,
+                        tabelaAmbulancias,
+                        ambulancias,
+                        itensPorPagina,
+                        () -> tabelaAmbulancias.refresh()
+                )
+        );
     }
 
     private void configurarTabela() {
@@ -123,9 +127,7 @@ public class AmbulanciaController implements Navigable {
             @Override
             protected void succeeded() {
                 ambulancias.setAll(getValue());
-                atualizarTotalDePaginas();
-                atualizarPag(0);
-                Platform.runLater(() -> recalcularItens(tabelaAmbulancias.getHeight()));
+                UiUtils.atualizarPaginacao(paginacaoAmbulancias, tabelaAmbulancias, ambulancias, itensPorPagina);
             }
 
             @Override
@@ -204,47 +206,7 @@ public class AmbulanciaController implements Navigable {
         navigator.showModal(Screens.EDITAR_AMBULANCIA, "Editar Ambulância");
     }
 
-    private void recalcularItens(double alturaTabela) {
-        if (alturaTabela <= 0) return;
-        int novosItensPorPagina = (int) Math.floor((alturaTabela - 25) / 25);
-        if (novosItensPorPagina < 1) novosItensPorPagina = 1;
-        if (this.itensPorPagina != novosItensPorPagina) {
-            this.itensPorPagina = novosItensPorPagina;
 
-            atualizarTotalDePaginas();
-
-            atualizarPag(paginacaoAmbulancias.getCurrentPageIndex());
-        }
-    }
-
-    private void atualizarTotalDePaginas() {
-        if (ambulancias.isEmpty()) {
-            paginacaoAmbulancias.setPageCount(1);
-            return;
-        }
-
-        int totalItens = ambulancias.size();
-        int totalPaginas = (int) Math.ceil((double) totalItens / itensPorPagina);
-
-        paginacaoAmbulancias.setPageCount(totalPaginas);
-    }
-
-    private void atualizarPag(int indicePagina) {
-        if (ambulancias.isEmpty()) {
-            tabelaAmbulancias.setItems(FXCollections.emptyObservableList());
-            return;
-        }
-
-        if (indicePagina >= paginacaoAmbulancias.getPageCount()) {
-            indicePagina = paginacaoAmbulancias.getPageCount() - 1;
-        }
-
-        int fromIndex = indicePagina * itensPorPagina;
-        int toIndex = Math.min(fromIndex + itensPorPagina, ambulancias.size());
-
-        List<Ambulancia> paginaAtual = ambulancias.subList(fromIndex, toIndex);
-        tabelaAmbulancias.setItems(FXCollections.observableArrayList(paginaAtual));
-    }
 
     @Override
     public void setNavigator(Navigator navigator) {

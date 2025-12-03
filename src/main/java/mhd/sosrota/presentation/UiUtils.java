@@ -1,5 +1,6 @@
 package mhd.sosrota.presentation;
 
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -105,12 +106,12 @@ public class UiUtils {
                 acoesBox.setAlignment(Pos.CENTER);
                 acoesBox.getChildren().addAll(editarButton, deletarButton);
 
-                editarButton.setOnAction(evt -> {
+                editarButton.setOnAction(_ -> {
                     T item = getTableView().getItems().get(getIndex());
                     if (onEditar != null) onEditar.accept(item);
                 });
 
-                deletarButton.setOnAction(evt -> {
+                deletarButton.setOnAction(_ -> {
                     var result = AlertUtil.showConfirmation(tituloAlerta, descricaoAlerta);
                     if (result.isPresent() && result.get() == ButtonType.OK) {
                         T item = getTableView().getItems().get(getIndex());
@@ -129,6 +130,51 @@ public class UiUtils {
                 }
             }
         };
+    }
+
+    /**
+     * Atualiza a Pagination e a TableView com base em uma lista mestra de dados.
+     * @param pagination O componente de paginação.
+     * @param tableView A tabela que exibirá os dados.
+     * @param listaMestra A lista completa contendo todos os dados.
+     * @param itensPorPagina Quantidade de itens por página.
+     * @param <T> O tipo do objeto (Profissional, Equipe, etc).
+     */
+    public static <T> void atualizarPaginacao(
+            Pagination pagination,
+            TableView<T> tableView,
+            List<T> listaMestra,
+            int itensPorPagina,
+            Runnable acaoAposMudarPagina
+    ) {
+        if (listaMestra == null || listaMestra.isEmpty()) {
+            pagination.setPageCount(1);
+            tableView.setItems(FXCollections.emptyObservableList());
+            return;
+        }
+
+        int totalPaginas = (int) Math.ceil((double) listaMestra.size() / itensPorPagina);
+        pagination.setPageCount(totalPaginas);
+
+        int indicePagina = pagination.getCurrentPageIndex();
+        if (indicePagina >= totalPaginas) {
+            indicePagina = totalPaginas - 1;
+            pagination.setCurrentPageIndex(indicePagina);
+        }
+
+        int fromIndex = indicePagina * itensPorPagina;
+        int toIndex = Math.min(fromIndex + itensPorPagina, listaMestra.size());
+
+        List<T> paginaAtual = listaMestra.subList(fromIndex, toIndex);
+        tableView.setItems(FXCollections.observableArrayList(paginaAtual));
+
+        if (acaoAposMudarPagina != null) {
+            acaoAposMudarPagina.run();
+        }
+    }
+
+    public static <T> void atualizarPaginacao(Pagination p, TableView<T> t, List<T> l, int i) {
+        atualizarPaginacao(p, t, l, i, null);
     }
 
     public static <T> Callback<ListView<T>, ListCell<T>> comboCellFactory(Function<T, String> extractor) {

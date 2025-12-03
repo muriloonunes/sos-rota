@@ -48,7 +48,7 @@ public class EquipeController implements Navigable {
     @FXML
     private TableColumn<Profissional, Void> colunaAcoesProfissional;
     @FXML
-    private Pagination professionalsPagination;
+    private Pagination professionalsPagination, teamsPagination;
     @FXML
     private Label erroLabelProfissionais, erroLabelEquipes;
     @FXML
@@ -68,19 +68,40 @@ public class EquipeController implements Navigable {
     private final AmbulanciaService ambulanciaService = AppContext.getInstance().getAmbulanciaService();
     private final ProfissionalService profissionalService = AppContext.getInstance().getProfissionalService();
     private final EquipeService equipeService = AppContext.getInstance().getEquipeService();
+
+    private final ObservableList<Equipe> listaEquipes = FXCollections.observableArrayList();
     private final ObservableList<Profissional> profissionais = FXCollections.observableArrayList();
 
     private final int itensPorPagina = 8;
     private Navigator navigator;
-    private boolean equipesAberta = false;
 
     @FXML
     public void initialize() {
         configurarProfissionaisTab();
 
+        professionalsPagination.currentPageIndexProperty().addListener((_, _, _) ->
+                UiUtils.atualizarPaginacao(
+                        professionalsPagination,
+                        professionalsTable,
+                        profissionais,
+                        itensPorPagina,
+                        () -> professionalsTable.refresh()
+                )
+        );
+
         equipesTab.setOnSelectionChanged(_ -> {
-            if (equipesTab.isSelected() && equipesAberta == false) {
+            if (equipesTab.isSelected()) {
                 configurarEquipesTab();
+
+                teamsPagination.currentPageIndexProperty().addListener((_, _, _) ->
+                        UiUtils.atualizarPaginacao(
+                                teamsPagination,
+                                equipesTable,
+                                listaEquipes,
+                                itensPorPagina,
+                                () -> equipesTable.refresh()
+                        )
+                );
             }
         });
     }
@@ -101,9 +122,6 @@ public class EquipeController implements Navigable {
 
         configurarTabelaProfissionais();
         carregarProfissionais();
-
-        professionalsPagination.currentPageIndexProperty().addListener(
-                (_, _, newValue) -> atualizarPag(newValue.intValue()));
     }
 
     private void configurarEquipesTab() {
@@ -260,8 +278,7 @@ public class EquipeController implements Navigable {
             @Override
             protected void succeeded() {
                 profissionais.setAll(getValue());
-                atualizarTotalDePaginas();
-                atualizarPag(0);
+                UiUtils.atualizarPaginacao(professionalsPagination, professionalsTable, profissionais, itensPorPagina);
             }
 
             @Override
@@ -287,7 +304,8 @@ public class EquipeController implements Navigable {
 
             @Override
             protected void succeeded() {
-                equipesTable.setItems(getValue());
+                listaEquipes.setAll(getValue());
+                UiUtils.atualizarPaginacao(teamsPagination, equipesTable, listaEquipes, itensPorPagina);
             }
 
             @Override
@@ -408,34 +426,7 @@ public class EquipeController implements Navigable {
 
     private void abrirEditarEquipe(Equipe equipe) {
         AppContext.getInstance().setEquipeEmEdicao(equipe);
-        navigator.showModal(Screens.EDITAR_EQUIPE, "Editar Equipe");
-    }
-
-    private void atualizarTotalDePaginas() {
-        if (profissionais.isEmpty()) {
-            professionalsPagination.setPageCount(1);
-            return;
-        }
-        int totalItens = profissionais.size();
-        int totalPaginas = (int) Math.ceil((double) totalItens / itensPorPagina);
-        professionalsPagination.setPageCount(totalPaginas);
-    }
-
-    private void atualizarPag(int indicePagina) {
-        if (profissionais.isEmpty()) {
-            professionalsTable.setItems(FXCollections.emptyObservableList());
-            return;
-        }
-
-        if (indicePagina >= professionalsPagination.getPageCount()) {
-            indicePagina = professionalsPagination.getPageCount() - 1;
-        }
-
-        int fromIndex = indicePagina * itensPorPagina;
-        int toIndex = Math.min(fromIndex + itensPorPagina, profissionais.size());
-
-        List<Profissional> paginaAtual = profissionais.subList(fromIndex, toIndex);
-        professionalsTable.setItems(FXCollections.observableArrayList(paginaAtual));
+        navigator.showModal(Screens.EDITAR_EQUIPE, "Editar Equipe", 450.0, 510.0);
     }
 
     @FXML

@@ -74,24 +74,33 @@ public class Navigator {
     }
 
     public void showModal(Screens screen, String title) {
+        showModal(screen, title, null, null);
+    }
+
+    public void showModal(Screens screen, String title, Double width, Double height) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(screen.getFxmlPath()));
             Parent root = loader.load();
 
-            // Injeta o Navigator no controller, se implementar Navigable
             Object controller = loader.getController();
             if (controller instanceof Navigable navController) {
                 navController.setNavigator(this);
             }
 
-            // Cria um novo Stage modal
             Stage modalStage = new Stage();
-            modalStage.initOwner(stage); // stage é o Stage principal
+            modalStage.initOwner(stage);
             modalStage.initModality(Modality.WINDOW_MODAL);
             modalStage.setTitle(title);
-            modalStage.setScene(new Scene(root));
-            modalStage.showAndWait(); // bloqueia o Stage principal até fechar
 
+            Scene scene;
+            if (width != null && height != null) {
+                scene = new Scene(root, width, height);
+            } else {
+                scene = new Scene(root);
+            }
+
+            modalStage.setScene(scene);
+            modalStage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Erro ao abrir modal: " + screen);
