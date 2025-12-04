@@ -1,6 +1,7 @@
 package mhd.sosrota.repository;
 
 import mhd.sosrota.model.Ocorrencia;
+import mhd.sosrota.model.enums.StatusOcorrencia;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -11,7 +12,7 @@ public interface OcorrenciaRepository {
 
     Ocorrencia buscarPorId(Long id);
 
-    List<Ocorrencia> buscarPorStatus(String status);
+    List<Ocorrencia> buscarPorStatus(StatusOcorrencia status);
 
     List<Ocorrencia> buscarPorTipo(String tipo);
 

@@ -38,10 +38,8 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
     }
 
     @Override
-    public List<Ocorrencia> buscarPorStatus(String status) {
+    public List<Ocorrencia> buscarPorStatus(StatusOcorrencia status) {
         try (EntityManager em = JpaManager.getEntityManager()) {
-
-            StatusOcorrencia statusEnum = StatusOcorrencia.valueOf(status.toUpperCase());
 
             TypedQuery<Ocorrencia> q = em.createQuery(
                     "SELECT o FROM Ocorrencia o " +
@@ -50,11 +48,10 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
                     Ocorrencia.class
             );
 
-            q.setParameter("status", statusEnum);
-
+            q.setParameter("status", status);
             return q.getResultList();
-
         } catch (Exception e) {
+            e.printStackTrace();
             return Collections.emptyList();
         }
     }

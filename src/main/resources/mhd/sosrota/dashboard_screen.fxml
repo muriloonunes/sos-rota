@@ -93,11 +93,10 @@
             </HBox>
             <TableView fx:id="ocorrenciasTableView" styleClass="table-view" VBox.vgrow="ALWAYS">
                 <columns>
-                    <TableColumn fx:id="idColumn" prefWidth="50" text="ID" />
-                    <TableColumn fx:id="localColumn" prefWidth="150" text="Local" />
+                    <TableColumn fx:id="bairroColumn" prefWidth="150" text="Bairro" />
                     <TableColumn fx:id="gravidadeColumn" prefWidth="100" text="Gravidade" />
-                    <TableColumn fx:id="tipoColumn" prefWidth="100" text="Tipo" />
                     <TableColumn fx:id="statusColumn" prefWidth="120" text="Status" />
+                    <TableColumn fx:id="slaColumn" prefWidth="100" text="SLA" />
                     <TableColumn fx:id="aberturaColumn" prefWidth="150" text="Abertura" />
                     <TableColumn fx:id="acoesColumn" prefWidth="100" text="Ações" />
                 </columns>

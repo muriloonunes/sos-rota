@@ -156,43 +156,45 @@ public class OcorrenciaController implements Navigable {
 
         acoesColumn.setCellFactory(_ -> new TableCell<>() {
             private final HBox acoesBox = new HBox(10);
-            private final MenuButton btnMenu = new MenuButton();
-            private final MenuItem itemDespachar = new MenuItem("Despachar");
-            private final MenuItem itemEditar = new MenuItem("Editar");
-            private final MenuItem itemCancelar = new MenuItem("Cancelar");
+
+            private final Button editarButton = new Button();
+            private final Button cancelarButton = new Button();
+            private final Button despacharButton = new Button();
             private final Button deletarButton = new Button();
 
             {
+                editarButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/editar.svg"))).scaleTo(12));
                 deletarButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/deletar.svg"))).scaleTo(12));
-                btnMenu.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/acoes.svg"))).scaleTo(12));
-                btnMenu.getStyleClass().add("btn-acoes");
-                //TODO estilizar o botao de acoes
+                despacharButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/rota.svg"))).scaleTo(12));
+                cancelarButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/cancelar.svg"))).scaleTo(12));
+
+                despacharButton.getStyleClass().add("btn-primary");
+                editarButton.getStyleClass().add("btn-primary");
                 deletarButton.getStyleClass().add("btn-ocorrencia");
+                cancelarButton.getStyleClass().add("btn-ocorrencia");
+
+                despacharButton.setOnAction(_ -> {
+                    Ocorrencia ocorrencia = getTableRow().getItem();
+                    abrirDespachar(ocorrencia);
+                });
+
+                editarButton.setOnAction(_ -> {
+                    Ocorrencia ocorrencia = getTableRow().getItem();
+                    abrirEditarOcorrencia(ocorrencia);
+                });
+
+                cancelarButton.setOnAction(_ -> {
+                    Ocorrencia ocorrencia = getTableRow().getItem();
+                    cancelarOcorrencia(ocorrencia);
+                });
 
                 deletarButton.setOnAction(_ -> {
                     Ocorrencia ocorrencia = getTableRow().getItem();
                     deletarOcorrencia(ocorrencia);
                 });
 
-                btnMenu.getItems().addAll(itemDespachar, itemEditar, new SeparatorMenuItem(), itemCancelar);
-
                 acoesBox.setAlignment(Pos.CENTER);
-                acoesBox.getChildren().addAll(btnMenu, deletarButton);
-
-                itemDespachar.setOnAction(_ -> {
-                    Ocorrencia ocorrencia = getTableView().getItems().get(getIndex());
-                    abrirDespachar(ocorrencia);
-                });
-
-                itemEditar.setOnAction(_ -> {
-                    Ocorrencia ocorrencia = getTableView().getItems().get(getIndex());
-                    abrirEditarOcorrencia(ocorrencia);
-                });
-
-                itemCancelar.setOnAction(_ -> {
-                    Ocorrencia ocorrencia = getTableView().getItems().get(getIndex());
-                    cancelarOcorrencia(ocorrencia);
-                });
+                acoesBox.getChildren().addAll(despacharButton, editarButton, cancelarButton, deletarButton);
             }
 
             @Override
@@ -206,12 +208,12 @@ public class OcorrenciaController implements Navigable {
 
                     boolean isAberta = oc.getStatusOcorrencia() == StatusOcorrencia.ABERTA;
 
-                    itemDespachar.setDisable(!isAberta);
+                    despacharButton.setDisable(!isAberta);
 
-                    itemEditar.setDisable(oc.getStatusOcorrencia() == StatusOcorrencia.CONCLUIDA
+                    editarButton.setDisable(oc.getStatusOcorrencia() == StatusOcorrencia.CONCLUIDA
                             || oc.getStatusOcorrencia() == StatusOcorrencia.CANCELADA);
 
-                    itemCancelar.setDisable(oc.getStatusOcorrencia() == StatusOcorrencia.CONCLUIDA
+                    cancelarButton.setDisable(oc.getStatusOcorrencia() == StatusOcorrencia.CONCLUIDA
                             || oc.getStatusOcorrencia() == StatusOcorrencia.CANCELADA);
 
                     setGraphic(acoesBox);
@@ -226,6 +228,9 @@ public class OcorrenciaController implements Navigable {
             return;
         }
 
+        AppContext.getInstance().setOcorrenciaParaDespachar(ocorrencia);
+
+        navigator.showModal(Screens.DESPACHAR, "Despachar ambulância");
         //TODO
     }
 
@@ -234,7 +239,7 @@ public class OcorrenciaController implements Navigable {
             @Override
             protected ObservableList<Ocorrencia> call() {
                 List<Ocorrencia> ocorrencias = service.listarTodas();
-                if (ocorrencias.isEmpty() || ocorrencias == null) {
+                if (ocorrencias.isEmpty()) {
                     tabelaOcorrencias.setPlaceholder(new Label("Nenhuma ocorrencia encontrada"));
                 }
                 return FXCollections.observableArrayList(ocorrencias);
@@ -267,36 +272,8 @@ public class OcorrenciaController implements Navigable {
     }
 
     private void cancelarOcorrencia(Ocorrencia ocorrencia) {
-        if (ocorrencia.getStatusOcorrencia() != StatusOcorrencia.ABERTA &&
-                ocorrencia.getStatusOcorrencia() != StatusOcorrencia.DESPACHADA) {
-            AlertUtil.showInfo("Ação Inválida", "Esta ocorrência já está finalizada.");
-            return;
-        }
-
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Cancelar Ocorrência");
-        dialog.setHeaderText("Motivo do Cancelamento");
-        dialog.setContentText("Justificativa:");
-        dialog.showAndWait().ifPresent(justificativa -> {
-            if (justificativa.trim().isEmpty()) {
-                AlertUtil.showInfo("Erro", "A justificativa é obrigatória.");
-                return;
-            }
-
-            try {
-                ocorrencia.setStatusOcorrencia(StatusOcorrencia.CANCELADA);
-                String novaObs = (ocorrencia.getObservacao() != null ? ocorrencia.getObservacao() : "")
-                        + "\n[CANCELAMENTO]: " + justificativa;
-                ocorrencia.setObservacao(novaObs);
-
-                service.salvar(ocorrencia);
-
-                tabelaOcorrencias.refresh();
-
-            } catch (Exception e) {
-                AlertUtil.showError("Erro", "Falha ao cancelar: " + e.getMessage());
-            }
-        });
+        service.cancelarOcorrencia(ocorrencia);
+        carregarOcorrencias();
     }
 
     private void deletarOcorrencia(Ocorrencia ocorrencia) {
@@ -309,6 +286,7 @@ public class OcorrenciaController implements Navigable {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             service.deletar(ocorrencia.getId());
             tabelaOcorrencias.getItems().remove(ocorrencia);
+            carregarOcorrencias();
         }
     }
 

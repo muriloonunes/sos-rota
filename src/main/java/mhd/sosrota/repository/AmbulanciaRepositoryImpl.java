@@ -6,6 +6,7 @@ import mhd.sosrota.infrastructure.database.JpaManager;
 import mhd.sosrota.model.Ambulancia;
 import mhd.sosrota.model.enums.StatusAmbulancia;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -108,14 +109,16 @@ public class AmbulanciaRepositoryImpl implements AmbulanciaRepository {
     }
 
     @Override
-    public long obterAmbulanciaStatus(StatusAmbulancia status) {
+    public List<Ambulancia> obterAmbulanciaStatus(StatusAmbulancia status) {
         try (EntityManager em = JpaManager.getEntityManager()) {
-            return em.createQuery("SELECT COUNT(a) FROM Ambulancia a WHERE a.statusAmbulancia = :status", Long.class)
+            return em.createQuery(
+                            "SELECT a FROM Ambulancia a JOIN FETCH a.bairroBase WHERE a.statusAmbulancia = :status", Ambulancia.class)
                     .setParameter("status", status)
-                    .getSingleResult();
+                    .getResultList();
+
         } catch (Exception e) {
             e.printStackTrace();
-            return 0;
+            return Collections.emptyList();
         }
     }
 }

@@ -15,11 +15,13 @@ public class AppContext {
     private final ProfissionalService profissionalService;
     private final EquipeService equipeService;
     private final OcorrenciaService ocorrenciaService;
+    private final AtendimentoService atendimentoService;
 
     private Ambulancia ambulanciaEmEdicao;
     private Profissional profissionalEmEdicao;
     private Equipe equipeEmEdicao;
     private Ocorrencia ocorrenciaEmEdicao;
+    private Ocorrencia ocorrenciaParaDespachar;
 
     private AppContext() {
         UsuarioRepository usuarioRepository = new UsuarioRepositoryImpl();
@@ -38,7 +40,10 @@ public class AppContext {
         EquipeRepository equipeRepository = new EquipeRepositoryImpl();
         this.equipeService = new EquipeService(equipeRepository, ambulanciaRepository);
 
-        ocorrenciaService = new OcorrenciaService(new OcorrenciaRepositoryImpl());
+        this.ocorrenciaService = new OcorrenciaService(new OcorrenciaRepositoryImpl());
+
+        AtendimentoRepository atendimentoRepository = new AtendimentoRepositoryImpl();
+        this.atendimentoService = new AtendimentoService(grafoService, ambulanciaRepository, atendimentoRepository);
     }
 
     public static synchronized AppContext getInstance() {
@@ -66,6 +71,10 @@ public class AppContext {
 
     public ProfissionalService getProfissionalService() {
         return profissionalService;
+    }
+
+    public AtendimentoService getDespachoService() {
+        return atendimentoService;
     }
 
     public EquipeService getEquipeService() {
@@ -102,5 +111,13 @@ public class AppContext {
 
     public void setOcorrenciaEmEdicao(Ocorrencia ocorrenciaEmEdicao) {
         this.ocorrenciaEmEdicao = ocorrenciaEmEdicao;
+    }
+
+    public Ocorrencia getOcorrenciaParaDespachar() {
+        return ocorrenciaParaDespachar;
+    }
+
+    public void setOcorrenciaParaDespachar(Ocorrencia ocorrenciaParaDespachar) {
+        this.ocorrenciaParaDespachar = ocorrenciaParaDespachar;
     }
 }

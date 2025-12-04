@@ -1,9 +1,11 @@
 package mhd.sosrota.service;
 
+import javafx.scene.control.TextInputDialog;
 import mhd.sosrota.model.Ocorrencia;
 import mhd.sosrota.model.enums.StatusOcorrencia;
 import mhd.sosrota.model.exceptions.CadastroException;
 import mhd.sosrota.repository.OcorrenciaRepository;
+import mhd.sosrota.util.AlertUtil;
 
 import java.util.List;
 
@@ -41,5 +43,38 @@ public class OcorrenciaService {
 
     public void deletar(Long id) {
         repository.deletar(id);
+    }
+
+    public void cancelarOcorrencia(Ocorrencia ocorrencia) {
+        if (ocorrencia.getStatusOcorrencia() != StatusOcorrencia.ABERTA &&
+                ocorrencia.getStatusOcorrencia() != StatusOcorrencia.DESPACHADA) {
+            AlertUtil.showInfo("Ação Inválida", "Esta ocorrência já está finalizada.");
+            return;
+        }
+
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Cancelar Ocorrência");
+        dialog.setHeaderText("Motivo do Cancelamento");
+        dialog.setContentText("Justificativa:");
+
+        dialog.showAndWait().ifPresent(justificativa -> {
+            if (justificativa.trim().isEmpty()) {
+                AlertUtil.showInfo("Erro", "A justificativa é obrigatória.");
+                return;
+            }
+
+            ocorrencia.setStatusOcorrencia(StatusOcorrencia.CANCELADA);
+
+            String novaObs = (ocorrencia.getObservacao() != null ? ocorrencia.getObservacao() : "")
+                    + "\n[CANCELAMENTO]: " + justificativa;
+
+            ocorrencia.setObservacao(novaObs);
+            repository.salvar(ocorrencia);
+        });
+    }
+
+    public int obterQuantidadeOcorrenciasPorStatus(StatusOcorrencia status) {
+        var lista = repository.buscarPorStatus(status);
+        return lista.size();
     }
 }

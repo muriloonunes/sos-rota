@@ -150,6 +150,60 @@ public class EquipeController implements Navigable {
                         .or(condutorComboBox.valueProperty().isNull())
         );
 
+        carregarCamposProfissionais();
+        configurarTabelaEquipe();
+        carregarEquipe();
+    }
+
+    private void configurarTabelaEquipe() {
+        colunaAmbulancia.setCellValueFactory(cellData -> {
+            var ambulancia = cellData.getValue().getAmbulancia();
+            return new SimpleStringProperty(ambulancia != null ? ambulancia.getPlaca() : "-");
+        });
+
+        colunaBase.setCellValueFactory(cellData -> {
+            var ambulanciaCelula = cellData.getValue().getAmbulancia();
+            var ambulancia = ambulanciaService.encontrarPorIdComBairro(ambulanciaCelula.getId());
+            return new SimpleStringProperty(
+                    ambulancia != null && ambulancia.getBairroBase() != null
+                            ? ambulancia.getBairroBase().toString()
+                            : "-"
+            );
+        });
+
+        colunaAtivo.setCellValueFactory(
+                cellData -> new SimpleBooleanProperty(cellData.getValue().isAtivo())
+        );
+        colunaAtivo.setCellFactory(UiUtils.criarCellFactoryCheckbox(
+                Equipe::isAtivo,
+                Equipe::setAtivo,
+                equipeService::atualizarEquipe
+        ));
+
+        colunaMedico.setCellValueFactory(cellData ->
+                obterNomePorFuncao(cellData.getValue(), FuncaoProfissional.MEDICO));
+
+        colunaEnfermeiro.setCellValueFactory(cellData ->
+                obterNomePorFuncao(cellData.getValue(), FuncaoProfissional.ENFERMEIRO));
+
+        colunaCondutor.setCellValueFactory(cellData ->
+                obterNomePorFuncao(cellData.getValue(), FuncaoProfissional.CONDUTOR));
+
+        colunaAcoesEquipe.setCellFactory(UiUtils.criarColunaAcoes(
+                (row) -> {
+                    abrirEditarEquipe(row);
+                    carregarEquipe();
+                },
+                (row) -> {
+                    equipeService.removerEquipe(row.getId());
+                    carregarEquipe();
+                },
+                "Deletar equipe",
+                "Tem certeza que deseja deletar essa equipe?"
+        ));
+    }
+
+    private void carregarCamposProfissionais() {
         Task<Pair<List<Ambulancia>, List<Profissional>>> task = new Task<>() {
             @Override
             protected Pair<List<Ambulancia>, List<Profissional>> call() {
@@ -212,57 +266,6 @@ public class EquipeController implements Navigable {
         };
 
         new Thread(task).start();
-
-        configurarTabelaEquipe();
-        carregarEquipe();
-    }
-
-    private void configurarTabelaEquipe() {
-        colunaAmbulancia.setCellValueFactory(cellData -> {
-            var ambulancia = cellData.getValue().getAmbulancia();
-            return new SimpleStringProperty(ambulancia != null ? ambulancia.getPlaca() : "-");
-        });
-
-        colunaBase.setCellValueFactory(cellData -> {
-            var ambulanciaCelula = cellData.getValue().getAmbulancia();
-            var ambulancia = ambulanciaService.encontrarPorIdComBairro(ambulanciaCelula.getId());
-            return new SimpleStringProperty(
-                    ambulancia != null && ambulancia.getBairroBase() != null
-                            ? ambulancia.getBairroBase().toString()
-                            : "-"
-            );
-        });
-
-        colunaAtivo.setCellValueFactory(
-                cellData -> new SimpleBooleanProperty(cellData.getValue().isAtivo())
-        );
-        colunaAtivo.setCellFactory(UiUtils.criarCellFactoryCheckbox(
-                Equipe::isAtivo,
-                Equipe::setAtivo,
-                equipeService::atualizarEquipe
-        ));
-
-        colunaMedico.setCellValueFactory(cellData ->
-                obterNomePorFuncao(cellData.getValue(), FuncaoProfissional.MEDICO));
-
-        colunaEnfermeiro.setCellValueFactory(cellData ->
-                obterNomePorFuncao(cellData.getValue(), FuncaoProfissional.ENFERMEIRO));
-
-        colunaCondutor.setCellValueFactory(cellData ->
-                obterNomePorFuncao(cellData.getValue(), FuncaoProfissional.CONDUTOR));
-
-        colunaAcoesEquipe.setCellFactory(UiUtils.criarColunaAcoes(
-                (row) -> {
-                    abrirEditarEquipe(row);
-                    carregarEquipe();
-                },
-                (row) -> {
-                    equipeService.removerEquipe(row.getId());
-                    carregarEquipe();
-                },
-                "Deletar equipe",
-                "Tem certeza que deseja deletar essa equipe?"
-        ));
     }
 
     private void configurarTabelaProfissionais() {
@@ -422,6 +425,7 @@ public class EquipeController implements Navigable {
                 AlertUtil.showInfo("Sucesso", "Equipe cadastrada com sucesso!");
                 handleLimparEquipe();
                 carregarEquipe();
+                carregarCamposProfissionais();
             }
 
             @Override

@@ -1,35 +1,49 @@
 package mhd.sosrota.controller;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Translate;
+import javafx.util.Pair;
 import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Bairro;
 import mhd.sosrota.model.GrafoCidade;
+import mhd.sosrota.model.Ocorrencia;
 import mhd.sosrota.model.Rua;
 import mhd.sosrota.model.enums.StatusAmbulancia;
+import mhd.sosrota.model.enums.StatusOcorrencia;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
 import mhd.sosrota.service.AmbulanciaService;
 import mhd.sosrota.service.GrafoCidadeService;
+import mhd.sosrota.service.OcorrenciaService;
+import mhd.sosrota.util.AlertUtil;
 import org.girod.javafx.svgimage.SVGImage;
 import org.girod.javafx.svgimage.SVGLoader;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 /**
@@ -42,16 +56,21 @@ public class DashboardController implements Navigable {
     @FXML
     private HBox ocorrenciasAbertasHbox, ambulanciasDisponiveisHbox, ambulanciasAtendimentoHbox;
     @FXML
-    private Label ambulanciasDisponiveisQtd, ambulanciasAtendimentoQtd;
+    private Label ocorrenciasAbertasQtd, ambulanciasDisponiveisQtd, ambulanciasAtendimentoQtd;
     @FXML
-    private TableView<String> ocorrenciasTableView;
+    private TableView<Ocorrencia> ocorrenciasTableView;
     @FXML
-    private TableColumn<String, String> idColumn, localColumn, gravidadeColumn, tipoColumn, statusColumn, aberturaColumn, acoesColumn;
+    private TableColumn<Ocorrencia, String> bairroColumn, gravidadeColumn, statusColumn;
+    @FXML
+    private TableColumn<Ocorrencia, OffsetDateTime> aberturaColumn, slaColumn;
+    @FXML
+    private TableColumn<Ocorrencia, Void> acoesColumn;
     @FXML
     private Pane mapaPane;
 
     private Navigator navigator;
 
+    private OcorrenciaService ocorrenciaService;
     private AmbulanciaService ambulanciaService;
     private GrafoCidadeService grafoService;
     private GrafoCidade grafo;
@@ -63,11 +82,13 @@ public class DashboardController implements Navigable {
 
     @FXML
     public void initialize() {
+        ocorrenciasAbertasQtd.setText("0");
         ambulanciasDisponiveisQtd.setText("0");
         ambulanciasAtendimentoQtd.setText("0");
 
         this.grafoService = AppContext.getInstance().getGrafoService();
         this.ambulanciaService = AppContext.getInstance().getAmbulanciaService();
+        this.ocorrenciaService = AppContext.getInstance().getOcorrenciaService();
         Platform.runLater(this::carregarDados);
 
         SVGImage exclamationIcon = SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/exclamacao.svg"))).scaleTo(48);
@@ -76,12 +97,140 @@ public class DashboardController implements Navigable {
         ocorrenciasAbertasHbox.getChildren().add(exclamationIcon);
         ambulanciasDisponiveisHbox.getChildren().add(ambulanciasIcon);
         ambulanciasAtendimentoHbox.getChildren().add(pulsoIcon);
+
+    }
+
+    private void configurarTabela() {
+        bairroColumn.setCellValueFactory(new PropertyValueFactory<>("bairro"));
+
+        gravidadeColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getGravidadeOcorrencia().getDescricao()
+        ));
+
+        statusColumn.setCellValueFactory(cellData -> new SimpleStringProperty(
+                cellData.getValue().getStatusOcorrencia().getDescricao()
+        ));
+
+        aberturaColumn.setCellValueFactory(new PropertyValueFactory<>("dataHoraAbertura"));
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+        aberturaColumn.setCellFactory(_ -> new TableCell<>() {
+            @Override
+            protected void updateItem(OffsetDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty) {
+                    setText(null);
+                } else {
+                    setText(formatador.format(item));
+                }
+            }
+        });
+
+        slaColumn.setCellValueFactory(new PropertyValueFactory<>("dataHoraAbertura"));
+        slaColumn.setCellFactory(_ -> new TableCell<>() {
+            @Override
+            protected void updateItem(OffsetDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    Ocorrencia ocorrencia = getTableRow().getItem();
+                    OffsetDateTime limite = ocorrencia.getLimiteSLA();
+
+                    if (limite == null) {
+                        setText("Aguardando...");
+                        return;
+                    }
+                    Duration duration = Duration.between(LocalDateTime.now(), limite);
+                    boolean estourado = duration.isNegative();
+                    long segundosAbs = Math.abs(duration.getSeconds());
+                    long minutos = segundosAbs / 60;
+                    long segundos = segundosAbs % 60;
+
+                    String textoTempo = String.format("%s%02d:%02d",
+                            estourado ? "-" : "",
+                            minutos,
+                            segundos
+                    );
+
+                    setText(textoTempo);
+
+                    if (estourado) {
+                        setTextFill(Color.RED);
+                        setStyle("-fx-font-weight: bold;");
+                    } else if (minutos < 2) {
+                        setTextFill(Color.ORANGE);
+                        setStyle("-fx-font-weight: bold;");
+                    } else {
+                        setTextFill(Color.BLACK);
+                        setStyle("");
+                    }
+                }
+            }
+        });
+
+        acoesColumn.setCellFactory(_ -> new TableCell<>() {
+            private final HBox acoesBox = new HBox(10);
+
+            private final Button cancelarButton = new Button();
+            private final Button despacharButton = new Button();
+
+            {
+                despacharButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/rota.svg"))).scaleTo(12));
+                cancelarButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/cancelar.svg"))).scaleTo(12));
+
+                despacharButton.getStyleClass().add("btn-primary");
+                cancelarButton.getStyleClass().add("btn-ocorrencia");
+
+                despacharButton.setOnAction(_ -> {
+                    Ocorrencia ocorrencia = getTableRow().getItem();
+                    abrirDespachar(ocorrencia);
+                });
+
+                cancelarButton.setOnAction(_ -> {
+                    Ocorrencia ocorrencia = getTableRow().getItem();
+                    cancelarOcorrencia(ocorrencia);
+                });
+
+                acoesBox.setAlignment(Pos.CENTER);
+                acoesBox.getChildren().addAll(despacharButton, cancelarButton);
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || getIndex() < 0 || getTableView().getItems().get(getIndex()) == null) {
+                    setGraphic(null);
+                } else {
+                    Ocorrencia oc = getTableView().getItems().get(getIndex());
+
+                    boolean isAberta = oc.getStatusOcorrencia() == StatusOcorrencia.ABERTA;
+
+                    despacharButton.setDisable(!isAberta);
+
+                    cancelarButton.setDisable(oc.getStatusOcorrencia() == StatusOcorrencia.CONCLUIDA
+                            || oc.getStatusOcorrencia() == StatusOcorrencia.CANCELADA);
+
+                    setGraphic(acoesBox);
+                }
+            }
+        });
     }
 
     private void carregarDados() {
         carregarGrafo();
-        carregarAmbulanciasDisponiveis();
-        carregarAmbulanciasAtendimento();
+        carregarAmbulancias();
+        configurarTabela();
+        carregarOcorrencias();
+        Timeline relogio = new Timeline(new KeyFrame(
+                javafx.util.Duration.seconds(1), _ -> ocorrenciasTableView.refresh())
+        );
+        relogio.setCycleCount(Timeline.INDEFINITE);
+        relogio.play();
     }
 
     private void carregarGrafo() {
@@ -114,42 +263,25 @@ public class DashboardController implements Navigable {
         new Thread(task).start();
     }
 
-    private void carregarAmbulanciasDisponiveis() {
-        Task<Long> task = new Task<>() {
+    private void carregarAmbulancias() {
+        Task<Pair<Long, Long>> task = new Task<>() {
             @Override
-            protected Long call() {
-                return ambulanciaService.obterAmbulanciaStatus(StatusAmbulancia.DISPONIVEL);
+            protected Pair<Long, Long> call() {
+                long disponiveis = ambulanciaService.obterQtdAmbulanciaStatus(StatusAmbulancia.DISPONIVEL);
+                long atendimento = ambulanciaService.obterQtdAmbulanciaStatus(StatusAmbulancia.EM_ATENDIMENTO);
+                return new Pair<>(disponiveis, atendimento);
             }
 
             @Override
             protected void succeeded() {
-                long resultado = getValue();
-                ambulanciasDisponiveisQtd.setText(String.valueOf(resultado));
+                Pair<Long, Long> resultado = getValue();
+                ambulanciasDisponiveisQtd.setText(String.valueOf(resultado.getKey()));
+                ambulanciasAtendimentoQtd.setText(String.valueOf(resultado.getValue()));
             }
 
             @Override
             protected void failed() {
                 ambulanciasDisponiveisQtd.setText("0");
-            }
-        };
-
-        new Thread(task).start();
-    }
-    private void carregarAmbulanciasAtendimento() {
-        Task<Long> task = new Task<>() {
-            @Override
-            protected Long call() {
-                return ambulanciaService.obterAmbulanciaStatus(StatusAmbulancia.EM_ATENDIMENTO);
-            }
-
-            @Override
-            protected void succeeded() {
-                long resultado = getValue();
-                ambulanciasAtendimentoQtd.setText(String.valueOf(resultado));
-            }
-
-            @Override
-            protected void failed() {
                 ambulanciasAtendimentoQtd.setText("0");
 
                 getException().printStackTrace();
@@ -157,6 +289,53 @@ public class DashboardController implements Navigable {
         };
 
         new Thread(task).start();
+    }
+
+    private void carregarOcorrencias() {
+        Task<Pair<ObservableList<Ocorrencia>, Integer>> task = new Task<>() {
+            @Override
+            protected Pair<ObservableList<Ocorrencia>, Integer> call() {
+                var lista = ocorrenciaService.listarTodas().stream().limit(10).toList();
+                var quantidade = ocorrenciaService.obterQuantidadeOcorrenciasPorStatus(StatusOcorrencia.ABERTA);
+                var ocorrenciasObservable = FXCollections.observableArrayList(lista);
+                return new Pair<>(ocorrenciasObservable, quantidade);
+            }
+
+            @Override
+            protected void succeeded() {
+                var resultado = getValue();
+                ocorrenciasTableView.setItems(resultado.getKey());
+                ocorrenciasAbertasQtd.setText(String.valueOf(resultado.getValue()));
+            }
+
+            @Override
+            protected void failed() {
+                ocorrenciasAbertasQtd.setText("0");
+                ocorrenciasTableView.setPlaceholder(new Label("Houve um erro ao carregar as ocorrências"));
+
+                getException().printStackTrace();
+            }
+        };
+
+        new Thread(task).start();
+    }
+
+    private void abrirDespachar(Ocorrencia ocorrencia) {
+        if (ocorrencia.getStatusOcorrencia() != StatusOcorrencia.ABERTA) {
+            AlertUtil.showInfo("Ação Inválida", "Só é possível despachar ocorrências abertas.");
+            return;
+        }
+
+        AppContext.getInstance().setOcorrenciaParaDespachar(ocorrencia);
+
+        navigator.showModal(Screens.DESPACHAR, "Despachar ambulância");
+        //TODO
+    }
+
+
+    private void cancelarOcorrencia(Ocorrencia ocorrencia) {
+        ocorrenciaService.cancelarOcorrencia(ocorrencia);
+        carregarOcorrencias();
     }
 
     private void desenharMapa() {
@@ -223,7 +402,7 @@ public class DashboardController implements Navigable {
         mundoGroup.setScaleX(zoom);
         mundoGroup.setScaleY(zoom);
 
-        mundoGroup.getTransforms().add(new Translate(0,0));
+        mundoGroup.getTransforms().add(new Translate(0, 0));
         mundoGroup.setTranslateX(mundoGroup.getTranslateX() + 50);
         mundoGroup.setTranslateY(mundoGroup.getTranslateY() - 350);
 
@@ -342,6 +521,7 @@ public class DashboardController implements Navigable {
     @FXML
     private void criarOcorrencia() {
         navigator.showModal(Screens.CRIAR_OCORRENCIA, "Criar Ocorrência");
+        carregarOcorrencias();
     }
 
     @Override

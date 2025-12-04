@@ -2,6 +2,7 @@ package mhd.sosrota.service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.Strictness;
 import mhd.sosrota.model.Bairro;
 import mhd.sosrota.model.GrafoCidade;
 import mhd.sosrota.model.Rua;
@@ -25,7 +26,7 @@ public class GrafoCidadeService {
     public GrafoCidadeService(BairroRepository bairroRepository, RuaRepository ruaRepository) {
         this.bairroRepository = bairroRepository;
         this.ruaRepository = ruaRepository;
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.gson = new GsonBuilder().setPrettyPrinting().setStrictness(Strictness.LENIENT).create();
     }
 
     public GrafoCidade obterGrafo() {
@@ -52,6 +53,7 @@ public class GrafoCidadeService {
 
         try (Reader reader = new FileReader(file)) {
             GrafoCidade grafo = gson.fromJson(reader, GrafoCidade.class);
+
             Map<Long, Bairro> mapaBairros = grafo.getBairros().stream()
                     .collect(Collectors.toMap(Bairro::getId, Function.identity()));
 
@@ -59,6 +61,9 @@ public class GrafoCidadeService {
                 rua.setOrigem(mapaBairros.get(rua.getOrigem().getId()));
                 rua.setDestino(mapaBairros.get(rua.getDestino().getId()));
             }
+
+            grafo.construirAdjacencia();
+
             return grafo;
         } catch (IOException | NullPointerException e) {
             e.printStackTrace();

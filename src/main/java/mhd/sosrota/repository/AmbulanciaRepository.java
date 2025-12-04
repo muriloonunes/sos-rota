@@ -26,5 +26,5 @@ public interface AmbulanciaRepository {
 
     boolean deletarAmbulancia(long id);
 
-    long obterAmbulanciaStatus(StatusAmbulancia status);
+    List<Ambulancia> obterAmbulanciaStatus(StatusAmbulancia status);
 }

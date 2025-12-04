@@ -110,7 +110,10 @@ public class AmbulanciaService {
         return repo.deletarAmbulancia(id);
     }
 
-    public long obterAmbulanciaStatus(StatusAmbulancia status) {
+    public long obterQtdAmbulanciaStatus(StatusAmbulancia status) {
+        return repo.obterAmbulanciaStatus(status).size();
+    }
+    public List<Ambulancia> obterAmbulanciaStatus(StatusAmbulancia status) {
         return repo.obterAmbulanciaStatus(status);
     }
 }

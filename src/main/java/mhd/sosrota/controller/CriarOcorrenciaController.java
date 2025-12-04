@@ -58,15 +58,23 @@ public class CriarOcorrenciaController implements Navigable {
         this.ocorrenciaEmEdicao = AppContext.getInstance().getOcorrenciaEmEdicao();
         if (this.ocorrenciaEmEdicao != null) {
             preencherCamposEdicao();
+            String bairroOcorrencia = ocorrenciaEmEdicao.getBairro().getNome();
+
+            registrarOcorrenciaButton.disableProperty().bind(
+                    bairroComboBox.valueProperty().isEqualTo(bairroOcorrencia)
+                            .and(gravidadeComboBox.valueProperty().isEqualTo(ocorrenciaEmEdicao.getGravidadeOcorrencia().getDescricao()))
+                            .and(tipoOcorrenciaTextField.textProperty().isEqualTo(ocorrenciaEmEdicao.getTipoOcorrencia()))
+                            .and(obsTextArea.textProperty().isEqualTo(ocorrenciaEmEdicao.getObservacao()))
+            );
+        } else {
+            registrarOcorrenciaButton.disableProperty().bind(
+                    bairroComboBox.getSelectionModel().selectedItemProperty().isNull()
+                            .or(gravidadeComboBox.getSelectionModel().selectedItemProperty().isNull())
+                            .or(tipoOcorrenciaTextField.textProperty().isEmpty())
+            );
         }
 
         AppContext.getInstance().setOcorrenciaEmEdicao(null);
-
-        registrarOcorrenciaButton.disableProperty().bind(
-                bairroComboBox.getSelectionModel().selectedItemProperty().isNull()
-                        .or(gravidadeComboBox.getSelectionModel().selectedItemProperty().isNull())
-                        .or(tipoOcorrenciaTextField.textProperty().isEmpty())
-        );
     }
 
     private void preencherCamposEdicao() {

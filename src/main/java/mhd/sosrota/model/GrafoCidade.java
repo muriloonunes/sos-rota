@@ -6,86 +6,65 @@ public class GrafoCidade {
     private List<Bairro> bairros;
     private List<Rua> ruas;
 
+    private transient Map<Bairro, List<Rua>> adjacencia;
+
     public GrafoCidade() {
     }
 
     public GrafoCidade(List<Bairro> bairros, List<Rua> ruas) {
         this.bairros = bairros;
         this.ruas = ruas;
+        construirAdjacencia();
     }
 
-    public List<Bairro> vizinhos(Bairro bairro) {
-        List<Bairro> vizinhos = new ArrayList<>();
-
+    public void construirAdjacencia() {
+        this.adjacencia = new HashMap<>();
+        for (Bairro b : bairros) {
+            adjacencia.put(b, new ArrayList<>());
+        }
         for (Rua rua : ruas) {
-            if (rua.getOrigem().equals(bairro)) {
-                vizinhos.add(rua.getDestino());
-            } else if (rua.getDestino().equals(bairro)) {
-                vizinhos.add(rua.getOrigem());
-            }
+            // grafo nao direcionado
+            adjacencia.computeIfAbsent(rua.getOrigem(), _ -> new ArrayList<>()).add(rua);
+            adjacencia.computeIfAbsent(rua.getDestino(), _ -> new ArrayList<>()).add(rua);
         }
-        return vizinhos;
     }
 
-    public List<Bairro> menorCaminho(GrafoCidade grafo, Bairro origem, Bairro destino) {
-        Map<Bairro, Double> dist = new HashMap<>();
-        Map<Bairro, Bairro> anterior = new HashMap<>();
+    public Map<Bairro, Double> calcularDistanciasParaTodos(Bairro origem) {
+        Map<Bairro, Double> distancias = new HashMap<>();
         Set<Bairro> visitados = new HashSet<>();
+        // PriorityQueue para pegar sempre o mais próximo (Performance O(E log V))
+        PriorityQueue<NoDijkstra> filaPrioridade = new PriorityQueue<>();
 
-        for (Bairro b : grafo.getBairros()) {
-            dist.put(b, Double.POSITIVE_INFINITY);
-            anterior.put(b, null);
+        // Inicialização
+        for (Bairro b : bairros) {
+            distancias.put(b, Double.POSITIVE_INFINITY);
         }
+        distancias.put(origem, 0.0);
+        filaPrioridade.add(new NoDijkstra(origem, 0.0));
 
-        dist.put(origem, 0.0);
+        while (!filaPrioridade.isEmpty()) {
+            NoDijkstra atualNo = filaPrioridade.poll();
+            Bairro atual = atualNo.bairro;
 
-        while (visitados.size() < grafo.getBairros().size()) {
-
-            Bairro atual = null;
-            double menor = Double.POSITIVE_INFINITY;
-
-            for (var e : dist.entrySet()) {
-                if (!visitados.contains(e.getKey()) && e.getValue() < menor) {
-                    atual = e.getKey();
-                    menor = e.getValue();
-                }
-            }
-
-            if (atual == null) break;
-            if (atual.equals(destino)) break;
-
+            if (visitados.contains(atual)) continue;
             visitados.add(atual);
 
-            for (Bairro viz : grafo.vizinhos(atual)) {
-                double novaDist = dist.get(atual) + grafo.distancia(atual, viz);
+            List<Rua> ruasSaida = adjacencia.getOrDefault(atual, Collections.emptyList());
 
-                if (novaDist < dist.get(viz)) {
-                    dist.put(viz, novaDist);
-                    anterior.put(viz, atual);
+            for (Rua rua : ruasSaida) {
+                Bairro vizinho = rua.getOrigem().equals(atual) ? rua.getDestino() : rua.getOrigem();
+
+                if (!visitados.contains(vizinho)) {
+                    double novaDist = distancias.get(atual) + rua.getDistanciaKm();
+
+                    if (novaDist < distancias.get(vizinho)) {
+                        distancias.put(vizinho, novaDist);
+                        filaPrioridade.add(new NoDijkstra(vizinho, novaDist));
+                    }
                 }
             }
         }
-
-        // reconstrói o caminho
-        LinkedList<Bairro> caminho = new LinkedList<>();
-        Bairro atual = destino;
-
-        while (atual != null) {
-            caminho.addFirst(atual);
-            atual = anterior.get(atual);
-        }
-
-        return caminho;
-    }
-
-    public double distancia(Bairro a, Bairro b) {
-        for (Rua rua : ruas) {
-            if (rua.getOrigem().equals(a) && rua.getDestino().equals(b) ||
-                    rua.getOrigem().equals(b) && rua.getDestino().equals(a)) {
-                return rua.getDistanciaKm();
-            }
-        }
-        return Double.POSITIVE_INFINITY;
+        return distancias;
     }
 
     public List<Bairro> getBairros() {
@@ -102,5 +81,20 @@ public class GrafoCidade {
 
     public void setRuas(List<Rua> ruas) {
         this.ruas = ruas;
+    }
+
+    private static class NoDijkstra implements Comparable<NoDijkstra> {
+        Bairro bairro;
+        double distancia;
+
+        public NoDijkstra(Bairro bairro, double distancia) {
+            this.bairro = bairro;
+            this.distancia = distancia;
+        }
+
+        @Override
+        public int compareTo(NoDijkstra outro) {
+            return Double.compare(this.distancia, outro.distancia);
+        }
     }
 }
