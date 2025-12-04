@@ -33,7 +33,7 @@ public class AppContext {
         this.profissionalService = new ProfissionalService(profissionalRepository);
 
         EquipeRepository equipeRepository = new EquipeRepositoryImpl();
-        this.equipeService = new EquipeService(equipeRepository);
+        this.equipeService = new EquipeService(equipeRepository, ambulanciaRepository);
     }
 
     public static synchronized AppContext getInstance() {

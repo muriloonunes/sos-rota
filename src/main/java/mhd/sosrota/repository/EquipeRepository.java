@@ -5,7 +5,6 @@ import mhd.sosrota.model.Equipe;
 import java.util.List;
 
 public interface EquipeRepository {
-
     Boolean insertEquipe(Equipe equipe);
 
     Equipe buscaPorPlacaAmbulancia(String placa);
@@ -17,4 +16,6 @@ public interface EquipeRepository {
     Boolean updateEquipe(Equipe equipe);
 
     Boolean deleteEquipe(long id);
+
+    boolean existeEquipeComAmbulancia(long idAmbulancia, long idEquipeIgnorada);
 }

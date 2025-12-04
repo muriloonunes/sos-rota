@@ -94,7 +94,7 @@ public class EditarEquipeController implements Navigable {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                var ambulancias = ambulanciaService.listarDisponiveis();
+                var ambulancias = ambulanciaService.listarAmbulanciaSemEquipe();
                 var profissionaisDisponiveis = profissionalService.listarProfissionaisDisponiveis();
 
                 Ambulancia atual = equipeEmEdicao.getAmbulancia();

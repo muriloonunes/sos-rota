@@ -1,5 +1,6 @@
 package mhd.sosrota.controller;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -56,7 +57,9 @@ public class EquipeController implements Navigable {
     @FXML
     private TableView<Equipe> equipesTable;
     @FXML
-    private TableColumn<Equipe, String> colunaAmbulancia, colunaMedico, colunaEnfermeiro, colunaCondutor;
+    private TableColumn<Equipe, String> colunaAmbulancia, colunaMedico, colunaEnfermeiro, colunaCondutor, colunaBase;
+    @FXML
+    private TableColumn<Equipe, Boolean> colunaAtivo;
     @FXML
     private TableColumn<Equipe, Void> colunaAcoesEquipe;
 
@@ -150,7 +153,7 @@ public class EquipeController implements Navigable {
         Task<Pair<List<Ambulancia>, List<Profissional>>> task = new Task<>() {
             @Override
             protected Pair<List<Ambulancia>, List<Profissional>> call() {
-                var ambulancias = ambulanciaService.listarDisponiveis();
+                var ambulancias = ambulanciaService.listarAmbulanciaSemEquipe();
                 var profissionais = profissionalService.listarProfissionaisDisponiveis();
                 return new Pair<>(ambulancias, profissionais);
             }
@@ -203,6 +206,7 @@ public class EquipeController implements Navigable {
 
             @Override
             protected void failed() {
+                getException().printStackTrace();
                 mostrarErro(erroLabelEquipes, "Houve um erro ao carregar os dados");
             }
         };
@@ -218,6 +222,25 @@ public class EquipeController implements Navigable {
             var ambulancia = cellData.getValue().getAmbulancia();
             return new SimpleStringProperty(ambulancia != null ? ambulancia.getPlaca() : "-");
         });
+
+        colunaBase.setCellValueFactory(cellData -> {
+            var ambulanciaCelula = cellData.getValue().getAmbulancia();
+            var ambulancia = ambulanciaService.encontrarPorIdComBairro(ambulanciaCelula.getId());
+            return new SimpleStringProperty(
+                    ambulancia != null && ambulancia.getBairroBase() != null
+                            ? ambulancia.getBairroBase().toString()
+                            : "-"
+            );
+        });
+
+        colunaAtivo.setCellValueFactory(
+                cellData -> new SimpleBooleanProperty(cellData.getValue().isAtivo())
+        );
+        colunaAtivo.setCellFactory(UiUtils.criarCellFactoryCheckbox(
+                Equipe::isAtivo,
+                Equipe::setAtivo,
+                equipeService::atualizarEquipe
+        ));
 
         colunaMedico.setCellValueFactory(cellData ->
                 obterNomePorFuncao(cellData.getValue(), FuncaoProfissional.MEDICO));

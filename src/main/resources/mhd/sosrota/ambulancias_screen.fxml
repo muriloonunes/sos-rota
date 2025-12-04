@@ -33,8 +33,9 @@
         <Separator />
         <GridPane hgap="10.0">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
-                <ColumnConstraints hgrow="SOMETIMES" percentWidth="50.0" />
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.0" />
+                <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.0" />
+            <ColumnConstraints hgrow="SOMETIMES" percentWidth="33.0" />
             </columnConstraints>
             <rowConstraints>
                 <RowConstraints vgrow="SOMETIMES" />
@@ -47,20 +48,10 @@
                             <Label styleClass="title-label" text="Placa:" />
                             <TextField fx:id="placaTextField" promptText="Ex: ABC1D23" styleClass="input-field" />
                         </VBox>
-
-                        <VBox spacing="4">
-                            <Label styleClass="title-label" text="Tipo:" />
-                            <ComboBox fx:id="tipoComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o tipo (Básica/UTI)" styleClass="info-selectors" />
-                        </VBox>
                     </children>
                 </VBox>
                 <VBox spacing="10.0" GridPane.columnIndex="1">
                     <children>
-
-                        <VBox spacing="4">
-                            <Label styleClass="title-label" text="Status Operacional:" />
-                            <ComboBox fx:id="statusComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o status" styleClass="info-selectors" />
-                        </VBox>
 
                         <VBox spacing="4">
                             <Label styleClass="title-label" text="Base Vinculada:" />
@@ -68,6 +59,11 @@
                         </VBox>
                     </children>
                 </VBox>
+
+                  <VBox spacing="4" GridPane.columnIndex="2">
+                      <Label styleClass="title-label" text="Tipo:" />
+                      <ComboBox fx:id="tipoComboBox" maxWidth="1.7976931348623157E308" promptText="Selecione o tipo (Básica/UTI)" styleClass="info-selectors" />
+                  </VBox>
             </children>
         </GridPane>
       <HBox alignment="CENTER_RIGHT">

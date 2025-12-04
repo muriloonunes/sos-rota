@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class AmbulanciaController implements Navigable {
     @FXML
-    private ComboBox<String> tipoComboBox, statusComboBox;
+    private ComboBox<String> tipoComboBox;
     @FXML
     private ComboBox<Bairro> baseComboBox;
     @FXML
@@ -62,13 +62,12 @@ public class AmbulanciaController implements Navigable {
 
         carregarAmbulancias();
 
-        UiUtils.configurarCamposAmbulancia(placaTextField, tipoComboBox, statusComboBox, baseComboBox);
+        UiUtils.configurarCamposAmbulancia(placaTextField, tipoComboBox, baseComboBox);
         tabelaAmbulancias.setItems(ambulancias);
 
         cadastrarAmbulanciaButton.disableProperty().bind(
                 (placaTextField.textProperty().isEmpty()
                         .or(tipoComboBox.valueProperty().isNull())
-                        .or(statusComboBox.valueProperty().isNull())
                         .or(baseComboBox.valueProperty().isNull()))
                         .or(placaTextField.textProperty().length().lessThan(7))
         );
@@ -143,7 +142,6 @@ public class AmbulanciaController implements Navigable {
     private void handleClearFields() {
         placaTextField.clear();
         tipoComboBox.getSelectionModel().clearSelection();
-        statusComboBox.getSelectionModel().clearSelection();
         baseComboBox.getSelectionModel().clearSelection();
     }
 
@@ -154,7 +152,6 @@ public class AmbulanciaController implements Navigable {
 
         String placa = placaTextField.getText().toUpperCase();
         String tipoDesc = tipoComboBox.getValue();
-        String statusDesc = statusComboBox.getValue();
         Bairro base = baseComboBox.getValue();
 
         UiUtils.setButtonLoading(cadastrarAmbulanciaButton, true, "Registrar Ambulância");
@@ -162,7 +159,7 @@ public class AmbulanciaController implements Navigable {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
-                service.cadastrarAmbulancia(placa, statusDesc, tipoDesc, base);
+                service.cadastrarAmbulancia(placa, tipoDesc, base);
                 return null;
             }
 
@@ -205,8 +202,6 @@ public class AmbulanciaController implements Navigable {
         AppContext.getInstance().setAmbulanciaEmEdicao(row);
         navigator.showModal(Screens.EDITAR_AMBULANCIA, "Editar Ambulância");
     }
-
-
 
     @Override
     public void setNavigator(Navigator navigator) {

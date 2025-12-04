@@ -81,23 +81,31 @@ public record ProfissionalService(ProfissionalRepository repo) {
         }
 
         try {
-            FuncaoProfissional funcao = FuncaoProfissional.fromNome(funcaoDesc);
-            if (funcao == null) {
-                throw new CadastroException("Função inválida.");
-            }
-
             Profissional profissionalExistente = repo.buscarPorId(id);
 
             if (profissionalExistente == null) {
                 throw new CadastroException("Profissional não encontrado.");
             }
 
+            FuncaoProfissional novaFuncao = FuncaoProfissional.fromNome(funcaoDesc);
+            if (novaFuncao == null) {
+                throw new CadastroException("Função inválida.");
+            }
+
+            boolean mudouDeFuncao = !profissionalExistente.getFuncaoProfissional().equals(novaFuncao);
+
+            if (mudouDeFuncao && profissionalExistente.getEquipe() != null && profissionalExistente.getEquipe().isAtivo()) {
+                throw new CadastroException("Não é possível alterar a função de um profissional que está alocado em uma equipe ativa.\nRemova-o da equipe ou a deixe inativa");
+            }
+
             profissionalExistente.setId(id);
             profissionalExistente.setNome(nome);
-            profissionalExistente.setFuncaoProfissional(funcao);
+            profissionalExistente.setFuncaoProfissional(novaFuncao);
             profissionalExistente.setContato(email);
 
             repo.atualizar(profissionalExistente);
+        } catch (CadastroException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             throw new CadastroException("Erro ao atualizar profissional.");

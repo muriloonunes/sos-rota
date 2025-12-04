@@ -9,6 +9,7 @@ import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Bairro;
 import mhd.sosrota.model.enums.StatusAmbulancia;
 import mhd.sosrota.model.enums.TipoAmbulancia;
+import mhd.sosrota.model.exceptions.CadastroException;
 import mhd.sosrota.util.AlertUtil;
 import org.girod.javafx.svgimage.SVGImage;
 import org.girod.javafx.svgimage.SVGLoader;
@@ -17,6 +18,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -30,6 +32,14 @@ public class UiUtils {
     private static final URL URL_EDITAR = UiUtils.class.getResource("/images/editar.svg");
     private static final URL URL_DELETAR = UiUtils.class.getResource("/images/deletar.svg");
 
+    public static void configurarCamposAmbulancia(
+            TextField placaField,
+            ComboBox<String> tipoComboBox,
+            ComboBox<Bairro> baseComboBox
+    ) {
+        configurarCamposAmbulancia(placaField, tipoComboBox, null, baseComboBox);
+    }
+
     public static void configurarCamposAmbulancia(TextField placaField, ComboBox<String> tipoComboBox, ComboBox<String> statusComboBox, ComboBox<Bairro> baseComboBox) {
         List<Bairro> bases = AppContext.getInstance().getGrafoService().obterBairros().stream().filter(
                 Bairro::temBase
@@ -41,11 +51,13 @@ public class UiUtils {
                         .toList()
         );
 
-        statusComboBox.getItems().addAll(
-                Arrays.stream(StatusAmbulancia.values())
-                        .map(StatusAmbulancia::getDescricao)
-                        .toList()
-        );
+        if (statusComboBox != null) {
+            statusComboBox.getItems().addAll(
+                    Arrays.stream(StatusAmbulancia.values())
+                            .map(StatusAmbulancia::getDescricao)
+                            .toList()
+            );
+        }
 
         baseComboBox.getItems().addAll(
                 bases
@@ -132,13 +144,51 @@ public class UiUtils {
         };
     }
 
+    public static <T> Callback<TableColumn<T, Boolean>, TableCell<T, Boolean>> criarCellFactoryCheckbox(
+            Function<T, Boolean> getter,
+            BiConsumer<T, Boolean> setter,
+            Consumer<T> onChange
+    ) {
+        return _ -> new TableCell<>() {
+            private final CheckBox checkBox = new CheckBox();
+
+            {
+                checkBox.setOnAction(event -> {
+                    T item = getTableView().getItems().get(getIndex());
+                    boolean novoValor = checkBox.isSelected();
+
+                    setter.accept(item, novoValor);
+                    try {
+                        onChange.accept(item);
+                    } catch (CadastroException e) {
+                        AlertUtil.showError("Erro", e.getMessage());
+                        checkBox.setSelected(!novoValor);
+                    }
+                });
+            }
+
+            @Override
+            protected void updateItem(Boolean value, boolean empty) {
+                super.updateItem(value, empty);
+
+                if (empty) {
+                    setGraphic(null);
+                } else {
+                    checkBox.setSelected(value != null && value);
+                    setGraphic(checkBox);
+                }
+            }
+        };
+    }
+
     /**
      * Atualiza a Pagination e a TableView com base em uma lista mestra de dados.
-     * @param pagination O componente de paginação.
-     * @param tableView A tabela que exibirá os dados.
-     * @param listaMestra A lista completa contendo todos os dados.
+     *
+     * @param pagination     O componente de paginação.
+     * @param tableView      A tabela que exibirá os dados.
+     * @param listaMestra    A lista completa contendo todos os dados.
      * @param itensPorPagina Quantidade de itens por página.
-     * @param <T> O tipo do objeto (Profissional, Equipe, etc).
+     * @param <T>            O tipo do objeto (Profissional, Equipe, etc).
      */
     public static <T> void atualizarPaginacao(
             Pagination pagination,

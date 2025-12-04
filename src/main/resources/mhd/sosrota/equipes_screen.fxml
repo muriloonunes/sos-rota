@@ -182,9 +182,11 @@
                             <TableView fx:id="equipesTable" styleClass="table-view" VBox.vgrow="ALWAYS">
                                 <columns>
                                     <TableColumn fx:id="colunaAmbulancia" prefWidth="120" text="Ambulância" />
+                           <TableColumn fx:id="colunaBase" prefWidth="75.0" text="Base" />
                                     <TableColumn fx:id="colunaMedico" prefWidth="150" text="Médico" />
                                     <TableColumn fx:id="colunaEnfermeiro" prefWidth="150" text="Enfermeiro" />
                                     <TableColumn fx:id="colunaCondutor" prefWidth="150" text="Condutor" />
+                           <TableColumn fx:id="colunaAtivo" prefWidth="75.0" text="Ativo" />
                                     <TableColumn fx:id="colunaAcoesEquipe" text="Ações" />
                                 </columns>
                                 <columnResizePolicy>

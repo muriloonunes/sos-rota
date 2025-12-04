@@ -12,7 +12,8 @@ public enum StatusAmbulancia {
     DISPONIVEL("Disponível"),
     EM_ATENDIMENTO("Em Atendimento"),
     MANUTENCAO("Manutenção"),
-    INATIVA("Inativa");
+    INATIVA("Inativa"),
+    DESATIVADA("Desativada");
 
     private final String descricao;
 

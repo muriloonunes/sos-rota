@@ -16,13 +16,25 @@ import java.util.List;
 
 public class AmbulanciaRepositoryImpl implements AmbulanciaRepository {
     @Override
-    public Ambulancia encontrarPorPlaca(String placa) {
+    public Ambulancia encontrarPorId(long id) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
+            return em.find(Ambulancia.class, id);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    @Override
+    public Ambulancia encontrarPorIdComBairro(long id) {
         try (EntityManager em = JpaManager.getEntityManager()) {
             return em.createQuery(
-                            "SELECT a FROM Ambulancia a WHERE a.placa = :placa", Ambulancia.class)
-                    .setParameter("placa", placa)
+                            "SELECT a FROM Ambulancia a " +
+                                    "LEFT JOIN FETCH a.bairroBase " +
+                                    "WHERE a.id = :id", Ambulancia.class)
+                    .setParameter("id", id)
                     .getSingleResult();
-        } catch (NoResultException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -38,17 +50,18 @@ public class AmbulanciaRepositoryImpl implements AmbulanciaRepository {
     }
 
     @Override
-    public List<Ambulancia> listarDisponiveis() {
+    public List<Ambulancia> listarAmbulanciaSemEquipe() {
         try (EntityManager em = JpaManager.getEntityManager()) {
             return em.createQuery(
-                    "SELECT a FROM Ambulancia a JOIN FETCH a.bairroBase " +
+                    "SELECT a FROM Ambulancia a " +
+                            "LEFT JOIN FETCH a.bairroBase " +
                             "WHERE a.id NOT IN (" +
                             "   SELECT e.ambulancia.id FROM Equipe e WHERE e.ativo = true" +
                             ")",
                     Ambulancia.class
             ).getResultList();
         } catch (NoResultException e) {
-            return null;
+            return List.of();
         }
     }
 
@@ -62,7 +75,7 @@ public class AmbulanciaRepositoryImpl implements AmbulanciaRepository {
     }
 
     @Override
-    public Ambulancia atualizarAmbulancia(Ambulancia dados) {
+    public void atualizarAmbulancia(Ambulancia dados) {
         try (EntityManager em = JpaManager.getEntityManager()) {
             em.getTransaction().begin();
 
@@ -74,8 +87,6 @@ public class AmbulanciaRepositoryImpl implements AmbulanciaRepository {
             original.setStatusAmbulancia(dados.getStatusAmbulancia());
             original.setBairroBase(dados.getBairroBase());
             em.getTransaction().commit();
-
-            return original;
         }
     }
 

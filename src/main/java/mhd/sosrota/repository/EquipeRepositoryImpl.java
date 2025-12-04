@@ -4,8 +4,10 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import mhd.sosrota.infrastructure.database.JpaManager;
+import mhd.sosrota.model.Ambulancia;
 import mhd.sosrota.model.Equipe;
 import mhd.sosrota.model.Profissional;
+import mhd.sosrota.model.enums.StatusAmbulancia;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +19,11 @@ public class EquipeRepositoryImpl implements EquipeRepository {
         EntityManager em = JpaManager.getEntityManager();
         try {
             em.getTransaction().begin();
+
+            Ambulancia amb = equipe.getAmbulancia();
+            amb.setStatusAmbulancia(StatusAmbulancia.DISPONIVEL);
+            em.merge(amb);
+
             em.persist(equipe);
             for (Profissional p : equipe.getProfissionais()) {
                 em.merge(p);
@@ -27,6 +34,8 @@ public class EquipeRepositoryImpl implements EquipeRepository {
             if (em.getTransaction().isActive()) em.getTransaction().rollback();
             e.printStackTrace();
             return false;
+        } finally {
+            em.close();
         }
     }
 
@@ -80,24 +89,57 @@ public class EquipeRepositoryImpl implements EquipeRepository {
 
     @Override
     public Boolean updateEquipe(Equipe equipeAlterada) {
-        try (EntityManager em = JpaManager.getEntityManager()) {
+        EntityManager em = JpaManager.getEntityManager();
+        try {
             em.getTransaction().begin();
+
+            Equipe equipeAntiga = em.find(Equipe.class, equipeAlterada.getId());
+            Ambulancia ambAntiga = equipeAntiga.getAmbulancia();
+            Ambulancia ambNova = em.find(Ambulancia.class, equipeAlterada.getAmbulancia().getId());
+
+            if (!ambAntiga.getId().equals(ambNova.getId())) {
+                if (ambAntiga.getStatusAmbulancia() != StatusAmbulancia.DESATIVADA) {
+                    ambAntiga.setStatusAmbulancia(StatusAmbulancia.INATIVA);
+                    em.merge(ambAntiga);
+                }
+            }
+
+            if (equipeAlterada.isAtivo()) {
+                if (ambNova.getStatusAmbulancia() != StatusAmbulancia.EM_ATENDIMENTO &&
+                        ambNova.getStatusAmbulancia() != StatusAmbulancia.MANUTENCAO) {
+
+                    ambNova.setStatusAmbulancia(StatusAmbulancia.DISPONIVEL);
+                }
+            } else {
+                if (ambNova.getStatusAmbulancia() != StatusAmbulancia.DESATIVADA) {
+                    ambNova.setStatusAmbulancia(StatusAmbulancia.INATIVA);
+                }
+            }
+            em.merge(ambNova);
+
 
             em.createQuery("UPDATE Profissional p SET p.equipe = NULL WHERE p.equipe.id = :id")
                     .setParameter("id", equipeAlterada.getId())
                     .executeUpdate();
 
-            Equipe equipe = em.merge(equipeAlterada);
+            Equipe equipeManaged = em.merge(equipeAlterada);
 
-            for (Profissional p  : equipeAlterada.getProfissionais()) {
-                p.setEquipe(equipe);
-                em.merge(p);
+            for (Profissional p : equipeAlterada.getProfissionais()) {
+                Profissional pManaged = em.find(Profissional.class, p.getId());
+                pManaged.setEquipe(equipeManaged);
+                em.merge(pManaged);
             }
 
             em.getTransaction().commit();
             return true;
         } catch (RuntimeException e) {
+            if (em.getTransaction().isActive()) {
+                em.getTransaction().rollback();
+            }
+            e.printStackTrace();
             return false;
+        } finally {
+            em.close();
         }
     }
 
@@ -109,6 +151,14 @@ public class EquipeRepositoryImpl implements EquipeRepository {
             Equipe equipeBD = em.find(Equipe.class, id);
             if (equipeBD == null) {
                 return false;
+            }
+
+            Ambulancia amb = equipeBD.getAmbulancia();
+            if (amb != null) {
+                if (amb.getStatusAmbulancia() != StatusAmbulancia.DESATIVADA) {
+                    amb.setStatusAmbulancia(StatusAmbulancia.INATIVA);
+                    em.merge(amb);
+                }
             }
 
             for (Profissional p : equipeBD.getProfissionais()) {
@@ -123,6 +173,23 @@ public class EquipeRepositoryImpl implements EquipeRepository {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    @Override
+    public boolean existeEquipeComAmbulancia(long idAmbulancia, long idEquipeIgnorada) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
+            Long count = em.createQuery(
+                            "SELECT COUNT(e) FROM Equipe e " +
+                                    "WHERE e.ambulancia.id = :ambId " +
+                                    "AND e.ativo = true " +
+                                    "AND e.id <> :equipeId",
+                            Long.class)
+                    .setParameter("ambId", idAmbulancia)
+                    .setParameter("equipeId", idEquipeIgnorada)
+                    .getSingleResult();
+
+            return count > 0;
         }
     }
 }

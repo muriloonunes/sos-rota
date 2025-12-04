@@ -28,16 +28,24 @@ public class AmbulanciaService {
         return repo.listarTodasAmbulancias();
     }
 
-    public List<Ambulancia> listarDisponiveis() {
-        return repo.listarDisponiveis();
+    public List<Ambulancia> listarAmbulanciaSemEquipe() {
+        return repo.listarAmbulanciaSemEquipe();
     }
 
-    public void cadastrarAmbulancia(String placa, String statusDesc, String tipoDesc, Bairro base) {
+    public Ambulancia encontrarPorId(long id) {
+        return repo.encontrarPorId(id);
+    }
+
+    public Ambulancia encontrarPorIdComBairro(long id) {
+        return repo.encontrarPorIdComBairro(id);
+    }
+
+    public void cadastrarAmbulancia(String placa, String tipoDesc, Bairro base) {
         if (!placa.matches("^[A-Z]{3}[0-9][A-Z][0-9]{2}$")) {
             throw new CadastroException("A placa deve estar no formato ABC1D23.");
         }
         try {
-            StatusAmbulancia status = StatusAmbulancia.fromDescricao(statusDesc);
+            StatusAmbulancia status = StatusAmbulancia.INATIVA; //sempre iniciamos a ambulancia como inativa, pois ela se inicia sem equipe
             TipoAmbulancia tipo = TipoAmbulancia.fromDescricao(tipoDesc);
             Ambulancia ambulancia = new Ambulancia(status, tipo, placa, base);
             repo.salvar(ambulancia);
@@ -59,7 +67,7 @@ public class AmbulanciaService {
         }
     }
 
-    public Ambulancia atualizarAmbulancia(String placa, String statusDesc, String tipoDesc, Bairro base, long id) {
+    public void atualizarAmbulancia(String placa, String statusDesc, String tipoDesc, Bairro base, long id) {
         if (!placa.matches("^[A-Z]{3}[0-9][A-Z][0-9]{2}$")) {
             throw new CadastroException("A placa deve estar no formato ABC1D23.");
         }
@@ -67,11 +75,19 @@ public class AmbulanciaService {
             throw new CadastroException("Selecione uma base válida.");
         }
         try {
+            Ambulancia ambulanciaExistente = repo.encontrarPorId(id);
+            if (ambulanciaExistente == null) {
+                throw new CadastroException("Ambulância não encontrada.");
+            }
+            if (ambulanciaExistente.getStatusAmbulancia() == StatusAmbulancia.EM_ATENDIMENTO) {
+                throw new CadastroException("Não é possível atualizar uma ambulância que está em atendimento.");
+            }
+
             StatusAmbulancia status = StatusAmbulancia.fromDescricao(statusDesc);
             TipoAmbulancia tipo = TipoAmbulancia.fromDescricao(tipoDesc);
             Ambulancia ambulancia = new Ambulancia(status, tipo, placa, base);
             ambulancia.setId(id);
-            return repo.atualizarAmbulancia(ambulancia);
+            repo.atualizarAmbulancia(ambulancia);
         } catch (Exception e) {
             Throwable causaAtual = e;
             while (causaAtual != null) {

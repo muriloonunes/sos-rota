@@ -12,15 +12,17 @@ import java.util.List;
  */
 
 public interface AmbulanciaRepository {
-    Ambulancia encontrarPorPlaca(String placa);
+    Ambulancia encontrarPorId(long id);
+
+    Ambulancia encontrarPorIdComBairro(long id);
 
     List<Ambulancia> listarTodasAmbulancias();
 
-    List<Ambulancia> listarDisponiveis();
+    List<Ambulancia> listarAmbulanciaSemEquipe();
 
     void salvar(Ambulancia ambulancia);
 
-    Ambulancia atualizarAmbulancia(Ambulancia ambulancia);
+    void atualizarAmbulancia(Ambulancia ambulancia);
 
     boolean deletarAmbulancia(long id);
 
