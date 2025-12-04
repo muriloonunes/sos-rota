@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="main-content-area" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.OcorrenciaController">
+<ScrollPane fitToHeight="true" fitToWidth="true" styleClass="main-content-area" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.OcorrenciaController">
     <content>
         <VBox alignment="TOP_LEFT" spacing="20" styleClass="main-content-area" VBox.vgrow="ALWAYS">
             <padding>
@@ -115,16 +115,15 @@
       
                 <VBox alignment="CENTER_LEFT" spacing="10" VBox.vgrow="ALWAYS">
                     <children>
-                        <TableView fx:id="ocorrenciasTableView" prefHeight="400.0" styleClass="table-view" VBox.vgrow="ALWAYS">
+                        <TableView fx:id="tabelaOcorrencias" prefHeight="400.0" styleClass="table-view" VBox.vgrow="ALWAYS">
                             <columns>
-                                <TableColumn fx:id="idColumn" prefWidth="60" text="ID" />
-                                <TableColumn fx:id="localColumn" prefWidth="180" text="Local" />
+                                <TableColumn fx:id="idColumn" prefWidth="40.0" text="ID" />
                                 <TableColumn fx:id="bairroColumn" prefWidth="140" text="Bairro" />
                                 <TableColumn fx:id="gravidadeColumn" prefWidth="120" text="Gravidade" />
-                                <TableColumn fx:id="tipoColumn" prefWidth="120" text="Tipo" />
                                 <TableColumn fx:id="statusColumn" prefWidth="140" text="Status" />
+                                <TableColumn fx:id="tipoColumn" prefWidth="120" text="Tipo" />
                                 <TableColumn fx:id="aberturaColumn" prefWidth="160" text="Data de abertura" />
-                                <TableColumn fx:id="ultimaAtualizacaoColumn" prefWidth="160" text="Última atualização" />
+                                <TableColumn fx:id="slaColumn" text="SLA" />
                                 <TableColumn fx:id="acoesColumn" prefWidth="140" text="Ações" />
                             </columns>
                             <placeholder>

@@ -2,6 +2,7 @@ package mhd.sosrota.infrastructure;
 
 import mhd.sosrota.model.Ambulancia;
 import mhd.sosrota.model.Equipe;
+import mhd.sosrota.model.Ocorrencia;
 import mhd.sosrota.model.Profissional;
 import mhd.sosrota.repository.*;
 import mhd.sosrota.service.*;
@@ -13,11 +14,12 @@ public class AppContext {
     private final AmbulanciaService ambulanciaService;
     private final ProfissionalService profissionalService;
     private final EquipeService equipeService;
+    private final OcorrenciaService ocorrenciaService;
 
     private Ambulancia ambulanciaEmEdicao;
     private Profissional profissionalEmEdicao;
     private Equipe equipeEmEdicao;
-    private OcorrenciaService ocorrenciaService;
+    private Ocorrencia ocorrenciaEmEdicao;
 
     private AppContext() {
         UsuarioRepository usuarioRepository = new UsuarioRepositoryImpl();
@@ -38,14 +40,16 @@ public class AppContext {
 
         ocorrenciaService = new OcorrenciaService(new OcorrenciaRepositoryImpl());
     }
-    public OcorrenciaService getOcorrenciaService() {
-        return ocorrenciaService;
-    }
+
     public static synchronized AppContext getInstance() {
         if (instance == null) {
             instance = new AppContext();
         }
         return instance;
+    }
+
+    public OcorrenciaService getOcorrenciaService() {
+        return ocorrenciaService;
     }
 
     public UsuarioService getUsuarioService() {
@@ -90,5 +94,13 @@ public class AppContext {
 
     public void setEquipeEmEdicao(Equipe equipeEmEdicao) {
         this.equipeEmEdicao = equipeEmEdicao;
+    }
+
+    public Ocorrencia getOcorrenciaEmEdicao() {
+        return ocorrenciaEmEdicao;
+    }
+
+    public void setOcorrenciaEmEdicao(Ocorrencia ocorrenciaEmEdicao) {
+        this.ocorrenciaEmEdicao = ocorrenciaEmEdicao;
     }
 }

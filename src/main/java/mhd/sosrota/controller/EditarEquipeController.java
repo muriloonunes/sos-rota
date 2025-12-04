@@ -239,6 +239,7 @@ public class EditarEquipeController implements Navigable {
             protected void succeeded() {
                 UiUtils.setButtonLoading(salvarButton, false, "Salvar alterações");
                 AlertUtil.showInfo("Sucesso", "Equipe atualizada com sucesso!");
+                AppContext.getInstance().setEquipeEmEdicao(null);
                 handleCancelar();
             }
 

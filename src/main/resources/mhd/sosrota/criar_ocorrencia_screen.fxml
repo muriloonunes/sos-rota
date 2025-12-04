@@ -12,12 +12,12 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<VBox alignment="TOP_CENTER" spacing="20" styleClass="main-content-area" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.OcorrenciaController">
+<VBox alignment="TOP_CENTER" spacing="20" styleClass="main-content-area" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.CriarOcorrenciaController">
     <padding>
         <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
     </padding>
 
-    <Text styleClass="vbox-container-titulo" text="Cadastrar Ocorrência" />
+    <Text fx:id="tituloTela" styleClass="vbox-container-titulo" text="Cadastrar Ocorrência" />
     <Separator />
     <VBox spacing="10.0" styleClass="vbox-container">
         <padding>
@@ -39,9 +39,10 @@
             <Label styleClass="title-label" text="Observações:" />
             <TextArea fx:id="obsTextArea" promptText="Detalhes adicionais sobre a ocorrência" styleClass="observacao-textfield" />
         </VBox>
+      <Label fx:id="erroLabel" styleClass="error-label" text="Erro!" />
 
         <HBox alignment="CENTER_LEFT" spacing="15">
-            <Button fx:id="registrarOcorrenciaButton" onAction="#handleRegistrarOcorrencia" styleClass="btn-primary" text="Registrar Ocorrência">
+            <Button fx:id="registrarOcorrenciaButton" onAction="#handleRegistrarOcorrencia" styleClass="btn-primary" text="Registrar ocorrência">
                 <font>
                     <Font size="14.0" />
                 </font>

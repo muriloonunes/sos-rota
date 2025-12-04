@@ -7,6 +7,7 @@ import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  *
@@ -36,7 +37,7 @@ public class Ocorrencia {
     private Bairro bairro;
 
     @Column(name = "data_hora_abertura", nullable = false, insertable = false, updatable = false)
-    private LocalDateTime dataHoraAbertura;
+    private OffsetDateTime dataHoraAbertura;
 
     @Enumerated
     @JdbcType(PostgreSQLEnumJdbcType.class)
@@ -53,7 +54,7 @@ public class Ocorrencia {
                       String tipoOcorrencia,
                       GravidadeOcorrencia gravidadeOcorrencia,
                       Bairro bairro,
-                      LocalDateTime dataHoraAbertura,
+                      OffsetDateTime dataHoraAbertura,
                       StatusOcorrencia statusOcorrencia,
                       String observacao) {
         this.id = id;
@@ -63,6 +64,13 @@ public class Ocorrencia {
         this.dataHoraAbertura = dataHoraAbertura;
         this.statusOcorrencia = statusOcorrencia;
         this.observacao = observacao;
+    }
+
+    public OffsetDateTime getLimiteSLA() {
+        if (dataHoraAbertura == null || gravidadeOcorrencia == null) {
+            return null;
+        }
+        return dataHoraAbertura.plusMinutes(gravidadeOcorrencia.getTempoSLA());
     }
 
     public Long getId() {
@@ -85,11 +93,11 @@ public class Ocorrencia {
         this.gravidadeOcorrencia = gravidadeOcorrencia;
     }
 
-    public LocalDateTime getDataHoraAbertura() {
+    public OffsetDateTime getDataHoraAbertura() {
         return dataHoraAbertura;
     }
 
-    public void setDataHoraAbertura(LocalDateTime dataHoraOcorrencia) {
+    public void setDataHoraAbertura(OffsetDateTime dataHoraOcorrencia) {
         this.dataHoraAbertura = dataHoraOcorrencia;
     }
 

@@ -19,12 +19,12 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
             em.getTransaction().begin();
             em.persist(ocorrencia);
             em.getTransaction().commit();
+            em.refresh(ocorrencia);
             return true;
-
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             if (em.getTransaction().isActive()) em.getTransaction().rollback();
             return false;
-
         } finally {
             em.close();
         }
@@ -103,7 +103,6 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
     @Override
     public List<Ocorrencia> listarTodas() {
         try (EntityManager em = JpaManager.getEntityManager()) {
-
             TypedQuery<Ocorrencia> q = em.createQuery(
                     "SELECT o FROM Ocorrencia o " +
                             "JOIN FETCH o.bairro " +
@@ -114,6 +113,7 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
             return q.getResultList();
 
         } catch (Exception e) {
+            e.printStackTrace();
             return Collections.emptyList();
         }
     }
