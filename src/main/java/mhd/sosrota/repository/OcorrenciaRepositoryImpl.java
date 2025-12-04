@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import mhd.sosrota.infrastructure.database.JpaManager;
 import mhd.sosrota.model.Ocorrencia;
+import mhd.sosrota.model.enums.StatusOcorrencia;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -19,9 +20,11 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
             em.persist(ocorrencia);
             em.getTransaction().commit();
             return true;
+
         } catch (RuntimeException e) {
             if (em.getTransaction().isActive()) em.getTransaction().rollback();
             return false;
+
         } finally {
             em.close();
         }
@@ -37,12 +40,20 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
     @Override
     public List<Ocorrencia> buscarPorStatus(String status) {
         try (EntityManager em = JpaManager.getEntityManager()) {
+
+            StatusOcorrencia statusEnum = StatusOcorrencia.valueOf(status.toUpperCase());
+
             TypedQuery<Ocorrencia> q = em.createQuery(
-                    "SELECT o FROM Ocorrencia o WHERE o.statusOcorrencia = :status",
+                    "SELECT o FROM Ocorrencia o " +
+                            "JOIN FETCH o.bairro " +
+                            "WHERE o.statusOcorrencia = :status",
                     Ocorrencia.class
             );
-            q.setParameter("status", status);
+
+            q.setParameter("status", statusEnum);
+
             return q.getResultList();
+
         } catch (Exception e) {
             return Collections.emptyList();
         }
@@ -51,12 +62,18 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
     @Override
     public List<Ocorrencia> buscarPorTipo(String tipo) {
         try (EntityManager em = JpaManager.getEntityManager()) {
+
             TypedQuery<Ocorrencia> q = em.createQuery(
-                    "SELECT o FROM Ocorrencia o WHERE LOWER(o.tipoOcorrencia) LIKE LOWER(:tipo)",
+                    "SELECT o FROM Ocorrencia o " +
+                            "JOIN FETCH o.bairro " +
+                            "WHERE LOWER(o.tipoOcorrencia) LIKE LOWER(:tipo)",
                     Ocorrencia.class
             );
+
             q.setParameter("tipo", "%" + tipo + "%");
+
             return q.getResultList();
+
         } catch (Exception e) {
             return Collections.emptyList();
         }
@@ -65,8 +82,10 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
     @Override
     public List<Ocorrencia> buscarPorPeriodo(LocalDateTime inicio, LocalDateTime fim) {
         try (EntityManager em = JpaManager.getEntityManager()) {
+
             TypedQuery<Ocorrencia> q = em.createQuery(
                     "SELECT o FROM Ocorrencia o " +
+                            "JOIN FETCH o.bairro " +
                             "WHERE o.dataHoraAbertura BETWEEN :inicio AND :fim",
                     Ocorrencia.class
             );
@@ -75,6 +94,7 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
             q.setParameter("fim", fim);
 
             return q.getResultList();
+
         } catch (Exception e) {
             return Collections.emptyList();
         }
@@ -83,11 +103,16 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
     @Override
     public List<Ocorrencia> listarTodas() {
         try (EntityManager em = JpaManager.getEntityManager()) {
+
             TypedQuery<Ocorrencia> q = em.createQuery(
-                    "SELECT o FROM Ocorrencia o ORDER BY o.dataHoraAbertura DESC",
+                    "SELECT o FROM Ocorrencia o " +
+                            "JOIN FETCH o.bairro " +
+                            "ORDER BY o.dataHoraAbertura DESC",
                     Ocorrencia.class
             );
+
             return q.getResultList();
+
         } catch (Exception e) {
             return Collections.emptyList();
         }
@@ -95,21 +120,28 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
 
     @Override
     public Boolean atualizar(Ocorrencia ocorrencia) {
-        try (EntityManager em = JpaManager.getEntityManager()) {
+        EntityManager em = JpaManager.getEntityManager();
+        try {
             em.getTransaction().begin();
             em.merge(ocorrencia);
             em.getTransaction().commit();
             return true;
+
         } catch (RuntimeException e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
             return false;
+
+        } finally {
+            em.close();
         }
     }
 
     @Override
     public Boolean deletar(Long id) {
-        try (EntityManager em = JpaManager.getEntityManager()) {
-            Ocorrencia o = em.find(Ocorrencia.class, id);
+        EntityManager em = JpaManager.getEntityManager();
 
+        try {
+            Ocorrencia o = em.find(Ocorrencia.class, id);
             if (o == null) return false;
 
             em.getTransaction().begin();
@@ -118,7 +150,11 @@ public class OcorrenciaRepositoryImpl implements OcorrenciaRepository {
             return true;
 
         } catch (RuntimeException e) {
+            if (em.getTransaction().isActive()) em.getTransaction().rollback();
             return false;
+
+        } finally {
+            em.close();
         }
     }
 }

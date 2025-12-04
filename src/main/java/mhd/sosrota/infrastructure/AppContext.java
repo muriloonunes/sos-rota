@@ -17,6 +17,7 @@ public class AppContext {
     private Ambulancia ambulanciaEmEdicao;
     private Profissional profissionalEmEdicao;
     private Equipe equipeEmEdicao;
+    private OcorrenciaService ocorrenciaService;
 
     private AppContext() {
         UsuarioRepository usuarioRepository = new UsuarioRepositoryImpl();
@@ -34,8 +35,12 @@ public class AppContext {
 
         EquipeRepository equipeRepository = new EquipeRepositoryImpl();
         this.equipeService = new EquipeService(equipeRepository, ambulanciaRepository);
-    }
 
+        ocorrenciaService = new OcorrenciaService(new OcorrenciaRepositoryImpl());
+    }
+    public OcorrenciaService getOcorrenciaService() {
+        return ocorrenciaService;
+    }
     public static synchronized AppContext getInstance() {
         if (instance == null) {
             instance = new AppContext();
