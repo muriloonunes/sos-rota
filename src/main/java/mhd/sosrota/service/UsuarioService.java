@@ -81,4 +81,21 @@ public class UsuarioService {
     public void limparDados() {
         prefs.limparDados();
     }
+
+    public void redefinirSenha(String username, String novaSenha) throws AuthenticationException {
+        if (username == null || username.isBlank()) {
+            throw new AuthenticationException("Informe o nome de usuário.");
+        }
+        if (novaSenha == null || novaSenha.isBlank()) {
+            throw new AuthenticationException("A nova senha não pode ser vazia.");
+        }
+        Usuario usuario = usuarioRepository.encontrarPorUsername(username);
+        if (usuario == null) {
+            throw new AuthenticationException("Usuário não encontrado.");
+        }
+        String hash = PasswordUtil.criarHash(novaSenha);
+        usuario.setSenha(hash);
+        usuarioRepository.atualizarUsuario(usuario);
+    }
+
 }

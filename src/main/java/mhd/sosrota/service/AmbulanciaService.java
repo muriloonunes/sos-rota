@@ -107,6 +107,8 @@ public class AmbulanciaService {
 
     public boolean deletarAmbulancia(long id) {
         //TODO ver quais regras de negocio impedem uma ambulancia de ser deletada
+        //Não é permitido excluir uma ambulância que esteja vinculada a atendimentos históricos (somente
+        //inativar);
         return repo.deletarAmbulancia(id);
     }
 

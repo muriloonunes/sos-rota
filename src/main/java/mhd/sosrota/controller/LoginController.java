@@ -20,7 +20,6 @@ import mhd.sosrota.util.AlertUtil;
 import java.sql.SQLException;
 
 /**
- *
  * @author Murilo Nunes <murilo_no@outlook.com>
  * @date 17/11/2025
  * @brief Class LoginController
@@ -166,6 +165,10 @@ public class LoginController implements Navigable {
     @FXML
     private void handleForgotPasswordAction() {
         //TODO
+        //Fiz o ForgotPasswordController, forgot_password_screen.fxml, e adicionei na enum Screens
+        if (navigator != null) {
+            //navigator.navigate(Screens.TELA_REDEFINIR_SENHA);
+        }
     }
 
     @FXML
