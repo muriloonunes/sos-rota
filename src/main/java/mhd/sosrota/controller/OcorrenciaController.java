@@ -231,6 +231,8 @@ public class OcorrenciaController implements Navigable {
         AppContext.getInstance().setOcorrenciaParaDespachar(ocorrencia);
 
         navigator.showModal(Screens.DESPACHAR, "Despachar ambulância");
+
+        carregarOcorrencias();
         //TODO
     }
 

@@ -10,6 +10,9 @@ import mhd.sosrota.model.enums.TipoAmbulancia;
 import mhd.sosrota.presentation.OpcaoDespacho;
 import mhd.sosrota.repository.AmbulanciaRepository;
 import mhd.sosrota.repository.AtendimentoRepository;
+import mhd.sosrota.model.Atendimento;
+import mhd.sosrota.model.enums.StatusOcorrencia;
+
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
  * @author Murilo Nunes <murilo_no@outlook.com>
  * @date 04/12/2025
  * @brief Class AtendimentoService
@@ -76,5 +78,24 @@ public class AtendimentoService {
 //        ambulancia.setStatusAmbulancia(StatusAmbulancia.EM_ATENDIMENTO);
 //        Atendimento atendimento = new Atendimento(ocorrencia, ambulancia, distanciaKm);
 //        atendimentoRepository.salvar(atendimento, ocorrencia, ambulancia);
+
+        if (ocorrencia == null || ambulancia == null) {
+            throw new IllegalArgumentException("Ocorrência e ambulância não podem ser nulos.");
+        }
+
+        if (ocorrencia.getStatusOcorrencia() != StatusOcorrencia.ABERTA) {
+            throw new IllegalStateException("Só é possível despachar ocorrências abertas.");
+        }
+
+        if (ambulancia.getStatusAmbulancia() != StatusAmbulancia.DISPONIVEL) {
+            throw new IllegalStateException("Só é possível despachar ambulâncias disponíveis.");
+        }
+
+        ocorrencia.setStatusOcorrencia(StatusOcorrencia.DESPACHADA);
+        ambulancia.setStatusAmbulancia(StatusAmbulancia.EM_ATENDIMENTO);
+
+        Atendimento atendimento = new Atendimento(ocorrencia, ambulancia, distanciaKm);
+
+        atendimentoRepository.salvar(atendimento, ocorrencia, ambulancia);
     }
 }
