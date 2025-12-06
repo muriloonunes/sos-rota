@@ -14,6 +14,7 @@ import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
 import mhd.sosrota.presentation.PasswordToggle;
+import mhd.sosrota.presentation.UiUtils;
 import mhd.sosrota.service.UsuarioService;
 import mhd.sosrota.util.AlertUtil;
 
@@ -29,13 +30,13 @@ public class LoginController implements Navigable {
     private Label loginErrorMessageLabel, cadastrarErrorMessageLabel;
 
     @FXML
-    private TextField cadastrarNomeField, cadastrarUsernameField, loginUsernameField, loginPasswordVisibleField, cadastrarPasswordVisibleField;
+    private TextField cadastrarNomeField, cadastrarUsernameField, loginUsernameField, loginPasswordVisibleField, cadastrarPasswordVisibleField, cadastrarConfirmarPasswordVisibleField;
 
     @FXML
-    private PasswordField cadastrarPasswordField, loginPasswordField;
+    private PasswordField cadastrarPasswordField, loginPasswordField, cadastrarConfirmarSenhaField;
 
     @FXML
-    private ImageView loginButtonImageView, cadastrarButtonImageView;
+    private ImageView loginButtonImageView, cadastrarButtonImageView, cadastrarConfirmarButtonImageView;
 
     @FXML
     private VBox cadastrarForm, loginForm;
@@ -43,7 +44,7 @@ public class LoginController implements Navigable {
     @FXML
     private Button loginButton, cadastrarButton, voltarLoginButton, abrirCadastrarButton;
 
-    private PasswordToggle loginToggle, cadastrarToggle;
+    private PasswordToggle loginToggle, cadastrarToggle, cadastrarConfirmarToggle;
 
     private Navigator navigator;
 
@@ -55,6 +56,7 @@ public class LoginController implements Navigable {
     public void initialize() {
         loginToggle = new PasswordToggle(loginPasswordField, loginPasswordVisibleField, loginButtonImageView);
         cadastrarToggle = new PasswordToggle(cadastrarPasswordField, cadastrarPasswordVisibleField, cadastrarButtonImageView);
+        cadastrarConfirmarToggle = new PasswordToggle(cadastrarConfirmarSenhaField, cadastrarConfirmarPasswordVisibleField, cadastrarConfirmarButtonImageView);
 
         loginButton.disableProperty().bind(
                 loginUsernameField.textProperty().isEmpty()
@@ -64,7 +66,8 @@ public class LoginController implements Navigable {
         cadastrarButton.disableProperty().bind(
                 cadastrarNomeField.textProperty().isEmpty()
                         .or(cadastrarUsernameField.textProperty().isEmpty()
-                                .or(cadastrarPasswordField.textProperty().isEmpty()))
+                                .or(cadastrarPasswordField.textProperty().isEmpty()
+                                        .or(cadastrarConfirmarSenhaField.textProperty().isEmpty())))
         );
 
         voltarLoginButton.disableProperty().bind(loading);
@@ -81,7 +84,7 @@ public class LoginController implements Navigable {
         String username = loginUsernameField.getText();
         String senha = loginPasswordField.getText();
 
-        setLoading(true, loginButton);
+        UiUtils.setButtonLoading(loginButton, true, "Entrar");
 
         Task<Usuario> task = new Task<>() {
             @Override
@@ -91,7 +94,7 @@ public class LoginController implements Navigable {
 
             @Override
             protected void succeeded() {
-                setLoading(false, loginButton);
+                UiUtils.setButtonLoading(loginButton, false, "Entrar");
                 Usuario usuario = getValue();
                 service.salvarUsuario(usuario.getNome(), usuario.getUsername());
 
@@ -100,7 +103,7 @@ public class LoginController implements Navigable {
 
             @Override
             protected void failed() {
-                setLoading(false, loginButton);
+                UiUtils.setButtonLoading(loginButton, false, "Entrar");
 
                 Throwable e = getException();
                 if (e instanceof AuthenticationException) {
@@ -123,8 +126,14 @@ public class LoginController implements Navigable {
         String nome = cadastrarNomeField.getText();
         String username = cadastrarUsernameField.getText();
         String senha = cadastrarPasswordField.getText();
+        String confirmar = cadastrarConfirmarSenhaField.getText();
 
-        setLoading(true, cadastrarButton);
+        if (!senha.equals(confirmar)) {
+            mostrarErroCadastro("As senhas digitadas não são iguais.");
+            return;
+        }
+
+        UiUtils.setButtonLoading(cadastrarButton, true, "Cadastrar");
 
         Task<Boolean> task = new Task<>() {
             @Override
@@ -134,7 +143,7 @@ public class LoginController implements Navigable {
 
             @Override
             protected void succeeded() {
-                setLoading(false, cadastrarButton);
+                UiUtils.setButtonLoading(cadastrarButton, false, "Cadastrar");
                 boolean cadastro = getValue();
                 if (cadastro) {
                     AlertUtil.showInfo("Cadastro realizado", "Usuário cadastrado com sucesso!");
@@ -144,7 +153,7 @@ public class LoginController implements Navigable {
 
             @Override
             protected void failed() {
-                setLoading(false, cadastrarButton);
+                UiUtils.setButtonLoading(cadastrarButton, false, "Cadastrar");
 
                 Throwable e = getException();
                 if (e instanceof AuthenticationException) {
@@ -166,9 +175,7 @@ public class LoginController implements Navigable {
     private void handleForgotPasswordAction() {
         //TODO
         //Fiz o ForgotPasswordController, forgot_password_screen.fxml, e adicionei na enum Screens
-        if (navigator != null) {
-            //navigator.navigate(Screens.TELA_REDEFINIR_SENHA);
-        }
+        navigator.showModal(Screens.TELA_REDEFINIR_SENHA, "Redefinir Senha", 400.0, 450.0);
     }
 
     @FXML
@@ -181,10 +188,12 @@ public class LoginController implements Navigable {
         cadastrarErrorMessageLabel.setVisible(false);
 
         cadastrarToggle.setShowing(false);
+        cadastrarConfirmarToggle.setShowing(false);
 
         cadastrarNomeField.clear();
         cadastrarUsernameField.clear();
         cadastrarPasswordField.clear();
+        cadastrarConfirmarSenhaField.clear();
     }
 
     @FXML
@@ -206,30 +215,6 @@ public class LoginController implements Navigable {
         navigator.navigate(Screens.TELA_APP);
     }
 
-    private void setLoading(boolean isLoading, Button button) {
-        loading.set(isLoading);
-        if (isLoading) {
-            button.setUserData(button.getText());
-            ProgressIndicator pi = new ProgressIndicator();
-
-            pi.setPrefSize(16, 16);
-
-            button.setText(null);
-            button.setGraphic(pi);
-            button.setMouseTransparent(true);
-            button.setFocusTraversable(true);
-        } else {
-            String originalText = (String) button.getUserData();
-
-            button.setText(originalText);
-            button.setGraphic(null);
-
-            button.setUserData(null);
-            button.setMouseTransparent(false);
-            button.setFocusTraversable(false);
-        }
-    }
-
     @FXML
     private void toggleLoginPassword() {
         loginToggle.toggle();
@@ -238,6 +223,11 @@ public class LoginController implements Navigable {
     @FXML
     private void toggleCadastrarPassword() {
         cadastrarToggle.toggle();
+    }
+
+    @FXML
+    private void toggleCadastrarConfirmarPassword() {
+        cadastrarConfirmarToggle.toggle();
     }
 
     @Override

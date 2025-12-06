@@ -189,6 +189,34 @@
                     </Button>
                 </HBox>
             </VBox>
+            <VBox spacing="5">
+                <Label styleClass="title-label" text="Confirmar senha">
+                    <font>
+                        <Font size="14" />
+                    </font>
+                </Label>
+                <HBox alignment="CENTER">
+                    <StackPane HBox.hgrow="ALWAYS">
+                        <PasswordField fx:id="cadastrarConfirmarSenhaField" minHeight="45.5" promptText="********">
+                            <padding>
+                                <Insets bottom="12" left="5" top="12" />
+                            </padding>
+                        </PasswordField>
+                        <TextField fx:id="cadastrarConfirmarPasswordVisibleField" managed="false" promptText="********" styleClass="input-field" visible="false">
+                            <padding>
+                                <Insets bottom="12" left="5" top="12" />
+                            </padding>
+                        </TextField>
+                    </StackPane>
+                    <Button onAction="#toggleCadastrarConfirmarPassword" styleClass="toggle-password-btn">
+                        <graphic>
+                            <ImageView fx:id="cadastrarConfirmarButtonImageView" fitHeight="24" fitWidth="24" preserveRatio="true">
+                                <Image url="@../../images/visibility_off.png" />
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </HBox>
+            </VBox>
             <Button fx:id="cadastrarButton" defaultButton="true" maxWidth="Infinity" onAction="#handleCadastrar" styleClass="login-btn-primary" text="Cadastrar">
                 <font>
                     <Font size="18" />

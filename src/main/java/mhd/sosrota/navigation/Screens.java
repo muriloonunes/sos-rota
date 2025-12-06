@@ -8,7 +8,7 @@ package mhd.sosrota.navigation;
 public enum Screens {
     TELA_LOGIN("/mhd/sosrota/login_screen.fxml"),
     TELA_APP("/mhd/sosrota/app_sidebar.fxml"),
-    TELA_REDEFINIR_SENHA("forgot_password_screen.fxml"),
+    TELA_REDEFINIR_SENHA("/mhd/sosrota/forgot_password_screen.fxml"),
     DASHBOARD_OVERVIEW("/mhd/sosrota/dashboard_screen.fxml"),
     DASHBOARD_OCCORRENCIAS("/mhd/sosrota/ocorrencias_screen.fxml"),
     CRIAR_OCORRENCIA("/mhd/sosrota/criar_ocorrencia_screen.fxml"),

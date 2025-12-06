@@ -4,11 +4,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import mhd.sosrota.SOSRotaView;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  *
@@ -20,10 +23,14 @@ public class Navigator {
     private final int APP_WIDTH = 1430;
     private final int APP_HEIGHT = 810;
 
+    private final Image STAGE_ICON = new Image(Objects.requireNonNull(SOSRotaView.class.getResourceAsStream("/images/icon.png")));
+
     private final Stage stage;
 
     public Navigator(Stage stage) {
         this.stage = stage;
+        stage.getIcons().add(STAGE_ICON);
+        stage.setTitle("SOS Rota");
     }
 
     public void navigate(Screens screen) {
@@ -99,6 +106,7 @@ public class Navigator {
                 scene = new Scene(root);
             }
 
+            modalStage.getIcons().add(STAGE_ICON);
             modalStage.setScene(scene);
             modalStage.showAndWait();
         } catch (IOException e) {

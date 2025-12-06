@@ -5,24 +5,26 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.ImageView;
 import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.exceptions.AuthenticationException;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
-import mhd.sosrota.navigation.Screens;
+import mhd.sosrota.presentation.PasswordToggle;
 import mhd.sosrota.service.UsuarioService;
 import mhd.sosrota.util.AlertUtil;
 
 public class ForgotPasswordController implements Navigable {
+    @FXML
+    private PasswordField novaSenhaField, confirmarSenhaField;
 
     @FXML
-    private TextField usernameField;
+    private TextField usernameField, novaSenhaVisibleField, confirmarSenhaVisibleField;
 
     @FXML
-    private PasswordField novaSenhaField;
+    private ImageView novaButtonImageView, confirmarButtonImageView;
 
-    @FXML
-    private PasswordField confirmarSenhaField;
+    private PasswordToggle novaToggle, confirmarToggle;
 
     @FXML
     private Label errorLabel;
@@ -44,6 +46,12 @@ public class ForgotPasswordController implements Navigable {
                         .or(novaSenhaField.textProperty().isEmpty())
                         .or(confirmarSenhaField.textProperty().isEmpty())
         );
+
+        novaToggle = new PasswordToggle(novaSenhaField, novaSenhaVisibleField, novaButtonImageView);
+        confirmarToggle = new PasswordToggle(confirmarSenhaField, confirmarSenhaVisibleField, confirmarButtonImageView);
+
+        novaToggle.setShowing(false);
+        confirmarToggle.setShowing(false);
     }
 
     @FXML
@@ -55,15 +63,14 @@ public class ForgotPasswordController implements Navigable {
         String confirmarSenha = confirmarSenhaField.getText();
 
         if (!novaSenha.equals(confirmarSenha)) {
-            mostrarErro("A nova senha e a confirmação não são iguais.");
+            mostrarErro("As senhas digitadas não são iguais.");
             return;
         }
 
         try {
             service.redefinirSenha(username, novaSenha);
             AlertUtil.showInfo("Sucesso", "Senha redefinida com sucesso!");
-            // Volta pra tela de login depois de salvar
-            navigator.navigate(Screens.TELA_LOGIN);
+            handleVoltar();
         } catch (AuthenticationException e) {
             mostrarErro(e.getMessage());
         } catch (Exception e) {
@@ -74,7 +81,7 @@ public class ForgotPasswordController implements Navigable {
 
     @FXML
     private void handleVoltar() {
-        navigator.navigate(Screens.TELA_LOGIN);
+        navigator.closeStage(salvarButton);
     }
 
     private void mostrarErro(String msg) {
@@ -87,6 +94,16 @@ public class ForgotPasswordController implements Navigable {
         errorLabel.setText("");
         errorLabel.setVisible(false);
         errorLabel.setManaged(false);
+    }
+
+    @FXML
+    private void toggleNovaSenha() {
+        novaToggle.toggle();
+    }
+
+    @FXML
+    private void toggleConfirmarSenha() {
+        confirmarToggle.toggle();
     }
 
     @Override
