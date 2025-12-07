@@ -329,12 +329,18 @@ public class DashboardController implements Navigable {
         AppContext.getInstance().setOcorrenciaParaDespachar(ocorrencia);
 
         navigator.showModal(Screens.DESPACHAR, "Despachar ambulância");
+
+        carregarOcorrencias();
         //TODO
     }
 
-
     private void cancelarOcorrencia(Ocorrencia ocorrencia) {
         ocorrenciaService.cancelarOcorrencia(ocorrencia);
+        carregarOcorrencias();
+    }
+
+    @FXML
+    private void handleAtualizarLista() {
         carregarOcorrencias();
     }
 
@@ -415,9 +421,7 @@ public class DashboardController implements Navigable {
         circulo.setOnMouseEntered(_ -> {
             Bairro b = (Bairro) circulo.getUserData();
 
-            mundoGroup.getChildren().forEach(node -> {
-                node.getStyleClass().add("escurecido");
-            });
+            mundoGroup.getChildren().forEach(node -> node.getStyleClass().add("escurecido"));
 
             circulo.getStyleClass().remove("escurecido");
             circulo.getStyleClass().add("bairro-destacado");
@@ -444,7 +448,7 @@ public class DashboardController implements Navigable {
             }
         });
 
-        circulo.setOnMouseExited(e -> {
+        circulo.setOnMouseExited(_ -> {
             mundoGroup.getChildren().forEach(node -> {
                 node.getStyleClass().removeAll(
                         "escurecido",

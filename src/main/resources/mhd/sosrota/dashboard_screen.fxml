@@ -77,9 +77,14 @@
         </GridPane>
 
         <VBox alignment="CENTER_LEFT" spacing="10" styleClass="vbox-container" VBox.vgrow="ALWAYS">
-            <HBox alignment="CENTER_LEFT">
+            <HBox alignment="CENTER_LEFT" spacing="10.0">
                 <Label styleClass="vbox-container-titulo" text="Ocorrências Recentes" />
                 <Region HBox.hgrow="ALWAYS" />
+            <Button onAction="#handleAtualizarLista" styleClass="btn-secondary" text="Atualizar lista">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Button>
                 <Button mnemonicParsing="false" onAction="#criarOcorrencia" styleClass="btn-ocorrencia" text="Criar ocorrência">
                     <font>
                         <Font size="14.0" />

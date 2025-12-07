@@ -3,7 +3,9 @@ package mhd.sosrota;
 import javafx.application.Application;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.infrastructure.UserPrefs;
+import mhd.sosrota.infrastructure.database.JpaManager;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
 
@@ -16,11 +18,19 @@ public class SOSRotaView extends Application {
 
         UserPrefs prefs = new UserPrefs();
         if (prefs.existeUsuarioSalvo()) {
+            AppContext.getInstance();
             navigator.navigate(Screens.TELA_APP);
         } else {
             navigator.navigate(Screens.TELA_LOGIN);
         }
         stage.show();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        AppContext.getInstance().getCicloAtendimentoService().pararServico();
+        JpaManager.close();
+        super.stop();
     }
 
     private void loadFonts() {

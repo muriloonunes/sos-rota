@@ -293,6 +293,11 @@ public class OcorrenciaController implements Navigable {
     }
 
     @FXML
+    private void handleAtualizarLista() {
+        carregarOcorrencias();
+    }
+
+    @FXML
     private void handleClearFields() {
         bairroComboBox.getSelectionModel().clearSelection();
         gravidadeComboBox.getSelectionModel().clearSelection();

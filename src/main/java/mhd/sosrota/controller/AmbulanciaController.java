@@ -126,7 +126,8 @@ public class AmbulanciaController implements Navigable {
             @Override
             protected void succeeded() {
                 ambulancias.setAll(getValue());
-                UiUtils.atualizarPaginacao(paginacaoAmbulancias, tabelaAmbulancias, ambulancias, itensPorPagina);
+                tabelaAmbulancias.setItems(ambulancias);
+//                UiUtils.atualizarPaginacao(paginacaoAmbulancias, tabelaAmbulancias, ambulancias, itensPorPagina);
             }
 
             @Override

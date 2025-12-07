@@ -2,6 +2,7 @@ package mhd.sosrota.controller;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -12,8 +13,9 @@ import mhd.sosrota.model.Ocorrencia;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.presentation.OpcaoDespacho;
-import mhd.sosrota.service.AmbulanciaService;
+import mhd.sosrota.presentation.UiUtils;
 import mhd.sosrota.service.AtendimentoService;
+import mhd.sosrota.util.AlertUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,7 +53,6 @@ public class DespachoController implements Navigable {
     private Button btnConfirmar;
 
     private Ocorrencia ocorrenciaAtual;
-    private AmbulanciaService ambulanciaService;
     private Navigator navigator;
     private AtendimentoService atendimentoService;
 
@@ -62,7 +63,6 @@ public class DespachoController implements Navigable {
         colDistancia.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getDistanciaFormatada()));
         colTempo.setCellValueFactory(d -> new SimpleStringProperty(d.getValue().getTempoFormatado()));
 
-        // 2. Recuperar Ocorrência do Contexto
         this.ocorrenciaAtual = AppContext.getInstance().getOcorrenciaParaDespachar();
         AppContext.getInstance().setOcorrenciaParaDespachar(null);
 
@@ -96,31 +96,65 @@ public class DespachoController implements Navigable {
     private void carregarSugestoesDeAmbulancia() {
         this.atendimentoService = AppContext.getInstance().getDespachoService();
 
-        List<OpcaoDespacho> opcoes = atendimentoService.buscarOpcoesDeDespacho(ocorrenciaAtual);
+        Task<List<OpcaoDespacho>> task = new Task<>() {
+            @Override
+            protected List<OpcaoDespacho> call() {
+                return atendimentoService.buscarOpcoesDeDespacho(ocorrenciaAtual);
+            }
 
-        if (opcoes.isEmpty()) {
-            tabelaAmbulancias.setPlaceholder(new Label("Nenhuma ambulância disponível ou rota não encontrada."));
-        } else {
-            tabelaAmbulancias.setItems(FXCollections.observableArrayList(opcoes));
-        }
+            @Override
+            protected void succeeded() {
+                var opcoes = getValue();
+                if (opcoes.isEmpty()) {
+                    tabelaAmbulancias.setPlaceholder(new Label("Nenhuma ambulância disponível ou rota não encontrada."));
+                } else {
+                    tabelaAmbulancias.setItems(FXCollections.observableArrayList(opcoes));
+                }
+            }
+
+            @Override
+            protected void failed() {
+                getException().printStackTrace();
+                tabelaAmbulancias.setPlaceholder(new Label("Nenhuma ambulância disponível ou rota não encontrada."));
+            }
+        };
+
+        new Thread(task).start();
     }
 
     @FXML
     private void handleConfirmarDespacho() {
         OpcaoDespacho selecao = tabelaAmbulancias.getSelectionModel().getSelectedItem();
+        if (selecao == null) return;
 
-        if (selecao != null) {
-            try {
-                double distancia = selecao.getDistanciaKm();
-                atendimentoService.realizarDespacho(ocorrenciaAtual, selecao.getAmbulancia(), distancia);
+        Ocorrencia ocorrencia = this.ocorrenciaAtual;
+        double distancia = selecao.getDistanciaKm();
+        double tempo = selecao.getTempoEstimadoMin();
 
-                navigator.closeStage(btnConfirmar);
-
-                //todo talvez mostrar um alerta de sucesso?
-            } catch (Exception e) {
-                e.printStackTrace();
+        UiUtils.setButtonLoading(btnConfirmar, true, "Confirmar Despacho");
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                atendimentoService.realizarDespacho(ocorrencia, selecao.getAmbulancia(), distancia, tempo);
+                return null;
             }
-        }
+
+            @Override
+            protected void succeeded() {
+                UiUtils.setButtonLoading(btnConfirmar, false, "Confirmar Despacho");
+                AlertUtil.showConfirmation("Sucesso", "Ambulância despachada com sucesso.");
+                handleCancelar();
+            }
+
+            @Override
+            protected void failed() {
+                UiUtils.setButtonLoading(btnConfirmar, false, "Confirmar Despacho");
+                getException().printStackTrace();
+                AlertUtil.showError("Erro", "Algo deu errado ao despachar a ambulância");
+            }
+        };
+
+        new Thread(task).start();
     }
 
     @FXML

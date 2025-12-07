@@ -17,4 +17,14 @@ public class JpaManager {
     public static EntityManager getEntityManager() {
         return emf.createEntityManager();
     }
+
+    public static EntityManagerFactory getFactory() {
+        return emf;
+    }
+
+    public static void close() {
+        if (emf != null && emf.isOpen()) {
+            emf.close();
+        }
+    }
 }

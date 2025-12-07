@@ -98,6 +98,11 @@
                             </font>
                         </Label>
                         <Region HBox.hgrow="ALWAYS" />
+                  <Button onAction="#handleAtualizarLista" styleClass="btn-secondary" text="Atualizar lista">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </Button>
                         <Button fx:id="novaOcorrenciaButton" mnemonicParsing="false" onAction="#criarOcorrencia" styleClass="btn-ocorrencia" text="Nova ocorrência">
                             <font>
                                 <Font size="14.0" />

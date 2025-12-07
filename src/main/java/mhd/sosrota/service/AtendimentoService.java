@@ -28,13 +28,15 @@ public class AtendimentoService {
     private final GrafoCidadeService grafoService;
     private final AmbulanciaRepository ambulanciaRepository;
     private final AtendimentoRepository atendimentoRepository;
+    private final CicloAtendimentoService cicloAtendimentoService;
 
     private static final double VELOCIDADE = 60.0;
 
-    public AtendimentoService(GrafoCidadeService grafoService, AmbulanciaRepository ambulanciaRepository, AtendimentoRepository atendimentoRepository) {
+    public AtendimentoService(GrafoCidadeService grafoService, AmbulanciaRepository ambulanciaRepository, AtendimentoRepository atendimentoRepository, CicloAtendimentoService cicloAtendimentoService) {
         this.grafoService = grafoService;
         this.ambulanciaRepository = ambulanciaRepository;
         this.atendimentoRepository = atendimentoRepository;
+        this.cicloAtendimentoService = cicloAtendimentoService;
     }
 
     public List<OpcaoDespacho> buscarOpcoesDeDespacho(Ocorrencia ocorrencia) {
@@ -72,13 +74,7 @@ public class AtendimentoService {
         return opcoes;
     }
 
-    public void realizarDespacho(Ocorrencia ocorrencia, Ambulancia ambulancia, double distanciaKm) {
-        //todo - ver formas de automatizar a "chegada" e "conclusao" do atendimento (voltar automaticamente a ambulancia para disponivel e a ocorrencia pra concluida)
-//        ocorrencia.setStatusOcorrencia(StatusOcorrencia.DESPACHADA);
-//        ambulancia.setStatusAmbulancia(StatusAmbulancia.EM_ATENDIMENTO);
-//        Atendimento atendimento = new Atendimento(ocorrencia, ambulancia, distanciaKm);
-//        atendimentoRepository.salvar(atendimento, ocorrencia, ambulancia);
-
+    public void realizarDespacho(Ocorrencia ocorrencia, Ambulancia ambulancia, double distanciaKm, double tempoEstimado) {
         if (ocorrencia == null || ambulancia == null) {
             throw new IllegalArgumentException("Ocorrência e ambulância não podem ser nulos.");
         }
@@ -97,5 +93,6 @@ public class AtendimentoService {
         Atendimento atendimento = new Atendimento(ocorrencia, ambulancia, distanciaKm);
 
         atendimentoRepository.salvar(atendimento, ocorrencia, ambulancia);
+        cicloAtendimentoService.iniciarCicloAtendimento(atendimento.getId(),  tempoEstimado);
     }
 }

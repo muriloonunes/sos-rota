@@ -1,5 +1,6 @@
 package mhd.sosrota.infrastructure;
 
+import mhd.sosrota.infrastructure.database.JpaManager;
 import mhd.sosrota.model.Ambulancia;
 import mhd.sosrota.model.Equipe;
 import mhd.sosrota.model.Ocorrencia;
@@ -16,6 +17,7 @@ public class AppContext {
     private final EquipeService equipeService;
     private final OcorrenciaService ocorrenciaService;
     private final AtendimentoService atendimentoService;
+    private final CicloAtendimentoService cicloAtendimentoService;
 
     private Ambulancia ambulanciaEmEdicao;
     private Profissional profissionalEmEdicao;
@@ -42,8 +44,10 @@ public class AppContext {
 
         this.ocorrenciaService = new OcorrenciaService(new OcorrenciaRepositoryImpl());
 
+        this.cicloAtendimentoService = new CicloAtendimentoService(JpaManager.getFactory());
+
         AtendimentoRepository atendimentoRepository = new AtendimentoRepositoryImpl();
-        this.atendimentoService = new AtendimentoService(grafoService, ambulanciaRepository, atendimentoRepository);
+        this.atendimentoService = new AtendimentoService(grafoService, ambulanciaRepository, atendimentoRepository, cicloAtendimentoService);
     }
 
     public static synchronized AppContext getInstance() {
@@ -79,6 +83,10 @@ public class AppContext {
 
     public EquipeService getEquipeService() {
         return equipeService;
+    }
+
+    public CicloAtendimentoService getCicloAtendimentoService() {
+        return cicloAtendimentoService;
     }
 
     public Ambulancia getAmbulanciaEmEdicao() {
