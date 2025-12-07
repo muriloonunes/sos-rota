@@ -43,39 +43,54 @@ public class AtendimentoRepositoryImpl implements AtendimentoRepository {
     }
 
     @Override
+    public Atendimento buscarPorOcorrenciaId(Long ocorrenciaId) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
+            return em.createQuery(
+                            "SELECT a FROM Atendimento a " +
+                                    "JOIN FETCH a.ambulancia " +
+                                    "WHERE a.ocorrencia.id = :ocid", Atendimento.class)
+                    .setParameter("ocid", ocorrenciaId)
+                    .getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
     public List<Atendimento> consultarHistorico(Long ambulanciaId, LocalDateTime inicio, LocalDateTime fim, GravidadeOcorrencia gravidade) {
-            try (EntityManager em = JpaManager.getEntityManager()) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
 
-                StringBuilder jpql = new StringBuilder(
-                        "SELECT a FROM Atendimento a WHERE 1=1"
-                );
+            StringBuilder jpql = new StringBuilder(
+                    "SELECT a FROM Atendimento a WHERE 1=1"
+            );
 
-                if (ambulanciaId != null) {
-                    jpql.append(" AND a.ambulancia.id = :amb");
-                }
-                if (inicio != null) {
-                    jpql.append(" AND a.dataHoraDespacho >= :inicio");
-                }
-                if (fim != null) {
-                    jpql.append(" AND a.dataHoraDespacho <= :fim");
-                }
-                if (gravidade != null) {
-                    jpql.append(" AND a.ocorrencia.gravidadeOcorrencia = :grav");
-                }
-
-                TypedQuery<Atendimento> query = em.createQuery(jpql.toString(), Atendimento.class);
-
-                if (ambulanciaId != null) query.setParameter("amb", ambulanciaId);
-                if (inicio != null) query.setParameter("inicio", inicio);
-                if (fim != null) query.setParameter("fim", fim);
-                if (gravidade != null) query.setParameter("grav", gravidade);
-
-                return query.getResultList();
-
-            } catch (Exception e){
-                e.printStackTrace();
-                return Collections.emptyList();
+            if (ambulanciaId != null) {
+                jpql.append(" AND a.ambulancia.id = :amb");
             }
+            if (inicio != null) {
+                jpql.append(" AND a.dataHoraDespacho >= :inicio");
+            }
+            if (fim != null) {
+                jpql.append(" AND a.dataHoraDespacho <= :fim");
+            }
+            if (gravidade != null) {
+                jpql.append(" AND a.ocorrencia.gravidadeOcorrencia = :grav");
+            }
+
+            TypedQuery<Atendimento> query = em.createQuery(jpql.toString(), Atendimento.class);
+
+            if (ambulanciaId != null) query.setParameter("amb", ambulanciaId);
+            if (inicio != null) query.setParameter("inicio", inicio);
+            if (fim != null) query.setParameter("fim", fim);
+            if (gravidade != null) query.setParameter("grav", gravidade);
+
+            return query.getResultList();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
     }
 
     @Override
@@ -97,7 +112,7 @@ public class AtendimentoRepositoryImpl implements AtendimentoRepository {
 
             return q.getSingleResult();
 
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -117,7 +132,7 @@ public class AtendimentoRepositoryImpl implements AtendimentoRepository {
             return em.createQuery(jpql, Object[].class)
                     .getResultList();
 
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
         }

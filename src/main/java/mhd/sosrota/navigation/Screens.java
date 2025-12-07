@@ -18,7 +18,8 @@ public enum Screens {
     EDITAR_AMBULANCIA("/mhd/sosrota/editar_ambulancia_screen.fxml"),
     EDITAR_PROFISSIONAL("/mhd/sosrota/editar_profissional_screen.fxml"),
     EDITAR_EQUIPE("/mhd/sosrota/editar_equipe_screen.fxml"),
-    DESPACHAR("/mhd/sosrota/despachar_ambulancia_screen.fxml");
+    DESPACHAR("/mhd/sosrota/despachar_ambulancia_screen.fxml"),
+    DETALHES("/mhd/sosrota/atendimento_detalhes_screen.fxml"),;
 
     private final String fxmlPath;
 

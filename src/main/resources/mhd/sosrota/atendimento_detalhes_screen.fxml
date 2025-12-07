@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<VBox alignment="TOP_CENTER" spacing="15.0" styleClass="main-content-area" stylesheets="@../../styles/global.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mhd.sosrota.controller.DetalhesAtendimentoController">
+    <padding>
+        <Insets bottom="20.0" left="30.0" right="30.0" top="20.0" />
+    </padding>
+
+    <HBox alignment="CENTER_LEFT">
+        <Text styleClass="vbox-container-titulo" text="Histórico da Ocorrência" />
+        <Label fx:id="idOcorrenciaLabel" style="-fx-text-fill: #666; -fx-font-size: 14px; -fx-padding: 0 0 0 10;" text="#123" />
+    </HBox>
+    <Separator />
+
+    <VBox spacing="10.0" styleClass="vbox-container">
+        <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Dados da Solicitação" />
+
+        <GridPane hgap="10" vgap="5">
+            <columnConstraints>
+                <ColumnConstraints minWidth="100" />
+                <ColumnConstraints hgrow="ALWAYS" />
+            </columnConstraints>
+
+            <Label styleClass="title-label" text="Tipo:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <Label fx:id="tipoLabel" text="..." GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+            <Label styleClass="title-label" text="Gravidade:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <Label fx:id="gravidadeLabel" text="..." GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+            <Label styleClass="title-label" text="Local:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <Label fx:id="bairroLabel" text="..." GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+            <Label styleClass="title-label" text="Status Atual:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <Label fx:id="statusLabel" style="-fx-font-weight: bold;" text="..." GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+            <Label styleClass="title-label" text="Observações:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+            <Label fx:id="obsLabel" text="..." wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
+        </GridPane>
+      <padding>
+         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+      </padding>
+    </VBox>
+
+    <VBox fx:id="atendimentoVbox" spacing="10.0" styleClass="vbox-container">
+        <Label style="-fx-font-weight: bold; -fx-font-size: 14px;" text="Logística e Execução" />
+
+        <GridPane hgap="10" vgap="8">
+            <columnConstraints>
+                <ColumnConstraints minWidth="120" />
+                <ColumnConstraints hgrow="ALWAYS" />
+            </columnConstraints>
+
+            <Label styleClass="title-label" text="Ambulância:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <Label fx:id="ambulanciaLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+            <Label styleClass="title-label" text="Distância Percorrida:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+            <Label fx:id="distanciaLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+            <Label styleClass="title-label" text="Abertura do Chamado:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+            <Label fx:id="horaAberturaLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+            <Label styleClass="title-label" text="Horário do Despacho:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+            <Label fx:id="horaDespachoLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+            <Label styleClass="title-label" text="Chegada no Local:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+            <Label fx:id="horaChegadaLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+            <Label styleClass="title-label" text="Conclusão/Liberação:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+            <Label fx:id="horaConclusaoLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
+        </GridPane>
+      <padding>
+         <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+      </padding>
+    </VBox>
+
+    <Label fx:id="avisoSemDespachoLabel" style="-fx-text-fill: #888; -fx-font-style: italic;" text="Esta ocorrência ainda não foi despachada." visible="false" />
+
+    <Button onAction="#fechar" styleClass="btn-secondary" text="Voltar / Fechar" />
+</VBox>

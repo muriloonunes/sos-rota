@@ -94,6 +94,9 @@ public class AtendimentoService {
         cicloAtendimentoService.iniciarCicloAtendimento(atendimento.getId(), tempoEstimado);
     }
 
+    public Atendimento obterHistorico(Long ocorrenciaId) {
+        return atendimentoRepository.buscarPorOcorrenciaId(ocorrenciaId);
+    }
 
     public List<Atendimento> consultarHistorico(Long ambulanciaId,
                                                 LocalDateTime inicio,

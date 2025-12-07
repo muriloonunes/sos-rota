@@ -24,6 +24,7 @@ public class AppContext {
     private Equipe equipeEmEdicao;
     private Ocorrencia ocorrenciaEmEdicao;
     private Ocorrencia ocorrenciaParaDespachar;
+    private Ocorrencia ocorrenciaDetalhes;
 
     private AppContext() {
         UsuarioRepository usuarioRepository = new UsuarioRepositoryImpl();
@@ -131,5 +132,13 @@ public class AppContext {
 
     public void setOcorrenciaParaDespachar(Ocorrencia ocorrenciaParaDespachar) {
         this.ocorrenciaParaDespachar = ocorrenciaParaDespachar;
+    }
+
+    public Ocorrencia getOcorrenciaDetalhes() {
+        return ocorrenciaDetalhes;
+    }
+
+    public void setOcorrenciaDetalhes(Ocorrencia ocorrenciaDetalhes) {
+        this.ocorrenciaDetalhes = ocorrenciaDetalhes;
     }
 }

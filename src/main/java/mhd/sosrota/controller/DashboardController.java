@@ -132,13 +132,21 @@ public class DashboardController implements Navigable {
 
             private final Button cancelarButton = new Button();
             private final Button despacharButton = new Button();
+            private final Button detalhesButton = new Button();
 
             {
+                detalhesButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/eye.svg"))).scaleTo(12));
                 despacharButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/rota.svg"))).scaleTo(12));
                 cancelarButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/cancelar.svg"))).scaleTo(12));
 
                 despacharButton.getStyleClass().add("btn-primary");
+                detalhesButton.getStyleClass().add("btn-primary");
                 cancelarButton.getStyleClass().add("btn-ocorrencia");
+
+                detalhesButton.setOnAction(_ -> {
+                    Ocorrencia ocorrencia = getTableRow().getItem();
+                    abrirDetalhes(ocorrencia);
+                });
 
                 despacharButton.setOnAction(_ -> {
                     Ocorrencia ocorrencia = getTableRow().getItem();
@@ -163,6 +171,14 @@ public class DashboardController implements Navigable {
                 } else {
                     Ocorrencia oc = getTableView().getItems().get(getIndex());
 
+                    acoesBox.getChildren().clear();
+
+                    if (oc.getStatusOcorrencia() == StatusOcorrencia.CONCLUIDA
+                            || oc.getStatusOcorrencia() == StatusOcorrencia.CANCELADA) {
+                        acoesBox.getChildren().add(detalhesButton);
+                    } else {
+                        acoesBox.getChildren().addAll(despacharButton, cancelarButton);
+                    }
                     boolean isAberta = oc.getStatusOcorrencia() == StatusOcorrencia.ABERTA;
 
                     despacharButton.setDisable(!isAberta);
@@ -273,6 +289,12 @@ public class DashboardController implements Navigable {
         };
 
         new Thread(task).start();
+    }
+
+
+    private void abrirDetalhes(Ocorrencia ocorrencia) {
+        AppContext.getInstance().setOcorrenciaDetalhes(ocorrencia);
+        navigator.showModal(Screens.DETALHES, "Detalhes"); //TODO talvez depois trocar de modal pra stage normal?
     }
 
     private void abrirDespachar(Ocorrencia ocorrencia) {

@@ -117,17 +117,25 @@ public class OcorrenciaController implements Navigable {
             private final Button cancelarButton = new Button();
             private final Button despacharButton = new Button();
             private final Button deletarButton = new Button();
+            private final Button detalhesButton = new Button();
 
             {
                 editarButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/editar.svg"))).scaleTo(12));
                 deletarButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/deletar.svg"))).scaleTo(12));
                 despacharButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/rota.svg"))).scaleTo(12));
                 cancelarButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/cancelar.svg"))).scaleTo(12));
+                detalhesButton.setGraphic(SVGLoader.load(Objects.requireNonNull(getClass().getResource("/images/eye.svg"))).scaleTo(12));
 
                 despacharButton.getStyleClass().add("btn-primary");
                 editarButton.getStyleClass().add("btn-primary");
+                detalhesButton.getStyleClass().add("btn-primary");
                 deletarButton.getStyleClass().add("btn-ocorrencia");
                 cancelarButton.getStyleClass().add("btn-ocorrencia");
+
+                detalhesButton.setOnAction(_ -> {
+                    Ocorrencia ocorrencia = getTableRow().getItem();
+                    abrirDetalhes(ocorrencia);
+                });
 
                 despacharButton.setOnAction(_ -> {
                     Ocorrencia ocorrencia = getTableRow().getItem();
@@ -150,32 +158,51 @@ public class OcorrenciaController implements Navigable {
                 });
 
                 acoesBox.setAlignment(Pos.CENTER);
-                acoesBox.getChildren().addAll(despacharButton, editarButton, cancelarButton, deletarButton);
             }
 
             @Override
             protected void updateItem(Void item, boolean empty) {
                 super.updateItem(item, empty);
 
-                if (empty || getIndex() < 0 || getTableView().getItems().get(getIndex()) == null) {
+                if (empty || getIndex() < 0) {
                     setGraphic(null);
-                } else {
-                    Ocorrencia oc = getTableView().getItems().get(getIndex());
-
-                    boolean isAberta = oc.getStatusOcorrencia() == StatusOcorrencia.ABERTA;
-
-                    despacharButton.setDisable(!isAberta);
-
-                    editarButton.setDisable(oc.getStatusOcorrencia() == StatusOcorrencia.CONCLUIDA
-                            || oc.getStatusOcorrencia() == StatusOcorrencia.CANCELADA);
-
-                    cancelarButton.setDisable(oc.getStatusOcorrencia() == StatusOcorrencia.CONCLUIDA
-                            || oc.getStatusOcorrencia() == StatusOcorrencia.CANCELADA);
-
-                    setGraphic(acoesBox);
+                    return;
                 }
+
+                Ocorrencia oc = getTableView().getItems().get(getIndex());
+                if (oc == null) {
+                    setGraphic(null);
+                    return;
+                }
+
+                acoesBox.getChildren().clear();
+
+                if (oc.getStatusOcorrencia() == StatusOcorrencia.CONCLUIDA
+                        || oc.getStatusOcorrencia() == StatusOcorrencia.CANCELADA) {
+                    acoesBox.getChildren().add(detalhesButton);
+                } else {
+                    acoesBox.getChildren().addAll(
+                            despacharButton, editarButton, cancelarButton, deletarButton
+                    );
+                }
+                boolean isAberta = oc.getStatusOcorrencia() == StatusOcorrencia.ABERTA;
+
+                despacharButton.setDisable(!isAberta);
+
+                boolean isFinalizada = oc.getStatusOcorrencia() == StatusOcorrencia.CONCLUIDA
+                        || oc.getStatusOcorrencia() == StatusOcorrencia.CANCELADA;
+
+                editarButton.setDisable(isFinalizada);
+                cancelarButton.setDisable(isFinalizada);
+
+                setGraphic(acoesBox);
             }
         });
+    }
+
+    private void abrirDetalhes(Ocorrencia ocorrencia) {
+        AppContext.getInstance().setOcorrenciaDetalhes(ocorrencia);
+        navigator.showModal(Screens.DETALHES, "Detalhes");  //TODO talvez depois trocar de modal pra stage normal?
     }
 
     private void abrirDespachar(Ocorrencia ocorrencia) {
@@ -189,7 +216,6 @@ public class OcorrenciaController implements Navigable {
         navigator.showModal(Screens.DESPACHAR, "Despachar ambulância");
 
         carregarOcorrencias();
-        //TODO
     }
 
     private void carregarOcorrencias() {

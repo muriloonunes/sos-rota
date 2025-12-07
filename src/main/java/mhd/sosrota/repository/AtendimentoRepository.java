@@ -24,6 +24,8 @@ public interface AtendimentoRepository {
             GravidadeOcorrencia gravidade
     );
 
+    Atendimento buscarPorOcorrenciaId(Long ocorrenciaId);
+
     Double tempoMedioRespostaPorGravidade(GravidadeOcorrencia gravidade);
 
     List<Object[]> mapaOcorrenciasPorBairro();
