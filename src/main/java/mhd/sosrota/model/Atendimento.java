@@ -21,11 +21,11 @@ public class Atendimento {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "ocorrencia_id", nullable = false)
+    @JoinColumn(name = "ocorrencia_id", referencedColumnName = "id_ocorrencia", nullable = false)
     private Ocorrencia ocorrencia;
 
     @ManyToOne
-    @JoinColumn(name = "ambulancia_id", nullable = false)
+    @JoinColumn(name = "ambulancia_id", referencedColumnName = "id_ambulancia", nullable = false)
     private Ambulancia ambulancia;
 
     @Column(name = "data_hora_despacho", nullable = false, insertable = false, updatable = false)

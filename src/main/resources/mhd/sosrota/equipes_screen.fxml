@@ -172,7 +172,7 @@
                             <Insets bottom="20" left="20" right="20" top="20" />
                         </padding>
 
-                        <Label styleClass="vbox-container-titulo" text="Equipes ativas">
+                        <Label styleClass="vbox-container-titulo" text="Equipes">
                             <font>
                                 <Font size="18.0" />
                             </font>

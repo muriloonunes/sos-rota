@@ -18,10 +18,13 @@ import java.util.List;
  * @brief Class AmbulanciaService
  */
 public class AmbulanciaService {
-    private final AmbulanciaRepository repo;
+    private AmbulanciaRepository repo;
 
     public AmbulanciaService(AmbulanciaRepository repo) {
         this.repo = repo;
+    }
+
+    public AmbulanciaService() {
     }
 
     public List<Ambulancia> listarTodasAmbulancias() {
