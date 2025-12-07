@@ -23,4 +23,41 @@ public enum StatusOcorrencia {
     public String getDescricao() {
         return descricao;
     }
+
+    // ===== MÉTODOS UTILITÁRIOS ===== //
+
+    /** Retorna true se a ocorrência ainda não foi atendida */
+    public boolean isAberta() {
+        return this == ABERTA;
+    }
+
+    /** Retorna true se já foi despachada para uma equipe */
+    public boolean isDespachada() {
+        return this == DESPACHADA;
+    }
+
+    /** Retorna true se está em processo de atendimento */
+    public boolean isEmAtendimento() {
+        return this == EM_ATENDIMENTO;
+    }
+
+    /** Retorna true se está concluída ou cancelada */
+    public boolean isFinalizada() {
+        return this == CONCLUIDA || this == CANCELADA;
+    }
+
+    /** Retorna true se ainda pode sofrer alterações */
+    public boolean isEditavel() {
+        return this == ABERTA || this == DESPACHADA || this == EM_ATENDIMENTO;
+    }
+
+    /** Apenas concluída com sucesso (não cancelada) */
+    public boolean isConcluidaComSucesso() {
+        return this == CONCLUIDA;
+    }
+
+    /** Retorna true se está encerrada definitivamente (concluída ou cancelada) */
+    public boolean isEncerrada() {
+        return this.isFinalizada();
+    }
 }

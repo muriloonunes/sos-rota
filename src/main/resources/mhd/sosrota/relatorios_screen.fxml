@@ -19,111 +19,31 @@
                 <Insets top="20" bottom="20" left="30" right="30"/>
             </padding>
 
-            <!-- ===========================
-                 FILTROS DE BUSCA
-            ============================ -->
-            <VBox spacing="10" styleClass="vbox-container">
-                <padding>
-                    <Insets left="16" right="16" top="16" bottom="16"/>
-                </padding>
 
-                <Label styleClass="vbox-container-titulo" text="Filtros de Consulta">
-                    <font><Font size="18"/></font>
-                </Label>
-
-                <GridPane hgap="12" vgap="8">
-                    <columnConstraints>
-                        <ColumnConstraints percentWidth="33"/>
-                        <ColumnConstraints percentWidth="33"/>
-                        <ColumnConstraints percentWidth="33"/>
-                    </columnConstraints>
-
-                    <!-- Período -->
-                    <VBox spacing="4">
-                        <Label styleClass="title-label" text="Período"/>
-                        <HBox spacing="8">
-                            <DatePicker fx:id="dtInicio" promptText="Início" styleClass="date-picker"/>
-                            <Label styleClass="title-label" text="até"/>
-                            <DatePicker fx:id="dtFim" promptText="Fim" styleClass="date-picker"/>
-                        </HBox>
-                    </VBox>
-
-                    <!-- Gravidade -->
-                    <VBox spacing="4" GridPane.columnIndex="1">
-                        <Label styleClass="title-label" text="Gravidade"/>
-                        <ComboBox fx:id="cmbGravidade" promptText="Todas" styleClass="info-selectors"/>
-                    </VBox>
-
-                    <!-- Ambulância -->
-                    <VBox spacing="4" GridPane.columnIndex="2">
-                        <Label styleClass="title-label" text="Ambulância"/>
-                        <ComboBox fx:id="cmbAmbulanciaId" promptText="Todas" styleClass="info-selectors"/>
-                    </VBox>
-                </GridPane>
-
-                <HBox alignment="CENTER_RIGHT" spacing="8">
-                    <Region HBox.hgrow="ALWAYS"/>
-                    <Button text="Limpar" styleClass="btn-secondary" onAction="#handleClearFilters"/>
-                    <Button text="Consultar" styleClass="btn-primary" onAction="#handleConsultarHistorico"/>
-                </HBox>
-            </VBox>
 
             <!-- ===========================
-                 HISTÓRICO DE ATENDIMENTOS
+                 RELATÓRIOS TEXTUAIS
             ============================ -->
             <VBox spacing="10" styleClass="vbox-container" VBox.vgrow="ALWAYS">
-                <padding>
-                    <Insets left="16" right="16" top="16" bottom="16"/>
-                </padding>
-
-                <Label styleClass="vbox-container-titulo" text="Histórico de Atendimentos">
+                <Label styleClass="vbox-container-titulo" text="Relatórios">
                     <font><Font size="18"/></font>
                 </Label>
 
-                <TableView fx:id="tabelaHistorico" VBox.vgrow="ALWAYS" styleClass="table-view">
-                    <columns>
-                        <TableColumn text="ID Atendimento" prefWidth="120"/>
-                        <TableColumn text="Ambulância" prefWidth="130"/>
-                        <TableColumn text="Bairro" prefWidth="160"/>
-                        <TableColumn text="Gravidade" prefWidth="120"/>
-                        <TableColumn text="Despacho" prefWidth="160"/>
-                        <TableColumn text="Chegada" prefWidth="160"/>
-                    </columns>
-
-                    <placeholder>
-                        <Label text="Nenhum registro encontrado."/>
-                    </placeholder>
-
-                    <columnResizePolicy>
-                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
-                    </columnResizePolicy>
-                </TableView>
-
-                <!-- ===========================
-                     TEMPO MÉDIO DE RESPOSTA
-                ============================ -->
                 <VBox spacing="6">
                     <HBox spacing="10" alignment="CENTER_LEFT">
                         <Label styleClass="title-label" text="Tempo médio de resposta:"/>
                         <Button text="Recalcular" styleClass="btn-secondary" onAction="#handleTempoMedioResposta"/>
                     </HBox>
-
-                    <TextArea fx:id="txtTempoMedio" prefRowCount="3"
-                              editable="false" wrapText="true"
+                    <TextArea fx:id="txtTempoMedio" prefRowCount="3" editable="false" wrapText="true"
                               styleClass="text-area-report"/>
                 </VBox>
 
-                <!-- ===========================
-                     OCORRÊNCIAS POR BAIRRO
-                ============================ -->
                 <VBox spacing="6">
                     <HBox alignment="CENTER_LEFT" spacing="10">
                         <Label styleClass="title-label" text="Mapa de ocorrências por bairro:"/>
                         <Button text="Atualizar" styleClass="btn-secondary" onAction="#handleMapaBairros"/>
                     </HBox>
-
-                    <TextArea fx:id="txtMapaBairros" prefRowCount="6"
-                              editable="false" wrapText="true"
+                    <TextArea fx:id="txtMapaBairros" prefRowCount="6" editable="false" wrapText="true"
                               styleClass="text-area-report"/>
                 </VBox>
             </VBox>
