@@ -14,6 +14,7 @@ import mhd.sosrota.model.Atendimento;
 import mhd.sosrota.model.enums.StatusOcorrencia;
 
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -36,6 +37,8 @@ public class AtendimentoService {
         this.ambulanciaRepository = ambulanciaRepository;
         this.atendimentoRepository = atendimentoRepository;
     }
+
+
 
     public List<OpcaoDespacho> buscarOpcoesDeDespacho(Ocorrencia ocorrencia) {
         GrafoCidade grafo = grafoService.obterGrafo();
@@ -97,5 +100,21 @@ public class AtendimentoService {
         Atendimento atendimento = new Atendimento(ocorrencia, ambulancia, distanciaKm);
 
         atendimentoRepository.salvar(atendimento, ocorrencia, ambulancia);
+    }
+
+
+    public List<Atendimento> consultarHistorico(Long ambulanciaId,
+                                                LocalDateTime inicio,
+                                                LocalDateTime fim,
+                                                GravidadeOcorrencia gravidade) {
+        return atendimentoRepository.consultarHistorico(ambulanciaId, inicio, fim, gravidade);
+    }
+
+    public Double tempoMedioRespostaPorGravidade(GravidadeOcorrencia gravidade) {
+        return atendimentoRepository.tempoMedioRespostaPorGravidade(gravidade);
+    }
+
+    public List<Object[]> mapaOcorrenciasPorBairro() {
+        return atendimentoRepository.mapaOcorrenciasPorBairro();
     }
 }
