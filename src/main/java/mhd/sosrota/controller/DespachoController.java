@@ -142,7 +142,7 @@ public class DespachoController implements Navigable {
             @Override
             protected void succeeded() {
                 UiUtils.setButtonLoading(btnConfirmar, false, "Confirmar Despacho");
-                AlertUtil.showConfirmation("Sucesso", "Ambulância despachada com sucesso.");
+                AlertUtil.showInfo( "Sucesso", "Ambulância despachada com sucesso.");
                 handleCancelar();
             }
 

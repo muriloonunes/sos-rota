@@ -106,7 +106,7 @@
                     <TableColumn fx:id="acoesColumn" prefWidth="100" text="Ações" />
                 </columns>
                 <placeholder>
-                    <Label text="Nenhuma ocorrência ativa no momento." />
+                    <Label text="Não há ocorrências recentes." />
                 </placeholder>
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />

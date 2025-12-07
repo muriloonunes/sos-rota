@@ -7,6 +7,10 @@ import mhd.sosrota.model.exceptions.CadastroException;
 import mhd.sosrota.repository.OcorrenciaRepository;
 import mhd.sosrota.util.AlertUtil;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.List;
 
 public class OcorrenciaService {
@@ -38,7 +42,11 @@ public class OcorrenciaService {
                 && ocorrencia.getId() == null) {
             throw new CadastroException("Não é possível criar uma ocorrência já concluída.");
         }
-        repository.salvar(ocorrencia);
+        if (ocorrencia.getId() == null) {
+            repository.salvar(ocorrencia);
+        } else {
+            repository.atualizar(ocorrencia);
+        }
     }
 
     public void deletar(Long id) {
@@ -64,17 +72,25 @@ public class OcorrenciaService {
             }
 
             ocorrencia.setStatusOcorrencia(StatusOcorrencia.CANCELADA);
+            ocorrencia.setSlaFinal(calcularSLAFinal(ocorrencia.getLimiteSLA()));
 
             String novaObs = (ocorrencia.getObservacao() != null ? ocorrencia.getObservacao() : "")
                     + "\n[CANCELAMENTO]: " + justificativa;
 
             ocorrencia.setObservacao(novaObs);
-            repository.salvar(ocorrencia);
+            repository.atualizar(ocorrencia);
         });
     }
 
     public int obterQuantidadeOcorrenciasPorStatus(StatusOcorrencia status) {
         var lista = repository.buscarPorStatus(status);
         return lista.size();
+    }
+
+    public static Duration calcularSLAFinal(OffsetDateTime limiteSla) {
+        ZoneId fusoBrasil = ZoneId.of("America/Sao_Paulo");
+        OffsetDateTime agora = OffsetDateTime.now(fusoBrasil);
+        OffsetDateTime limiteSLa = limiteSla.withOffsetSameLocal(ZoneOffset.ofHours(-3));
+        return Duration.between(agora, limiteSLa);
     }
 }

@@ -1,18 +1,13 @@
 package mhd.sosrota.service;
 
-import mhd.sosrota.model.Ambulancia;
-import mhd.sosrota.model.Bairro;
-import mhd.sosrota.model.GrafoCidade;
-import mhd.sosrota.model.Ocorrencia;
+import mhd.sosrota.model.*;
 import mhd.sosrota.model.enums.GravidadeOcorrencia;
 import mhd.sosrota.model.enums.StatusAmbulancia;
+import mhd.sosrota.model.enums.StatusOcorrencia;
 import mhd.sosrota.model.enums.TipoAmbulancia;
 import mhd.sosrota.presentation.OpcaoDespacho;
 import mhd.sosrota.repository.AmbulanciaRepository;
 import mhd.sosrota.repository.AtendimentoRepository;
-import mhd.sosrota.model.Atendimento;
-import mhd.sosrota.model.enums.StatusOcorrencia;
-
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,7 +34,6 @@ public class AtendimentoService {
         this.atendimentoRepository = atendimentoRepository;
         this.cicloAtendimentoService = cicloAtendimentoService;
     }
-
 
 
     public List<OpcaoDespacho> buscarOpcoesDeDespacho(Ocorrencia ocorrencia) {
@@ -91,12 +85,13 @@ public class AtendimentoService {
         }
 
         ocorrencia.setStatusOcorrencia(StatusOcorrencia.DESPACHADA);
+        ocorrencia.setSlaFinal(OcorrenciaService.calcularSLAFinal(ocorrencia.getLimiteSLA()));
         ambulancia.setStatusAmbulancia(StatusAmbulancia.EM_ATENDIMENTO);
 
         Atendimento atendimento = new Atendimento(ocorrencia, ambulancia, distanciaKm);
 
         atendimentoRepository.salvar(atendimento, ocorrencia, ambulancia);
-        cicloAtendimentoService.iniciarCicloAtendimento(atendimento.getId(),  tempoEstimado);
+        cicloAtendimentoService.iniciarCicloAtendimento(atendimento.getId(), tempoEstimado);
     }
 
 

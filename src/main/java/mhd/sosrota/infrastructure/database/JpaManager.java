@@ -11,15 +11,34 @@ import jakarta.persistence.Persistence;
  * @brief Class JpaManager
  */
 public class JpaManager {
-    private static final EntityManagerFactory emf =
-            Persistence.createEntityManagerFactory("SosRota");
+    private static EntityManagerFactory emf;
 
-    public static EntityManager getEntityManager() {
-        return emf.createEntityManager();
+    public static void initialize() {
+        if (emf == null) {
+            try {
+                emf = Persistence.createEntityManagerFactory("SosRota");
+            } catch (Exception e) {
+                throw new RuntimeException("Erro ao conectar ao banco de dados.", e);
+            }
+        }
     }
 
     public static EntityManagerFactory getFactory() {
+        if (emf == null) {
+            throw new IllegalStateException("O EntityManagerFactory não foi inicializado. O banco está offline?");
+        }
         return emf;
+    }
+
+    public static EntityManager getEntityManager() {
+        if (emf == null) {
+            throw new IllegalStateException("Modo Offline: Não é possível criar EntityManager.");
+        }
+        return emf.createEntityManager();
+    }
+
+    public static boolean isOffline() {
+        return emf == null || !emf.isOpen();
     }
 
     public static void close() {

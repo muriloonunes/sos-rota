@@ -4,10 +4,13 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.paint.Color;
 import javafx.util.Callback;
 import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Bairro;
+import mhd.sosrota.model.Ocorrencia;
 import mhd.sosrota.model.enums.StatusAmbulancia;
+import mhd.sosrota.model.enums.StatusOcorrencia;
 import mhd.sosrota.model.enums.TipoAmbulancia;
 import mhd.sosrota.model.exceptions.CadastroException;
 import mhd.sosrota.util.AlertUtil;
@@ -15,6 +18,9 @@ import org.girod.javafx.svgimage.SVGImage;
 import org.girod.javafx.svgimage.SVGLoader;
 
 import java.net.URL;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -153,7 +159,7 @@ public class UiUtils {
             private final CheckBox checkBox = new CheckBox();
 
             {
-                checkBox.setOnAction(event -> {
+                checkBox.setOnAction(_ -> {
                     T item = getTableView().getItems().get(getIndex());
                     boolean novoValor = checkBox.isSelected();
 
@@ -176,6 +182,64 @@ public class UiUtils {
                 } else {
                     checkBox.setSelected(value != null && value);
                     setGraphic(checkBox);
+                }
+            }
+        };
+    }
+
+    public static Callback<TableColumn<Ocorrencia, OffsetDateTime>, TableCell<Ocorrencia, OffsetDateTime>> criarSlaCellFactory() {
+        return _ -> new TableCell<>() {
+            @Override
+            protected void updateItem(OffsetDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+
+                Ocorrencia ocorrencia = getTableRow() == null ? null : getTableRow().getItem();
+
+                if (empty || ocorrencia == null) {
+                    setText(null);
+                    setStyle("");
+                    return;
+                }
+
+                Duration duration;
+                if (ocorrencia.getStatusOcorrencia() != StatusOcorrencia.ABERTA && ocorrencia.getSlaFinal() != null) {
+                    duration = ocorrencia.getSlaFinal();
+                } else {
+                    OffsetDateTime limite = ocorrencia.getLimiteSLA();
+                    if (limite == null) {
+                        setText("Aguardando...");
+                        setStyle("");
+                        return;
+                    }
+                    duration = Duration.between(LocalDateTime.now(), limite);
+                }
+
+                aplicarFormatacaoSla(duration);
+            }
+
+            private void aplicarFormatacaoSla(Duration duration) {
+                boolean estourado = duration.isNegative();
+                long segundosAbs = Math.abs(duration.getSeconds());
+                long minutos = segundosAbs / 60;
+                long segundos = segundosAbs % 60;
+
+                String textoTempo = String.format("%s%02d:%02d",
+                        estourado ? "-" : "",
+                        minutos,
+                        segundos
+                );
+
+                setText(textoTempo);
+
+                if (estourado) {
+                    setTextFill(Color.RED);
+                    setStyle("-fx-font-weight: bold;");
+                } else if (minutos < 2) {
+                    setTextFill(Color.ORANGE);
+                    setStyle("-fx-font-weight: bold;");
+                } else {
+                    setTextFill(Color.BLACK);
+                    setStyle("");
                 }
             }
         };

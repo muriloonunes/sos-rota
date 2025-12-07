@@ -11,7 +11,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
-import javafx.scene.paint.Color;
 import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Bairro;
 import mhd.sosrota.model.Ocorrencia;
@@ -20,12 +19,11 @@ import mhd.sosrota.model.enums.StatusOcorrencia;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
+import mhd.sosrota.presentation.UiUtils;
 import mhd.sosrota.service.OcorrenciaService;
 import mhd.sosrota.util.AlertUtil;
 import org.girod.javafx.svgimage.SVGLoader;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -110,49 +108,7 @@ public class OcorrenciaController implements Navigable {
         });
 
         slaColumn.setCellValueFactory(new PropertyValueFactory<>("dataHoraAbertura"));
-        slaColumn.setCellFactory(_ -> new TableCell<>() {
-            @Override
-            protected void updateItem(OffsetDateTime item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    Ocorrencia ocorrencia = getTableRow().getItem();
-                    OffsetDateTime limite = ocorrencia.getLimiteSLA();
-
-                    if (limite == null) {
-                        setText("Aguardando...");
-                        return;
-                    }
-                    Duration duration = Duration.between(LocalDateTime.now(), limite);
-                    boolean estourado = duration.isNegative();
-                    long segundosAbs = Math.abs(duration.getSeconds());
-                    long minutos = segundosAbs / 60;
-                    long segundos = segundosAbs % 60;
-
-                    String textoTempo = String.format("%s%02d:%02d",
-                            estourado ? "-" : "",
-                            minutos,
-                            segundos
-                    );
-
-                    setText(textoTempo);
-
-                    if (estourado) {
-                        setTextFill(Color.RED);
-                        setStyle("-fx-font-weight: bold;");
-                    } else if (minutos < 2) {
-                        setTextFill(Color.ORANGE);
-                        setStyle("-fx-font-weight: bold;");
-                    } else {
-                        setTextFill(Color.BLACK);
-                        setStyle("");
-                    }
-                }
-            }
-        });
+        slaColumn.setCellFactory(UiUtils.criarSlaCellFactory());
 
         acoesColumn.setCellFactory(_ -> new TableCell<>() {
             private final HBox acoesBox = new HBox(10);
@@ -242,7 +198,7 @@ public class OcorrenciaController implements Navigable {
             protected ObservableList<Ocorrencia> call() {
                 List<Ocorrencia> ocorrencias = service.listarTodas();
                 if (ocorrencias.isEmpty()) {
-                    tabelaOcorrencias.setPlaceholder(new Label("Nenhuma ocorrencia encontrada"));
+                    tabelaOcorrencias.setPlaceholder(new Label("Nenhuma ocorrência encontrada"));
                 }
                 return FXCollections.observableArrayList(ocorrencias);
             }

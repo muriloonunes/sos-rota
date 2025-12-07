@@ -7,7 +7,7 @@ import mhd.sosrota.model.Atendimento;
 import mhd.sosrota.model.enums.StatusAmbulancia;
 import mhd.sosrota.model.enums.StatusOcorrencia;
 
-import java.time.LocalDateTime;
+import java.time.*;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -35,26 +35,57 @@ public class CicloAtendimentoService {
     public void iniciarCicloAtendimento(Long atendimentoId, double tempoViagemMinutos) {
         long tempoSimulado = (long) (tempoViagemMinutos * FATOR_CONVERSAO); //pra simular, 1 min da simulação = 10 segundos reais
         System.out.println(">> SIMULAÇÃO INICIADA para Atendimento " + atendimentoId);
+        OffsetDateTime agora = OffsetDateTime.now(ZoneId.of("America/Sao_Paulo"));
 
         //simula a chegada da ambulancia no local após o tempo da viagem
         scheduler.schedule(() -> registrarChegada(atendimentoId), tempoSimulado, TimeUnit.SECONDS);
+        System.out.println(">>> [Simulação] Ocorrência deve estar em atendimento às " + agora.plusSeconds(tempoSimulado));
 
         //smiula o fim do atendimento e o início da volta da ambulancia
         scheduler.schedule(() -> registrarConclusaoAtendimento(atendimentoId), tempoSimulado + TEMPO_ATENDIMENTO, TimeUnit.SECONDS);
+        System.out.println(">>> [Simulação] Ocorrência deve estar finalizada às " + agora.plusSeconds(tempoSimulado + TEMPO_ATENDIMENTO));
 
         //voltou pra base após o tempo da viagem de ida + tempo de atendimento + viagem de volta
         scheduler.schedule(() -> registrarRetornoBase(atendimentoId), (tempoSimulado * 2) + TEMPO_ATENDIMENTO, TimeUnit.SECONDS);
+        System.out.println(">>> [Simulação] Ambulância deve estar disponível às " + agora.plusSeconds((tempoSimulado * 2) + TEMPO_ATENDIMENTO));
     }
 
     private void verificarPendencias() {
         rodaTransacao(em -> {
-            List<Atendimento> pendentes = em.createQuery(
-                    "SELECT a FROM Atendimento a WHERE a.dataHoraDespacho IS NOT NULL AND a.dataHoraConclusao IS NULL",
-                    Atendimento.class
-            ).getResultList();
+            List<Atendimento> pendentes = em.createQuery("""
+                        SELECT a FROM Atendimento a
+                        WHERE a.dataHoraDespacho IS NOT NULL
+                        AND a.dataHoraConclusao IS NULL
+                    """, Atendimento.class).getResultList();
 
             for (Atendimento at : pendentes) {
                 tratarAtendimentoPendente(at, em);
+            }
+
+            List<Ambulancia> travadas = em.createQuery("""
+                                SELECT amb FROM Ambulancia amb
+                                WHERE amb.statusAmbulancia = :status
+                            """, Ambulancia.class)
+                    .setParameter("status", StatusAmbulancia.EM_ATENDIMENTO)
+                    .getResultList();
+
+            for (Ambulancia amb : travadas) {
+                Atendimento ultimo = em.createQuery("""
+                                    SELECT a FROM Atendimento a
+                                    WHERE a.ambulancia.id = :idAmb
+                                    ORDER BY a.dataHoraDespacho DESC
+                                """, Atendimento.class)
+                        .setParameter("idAmb", amb.getId())
+                        .setMaxResults(1)
+                        .getSingleResult();
+
+                if (ultimo.getDataHoraConclusao() != null) {
+                    amb.setStatusAmbulancia(StatusAmbulancia.DISPONIVEL);
+                    System.out.println(">>> [Recovery] Ambulância "
+                            + amb.getPlaca() + " liberada (atendimento já estava concluído).");
+
+                    em.merge(amb);
+                }
             }
         });
     }
@@ -65,15 +96,21 @@ public class CicloAtendimentoService {
 
         long tempoViagem = (long) (at.getDistanciaKm() * FATOR_CONVERSAO);  //o tempo entre sair da base e chegar na ocorrencia
 
-        LocalDateTime horaChegada = dataDespacho.plusSeconds(tempoViagem); //hora de chegar na ocorrencia
-        LocalDateTime horaFimAtendimento = horaChegada.plusSeconds(TEMPO_ATENDIMENTO); //hora de terminar o atendimento
+        ZonedDateTime horaChegada = dataDespacho.plusSeconds(tempoViagem)
+                .atOffset(ZoneOffset.ofHours(-6)).atZoneSameInstant(ZoneId.of("America/Sao_Paulo")); //hora de chegar na ocorrencia
+        LocalDateTime horaFimAtendimento = horaChegada.plusSeconds(TEMPO_ATENDIMENTO).toLocalDateTime(); //hora de terminar o atendimento
         LocalDateTime horaRetornoBase = horaFimAtendimento.plusSeconds(tempoViagem); //hora de voltar pra base
+
+        System.out.println("Data Despacho: " + dataDespacho);
+        System.out.println("Hora Chegada: " + horaChegada);
+        System.out.println("Hora Fim Atendimento: " + horaFimAtendimento);
+        System.out.println("Hora Retorno Base: " + horaRetornoBase);
 
         if (agora.isAfter(horaRetornoBase)) {
             at.getOcorrencia().setStatusOcorrencia(StatusOcorrencia.CONCLUIDA);
             at.getAmbulancia().setStatusAmbulancia(StatusAmbulancia.DISPONIVEL);
 
-            at.setDataHoraChegada(horaChegada); // chegou na ocorrencia
+            at.setDataHoraChegada(horaChegada.toLocalDateTime()); // chegou na ocorrencia
             at.setDataHoraConclusao(horaFimAtendimento);
             em.merge(at.getOcorrencia());
             em.merge(at.getAmbulancia());

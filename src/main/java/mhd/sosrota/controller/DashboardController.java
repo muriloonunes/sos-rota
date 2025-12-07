@@ -16,7 +16,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
@@ -33,6 +32,7 @@ import mhd.sosrota.model.enums.StatusOcorrencia;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
+import mhd.sosrota.presentation.UiUtils;
 import mhd.sosrota.service.AmbulanciaService;
 import mhd.sosrota.service.GrafoCidadeService;
 import mhd.sosrota.service.OcorrenciaService;
@@ -40,8 +40,6 @@ import mhd.sosrota.util.AlertUtil;
 import org.girod.javafx.svgimage.SVGImage;
 import org.girod.javafx.svgimage.SVGLoader;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -97,7 +95,6 @@ public class DashboardController implements Navigable {
         ocorrenciasAbertasHbox.getChildren().add(exclamationIcon);
         ambulanciasDisponiveisHbox.getChildren().add(ambulanciasIcon);
         ambulanciasAtendimentoHbox.getChildren().add(pulsoIcon);
-
     }
 
     private void configurarTabela() {
@@ -128,49 +125,7 @@ public class DashboardController implements Navigable {
         });
 
         slaColumn.setCellValueFactory(new PropertyValueFactory<>("dataHoraAbertura"));
-        slaColumn.setCellFactory(_ -> new TableCell<>() {
-            @Override
-            protected void updateItem(OffsetDateTime item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || getTableRow() == null || getTableRow().getItem() == null) {
-                    setText(null);
-                    setStyle("");
-                } else {
-                    Ocorrencia ocorrencia = getTableRow().getItem();
-                    OffsetDateTime limite = ocorrencia.getLimiteSLA();
-
-                    if (limite == null) {
-                        setText("Aguardando...");
-                        return;
-                    }
-                    Duration duration = Duration.between(LocalDateTime.now(), limite);
-                    boolean estourado = duration.isNegative();
-                    long segundosAbs = Math.abs(duration.getSeconds());
-                    long minutos = segundosAbs / 60;
-                    long segundos = segundosAbs % 60;
-
-                    String textoTempo = String.format("%s%02d:%02d",
-                            estourado ? "-" : "",
-                            minutos,
-                            segundos
-                    );
-
-                    setText(textoTempo);
-
-                    if (estourado) {
-                        setTextFill(Color.RED);
-                        setStyle("-fx-font-weight: bold;");
-                    } else if (minutos < 2) {
-                        setTextFill(Color.ORANGE);
-                        setStyle("-fx-font-weight: bold;");
-                    } else {
-                        setTextFill(Color.BLACK);
-                        setStyle("");
-                    }
-                }
-            }
-        });
+        slaColumn.setCellFactory(UiUtils.criarSlaCellFactory());
 
         acoesColumn.setCellFactory(_ -> new TableCell<>() {
             private final HBox acoesBox = new HBox(10);
@@ -331,17 +286,19 @@ public class DashboardController implements Navigable {
         navigator.showModal(Screens.DESPACHAR, "Despachar ambulância");
 
         carregarOcorrencias();
-        //TODO
+        carregarAmbulancias();
     }
 
     private void cancelarOcorrencia(Ocorrencia ocorrencia) {
         ocorrenciaService.cancelarOcorrencia(ocorrencia);
         carregarOcorrencias();
+        carregarAmbulancias();
     }
 
     @FXML
     private void handleAtualizarLista() {
         carregarOcorrencias();
+        carregarAmbulancias();
     }
 
     private void desenharMapa() {
@@ -448,16 +405,12 @@ public class DashboardController implements Navigable {
             }
         });
 
-        circulo.setOnMouseExited(_ -> {
-            mundoGroup.getChildren().forEach(node -> {
-                node.getStyleClass().removeAll(
-                        "escurecido",
-                        "bairro-destacado",
-                        "bairro-label-destacado",
-                        "rua-destacada"
-                );
-            });
-        });
+        circulo.setOnMouseExited(_ -> mundoGroup.getChildren().forEach(node -> node.getStyleClass().removeAll(
+                "escurecido",
+                "bairro-destacado",
+                "bairro-label-destacado",
+                "rua-destacada"
+        )));
     }
 
     private void configurarNavegacao(Group mundoGroup) {
@@ -526,6 +479,7 @@ public class DashboardController implements Navigable {
     private void criarOcorrencia() {
         navigator.showModal(Screens.CRIAR_OCORRENCIA, "Criar Ocorrência");
         carregarOcorrencias();
+        carregarAmbulancias();
     }
 
     @Override

@@ -3,10 +3,11 @@ package mhd.sosrota.model;
 import jakarta.persistence.*;
 import mhd.sosrota.model.enums.GravidadeOcorrencia;
 import mhd.sosrota.model.enums.StatusOcorrencia;
+import mhd.sosrota.util.DurationToSecondsConverter;
 import org.hibernate.annotations.JdbcType;
 import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 
 /**
@@ -46,6 +47,10 @@ public class Ocorrencia {
 
     @Column(name = "observacao", columnDefinition = "TEXT")
     private String observacao;
+
+    @Column(name = "sla_final")
+    @Convert(converter = DurationToSecondsConverter.class)
+    private Duration slaFinal;
 
     public Ocorrencia() {
     }
@@ -119,6 +124,14 @@ public class Ocorrencia {
 
     public void setBairro(Bairro bairro) {
         this.bairro = bairro;
+    }
+
+    public Duration getSlaFinal() {
+        return slaFinal;
+    }
+
+    public void setSlaFinal(Duration slaFinal) {
+        this.slaFinal = slaFinal;
     }
 
     public String getObservacao() {

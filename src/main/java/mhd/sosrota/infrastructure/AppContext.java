@@ -44,10 +44,14 @@ public class AppContext {
 
         this.ocorrenciaService = new OcorrenciaService(new OcorrenciaRepositoryImpl());
 
-        this.cicloAtendimentoService = new CicloAtendimentoService(JpaManager.getFactory());
-
-        AtendimentoRepository atendimentoRepository = new AtendimentoRepositoryImpl();
-        this.atendimentoService = new AtendimentoService(grafoService, ambulanciaRepository, atendimentoRepository, cicloAtendimentoService);
+        if (!JpaManager.isOffline()) {
+            this.cicloAtendimentoService = new CicloAtendimentoService(JpaManager.getFactory());
+            AtendimentoRepository atendimentoRepository = new AtendimentoRepositoryImpl();
+            this.atendimentoService = new AtendimentoService(grafoService, ambulanciaRepository, atendimentoRepository, cicloAtendimentoService);
+        } else {
+            this.cicloAtendimentoService = null;
+            this.atendimentoService = null;
+        }
     }
 
     public static synchronized AppContext getInstance() {

@@ -17,4 +17,5 @@ module mhd.sosrota {
     exports mhd.sosrota.controller;
     opens mhd.sosrota.model to org.hibernate.orm.core, com.google.gson, javafx.base;
     exports mhd.sosrota.navigation;
+    opens mhd.sosrota.util to org.hibernate.orm.core;
 }

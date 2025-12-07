@@ -8,6 +8,7 @@ import mhd.sosrota.infrastructure.UserPrefs;
 import mhd.sosrota.infrastructure.database.JpaManager;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
+import mhd.sosrota.util.AlertUtil;
 
 public class SOSRotaView extends Application {
     @Override
@@ -16,9 +17,14 @@ public class SOSRotaView extends Application {
         loadFonts();
         Navigator navigator = new Navigator(stage);
 
+        try {
+            JpaManager.initialize();
+            AppContext.getInstance();
+        } catch (Exception e) {
+            AlertUtil.showError("Erro!", "Houve um problema ao se conectar com o banco de dados.\nO programa rodará com funcionalidades limitadas");
+        }
         UserPrefs prefs = new UserPrefs();
         if (prefs.existeUsuarioSalvo()) {
-            AppContext.getInstance();
             navigator.navigate(Screens.TELA_APP);
         } else {
             navigator.navigate(Screens.TELA_LOGIN);
