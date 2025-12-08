@@ -59,7 +59,23 @@ public class AmbulanciaService {
             Ambulancia ambulancia = new Ambulancia(status, tipo, placa, base);
             ambulanciaRepository.salvar(ambulancia);
         } catch (Exception e) {
-            tratarExcecao(e);
+            Throwable causaAtual = e;
+            while (causaAtual != null) {
+
+                if (causaAtual instanceof ConstraintViolationException) {
+                    throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
+                }
+
+                if (causaAtual instanceof SQLException sqlEx) {
+                    if ("23505".equals(sqlEx.getSQLState())) {
+                        throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
+                    }
+                }
+
+                causaAtual = causaAtual.getCause();
+            }
+
+            throw e;
         }
     }
 
@@ -78,14 +94,33 @@ public class AmbulanciaService {
             if (ambulanciaExistente.getStatusAmbulancia() == StatusAmbulancia.EM_ATENDIMENTO) {
                 throw new CadastroException("Não é possível atualizar uma ambulância que está em atendimento.");
             }
-
+            Equipe equipe = equipeRepository.buscaPorAmbulancia(id);
+            if (equipe != null) {
+                throw new CadastroException("Não é possível atualizar uma ambulância que está vinculada a uma equipe.\nRemova-a da equipe ou inative-a ao invés disso.");
+            }
             StatusAmbulancia status = StatusAmbulancia.fromDescricao(statusDesc);
             TipoAmbulancia tipo = TipoAmbulancia.fromDescricao(tipoDesc);
             Ambulancia ambulancia = new Ambulancia(status, tipo, placa, base);
             ambulancia.setId(id);
             ambulanciaRepository.atualizarAmbulancia(ambulancia);
         } catch (Exception e) {
-            tratarExcecao(e);
+            Throwable causaAtual = e;
+            while (causaAtual != null) {
+
+                if (causaAtual instanceof ConstraintViolationException) {
+                    throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
+                }
+
+                if (causaAtual instanceof SQLException sqlEx) {
+                    if ("23505".equals(sqlEx.getSQLState())) {
+                        throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
+                    }
+                }
+
+                causaAtual = causaAtual.getCause();
+            }
+
+            throw e;
         }
     }
 
@@ -110,25 +145,5 @@ public class AmbulanciaService {
 
     public List<Ambulancia> obterAmbulanciaStatus(StatusAmbulancia status) {
         return ambulanciaRepository.obterAmbulanciaStatus(status);
-    }
-
-    private void tratarExcecao(Exception e) {
-        Throwable causaAtual = e;
-        while (causaAtual != null) {
-
-            if (causaAtual instanceof ConstraintViolationException) {
-                throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
-            }
-
-            if (causaAtual instanceof SQLException sqlEx) {
-                if ("23505".equals(sqlEx.getSQLState())) {
-                    throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
-                }
-            }
-
-            causaAtual = causaAtual.getCause();
-        }
-
-        throw new RuntimeException(e);
     }
 }

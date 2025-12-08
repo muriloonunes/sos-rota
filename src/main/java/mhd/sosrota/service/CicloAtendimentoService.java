@@ -26,6 +26,7 @@ public class CicloAtendimentoService {
 
     private final long TEMPO_ATENDIMENTO = 7; // Tempo fixo que a equipe leva pra atender
     private final long FATOR_CONVERSAO = 10;
+    private final TimeUnit TIME_UNIT = TimeUnit.SECONDS;
 
     public CicloAtendimentoService(EntityManagerFactory emf) {
         this.emf = emf;
@@ -38,15 +39,15 @@ public class CicloAtendimentoService {
         OffsetDateTime agora = OffsetDateTime.now(ZoneId.of("America/Sao_Paulo"));
 
         //simula a chegada da ambulancia no local após o tempo da viagem
-        scheduler.schedule(() -> registrarChegada(atendimentoId), tempoSimulado, TimeUnit.SECONDS);
+        scheduler.schedule(() -> registrarChegada(atendimentoId), tempoSimulado, TIME_UNIT);
         System.out.println(">>> [Simulação] Ocorrência deve estar em atendimento às " + agora.plusSeconds(tempoSimulado));
 
         //smiula o fim do atendimento e o início da volta da ambulancia
-        scheduler.schedule(() -> registrarConclusaoAtendimento(atendimentoId), tempoSimulado + TEMPO_ATENDIMENTO, TimeUnit.SECONDS);
+        scheduler.schedule(() -> registrarConclusaoAtendimento(atendimentoId), tempoSimulado + TEMPO_ATENDIMENTO, TIME_UNIT);
         System.out.println(">>> [Simulação] Ocorrência deve estar finalizada às " + agora.plusSeconds(tempoSimulado + TEMPO_ATENDIMENTO));
 
         //voltou pra base após o tempo da viagem de ida + tempo de atendimento + viagem de volta
-        scheduler.schedule(() -> registrarRetornoBase(atendimentoId), (tempoSimulado * 2) + TEMPO_ATENDIMENTO, TimeUnit.SECONDS);
+        scheduler.schedule(() -> registrarRetornoBase(atendimentoId), (tempoSimulado * 2) + TEMPO_ATENDIMENTO, TIME_UNIT);
         System.out.println(">>> [Simulação] Ambulância deve estar disponível às " + agora.plusSeconds((tempoSimulado * 2) + TEMPO_ATENDIMENTO));
     }
 
@@ -116,17 +117,17 @@ public class CicloAtendimentoService {
 
             // Se ainda não chegou na ocorrência, agendar chegada
             if (delayChegada > 0) {
-                scheduler.schedule(() -> registrarChegada(at.getId()), delayChegada, TimeUnit.SECONDS);
+                scheduler.schedule(() -> registrarChegada(at.getId()), delayChegada, TIME_UNIT);
             }
 
             // Se ainda não acabou o atendimento, agendar fim
             if (delayFimAtendimento > 0) {
-                scheduler.schedule(() -> registrarConclusaoAtendimento(at.getId()), delayFimAtendimento, TimeUnit.SECONDS);
+                scheduler.schedule(() -> registrarConclusaoAtendimento(at.getId()), delayFimAtendimento, TIME_UNIT);
             }
 
             // O retorno sempre será agendado
             if (delayRetorno > 0) {
-                scheduler.schedule(() -> registrarRetornoBase(at.getId()), delayRetorno, TimeUnit.SECONDS);
+                scheduler.schedule(() -> registrarRetornoBase(at.getId()), delayRetorno, TIME_UNIT);
             }
         }
     }
@@ -183,7 +184,7 @@ public class CicloAtendimentoService {
     public void pararServico() {
         scheduler.shutdown();
         try {
-            if (!scheduler.awaitTermination(2, TimeUnit.SECONDS)) {
+            if (!scheduler.awaitTermination(2, TIME_UNIT)) {
                 scheduler.shutdownNow();
             }
         } catch (InterruptedException e) {

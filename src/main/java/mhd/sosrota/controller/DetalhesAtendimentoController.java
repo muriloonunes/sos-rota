@@ -6,6 +6,7 @@ import javafx.scene.layout.VBox;
 import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Atendimento;
 import mhd.sosrota.model.Ocorrencia;
+import mhd.sosrota.model.enums.StatusOcorrencia;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.service.AtendimentoService;
@@ -70,12 +71,12 @@ public class DetalhesAtendimentoController implements Navigable {
             horaDespachoLabel.setText(formatarData(atendimento.getDataHoraDespacho().toLocalDateTime()));
             horaChegadaLabel.setText(formatarData(atendimento.getDataHoraChegada()));
             horaConclusaoLabel.setText(formatarData(atendimento.getDataHoraConclusao()));
-
         } else {
             atendimentoVbox.setVisible(false);
             atendimentoVbox.setManaged(false);
-            avisoSemDespachoLabel.setVisible(true);
-
+            if (ocorrencia.getStatusOcorrencia() != StatusOcorrencia.CANCELADA) {
+                avisoSemDespachoLabel.setVisible(true);
+            }
             horaDespachoLabel.setText("-");
             horaChegadaLabel.setText("-");
             horaConclusaoLabel.setText("-");
