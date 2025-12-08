@@ -154,6 +154,8 @@ public class DespachoController implements Navigable {
                 UiUtils.setButtonLoading(btnConfirmar, true, "Confirmar Despacho");
                 new Thread(task).start();
             }
+        } else {
+            new Thread(task).start();
         }
     }
 
