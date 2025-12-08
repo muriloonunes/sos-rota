@@ -200,6 +200,40 @@ public class OcorrenciaController implements Navigable {
         });
     }
 
+    @FXML
+    private void handleAplicarFiltros() {
+        String bairroSelecionado = bairroComboBox.getValue();
+        String gravidadeSelecionada = gravidadeComboBox.getValue();
+        String statusSelecionado = statusComboBox.getValue();
+
+        if (bairroSelecionado == null && gravidadeSelecionada == null && statusSelecionado == null) {
+            tabelaOcorrencias.setItems(ocorrencias);
+            return;
+        }
+
+        var filtradas = ocorrencias.stream()
+                .filter(oc -> {
+                    if (oc == null) return false;
+
+                    boolean bairroOk = (bairroSelecionado == null)
+                            || (oc.getBairro() != null
+                            && Objects.equals(oc.getBairro().getNome(), bairroSelecionado));
+
+                    boolean gravidadeOk = (gravidadeSelecionada == null)
+                            || (oc.getGravidadeOcorrencia() != null
+                            && Objects.equals(oc.getGravidadeOcorrencia().getDescricao(), gravidadeSelecionada));
+
+                    boolean statusOk = (statusSelecionado == null)
+                            || (oc.getStatusOcorrencia() != null
+                            && Objects.equals(oc.getStatusOcorrencia().getDescricao(), statusSelecionado));
+
+                    return bairroOk && gravidadeOk && statusOk;
+                })
+                .toList();
+
+        tabelaOcorrencias.setItems(FXCollections.observableArrayList(filtradas));
+    }
+
     private void abrirDetalhes(Ocorrencia ocorrencia) {
         AppContext.getInstance().setOcorrenciaDetalhes(ocorrencia);
         navigator.showModal(Screens.DETALHES, "Detalhes");  //TODO talvez depois trocar de modal pra stage normal?
@@ -284,8 +318,9 @@ public class OcorrenciaController implements Navigable {
         bairroComboBox.getSelectionModel().clearSelection();
         gravidadeComboBox.getSelectionModel().clearSelection();
 
-        if (statusComboBox != null)
-            statusComboBox.getSelectionModel().clearSelection();
+        if (statusComboBox != null) statusComboBox.getSelectionModel().clearSelection();
+
+        tabelaOcorrencias.setItems(ocorrencias);
     }
 
     @FXML

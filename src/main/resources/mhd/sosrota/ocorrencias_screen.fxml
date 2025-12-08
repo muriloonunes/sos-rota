@@ -75,7 +75,7 @@
                         <Font size="14.0" />
                      </font>
                   </Button>
-                        <Button fx:id="aplicarFiltrosButton" mnemonicParsing="false" styleClass="btn-primary" text="Aplicar filtros">
+                        <Button fx:id="aplicarFiltrosButton" mnemonicParsing="false" styleClass="btn-primary" text="Aplicar filtros" onAction="#handleAplicarFiltros">
                      <font>
                         <Font size="14.0" />
                      </font>
