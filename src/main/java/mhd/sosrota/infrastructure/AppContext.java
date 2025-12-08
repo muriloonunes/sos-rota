@@ -34,20 +34,20 @@ public class AppContext {
         RuaRepository ruaRepository = new RuaRepositoryImpl();
         this.grafoService = new GrafoCidadeService(bairroRepository, ruaRepository);
 
+        AtendimentoRepository atendimentoRepository = new AtendimentoRepositoryImpl();
         AmbulanciaRepository ambulanciaRepository = new AmbulanciaRepositoryImpl();
-        this.ambulanciaService = new AmbulanciaService(ambulanciaRepository);
+        EquipeRepository equipeRepository = new EquipeRepositoryImpl();
+        this.ambulanciaService = new AmbulanciaService(ambulanciaRepository, atendimentoRepository, equipeRepository);
 
         ProfissionalRepository profissionalRepository = new ProfissionalRepositoryImpl();
         this.profissionalService = new ProfissionalService(profissionalRepository);
 
-        EquipeRepository equipeRepository = new EquipeRepositoryImpl();
         this.equipeService = new EquipeService(equipeRepository, ambulanciaRepository);
 
         this.ocorrenciaService = new OcorrenciaService(new OcorrenciaRepositoryImpl());
 
         if (!JpaManager.isOffline()) {
             this.cicloAtendimentoService = new CicloAtendimentoService(JpaManager.getFactory());
-            AtendimentoRepository atendimentoRepository = new AtendimentoRepositoryImpl();
             this.atendimentoService = new AtendimentoService(grafoService, ambulanciaRepository, atendimentoRepository, cicloAtendimentoService);
         } else {
             this.cicloAtendimentoService = null;

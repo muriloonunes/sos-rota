@@ -17,6 +17,7 @@ import mhd.sosrota.model.Equipe;
 import mhd.sosrota.model.Profissional;
 import mhd.sosrota.model.enums.FuncaoProfissional;
 import mhd.sosrota.model.exceptions.CadastroException;
+import mhd.sosrota.model.exceptions.DeleteException;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
@@ -49,8 +50,6 @@ public class EquipeController implements Navigable {
     @FXML
     private TableColumn<Profissional, Void> colunaAcoesProfissional;
     @FXML
-    private Pagination professionalsPagination, teamsPagination;
-    @FXML
     private Label erroLabelProfissionais, erroLabelEquipes;
     @FXML
     private Tab equipesTab;
@@ -75,36 +74,15 @@ public class EquipeController implements Navigable {
     private final ObservableList<Equipe> listaEquipes = FXCollections.observableArrayList();
     private final ObservableList<Profissional> profissionais = FXCollections.observableArrayList();
 
-    private final int itensPorPagina = 8;
     private Navigator navigator;
 
     @FXML
     public void initialize() {
         configurarProfissionaisTab();
 
-        professionalsPagination.currentPageIndexProperty().addListener((_, _, _) ->
-                UiUtils.atualizarPaginacao(
-                        professionalsPagination,
-                        professionalsTable,
-                        profissionais,
-                        itensPorPagina,
-                        () -> professionalsTable.refresh()
-                )
-        );
-
         equipesTab.setOnSelectionChanged(_ -> {
             if (equipesTab.isSelected()) {
                 configurarEquipesTab();
-
-                teamsPagination.currentPageIndexProperty().addListener((_, _, _) ->
-                        UiUtils.atualizarPaginacao(
-                                teamsPagination,
-                                equipesTable,
-                                listaEquipes,
-                                itensPorPagina,
-                                () -> equipesTable.refresh()
-                        )
-                );
             }
         });
     }
@@ -150,7 +128,7 @@ public class EquipeController implements Navigable {
                         .or(condutorComboBox.valueProperty().isNull())
         );
 
-        carregarCamposProfissionais();
+        carregarAreaMontarEquipe();
         configurarTabelaEquipe();
         carregarEquipe();
     }
@@ -158,7 +136,8 @@ public class EquipeController implements Navigable {
     private void configurarTabelaEquipe() {
         colunaAmbulancia.setCellValueFactory(cellData -> {
             var ambulancia = cellData.getValue().getAmbulancia();
-            return new SimpleStringProperty(ambulancia != null ? ambulancia.getPlaca() : "-");
+            String celula = ambulancia != null ? ambulancia.getPlaca() + " (" + ambulancia.getTipoAmbulancia().getDescricao() + ")" : "-";
+            return new SimpleStringProperty(celula);
         });
 
         colunaBase.setCellValueFactory(cellData -> {
@@ -203,7 +182,7 @@ public class EquipeController implements Navigable {
         ));
     }
 
-    private void carregarCamposProfissionais() {
+    private void carregarAreaMontarEquipe() {
         Task<Pair<List<Ambulancia>, List<Profissional>>> task = new Task<>() {
             @Override
             protected Pair<List<Ambulancia>, List<Profissional>> call() {
@@ -280,15 +259,13 @@ public class EquipeController implements Navigable {
                     abrirEditarProfissional(row);
                     carregarProfissionais();
                 },
-                (row) -> {
-                    profissionalService.deletarProfissional(row.getId());
-                    carregarProfissionais();
-                },
+                this::deletarProfissional,
                 "Deletar profissional",
                 "Tem certeza que deseja deletar este profissional?"
         ));
     }
 
+    @FXML
     private void carregarProfissionais() {
         Task<ObservableList<Profissional>> task = new Task<>() {
             @Override
@@ -304,11 +281,12 @@ public class EquipeController implements Navigable {
             @Override
             protected void succeeded() {
                 profissionais.setAll(getValue());
-                UiUtils.atualizarPaginacao(professionalsPagination, professionalsTable, profissionais, itensPorPagina);
+                professionalsTable.setItems(profissionais);
             }
 
             @Override
             protected void failed() {
+                getException().printStackTrace();
                 professionalsTable.setPlaceholder(new Label("Erro ao carregar profissionais"));
             }
         };
@@ -316,6 +294,7 @@ public class EquipeController implements Navigable {
         new Thread(task).start();
     }
 
+    @FXML
     private void carregarEquipe() {
         Task<ObservableList<Equipe>> task = new Task<>() {
             @Override
@@ -331,7 +310,7 @@ public class EquipeController implements Navigable {
             @Override
             protected void succeeded() {
                 listaEquipes.setAll(getValue());
-                UiUtils.atualizarPaginacao(teamsPagination, equipesTable, listaEquipes, itensPorPagina);
+                equipesTable.setItems(listaEquipes);
             }
 
             @Override
@@ -425,7 +404,7 @@ public class EquipeController implements Navigable {
                 AlertUtil.showInfo("Sucesso", "Equipe cadastrada com sucesso!");
                 handleLimparEquipe();
                 carregarEquipe();
-                carregarCamposProfissionais();
+                carregarAreaMontarEquipe();
             }
 
             @Override
@@ -439,6 +418,35 @@ public class EquipeController implements Navigable {
                 } else {
                     e.printStackTrace();
                     mostrarErro(erroLabelEquipes, "Algo deu errado.");
+                }
+            }
+        };
+
+        new Thread(task).start();
+    }
+
+
+    private void deletarProfissional(Profissional row) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                profissionalService.deletarProfissional(row.getId());
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                AlertUtil.showInfo("Sucesso", "Profissional deletado com sucesso.");
+                carregarProfissionais();
+            }
+
+            @Override
+            protected void failed() {
+                Throwable e = getException();
+                if (e instanceof DeleteException) {
+                    AlertUtil.showError("Erro!", e.getMessage());
+                } else {
+                    mostrarErro(erroLabelProfissionais, "Erro ao deletar profissional.");
                 }
             }
         };

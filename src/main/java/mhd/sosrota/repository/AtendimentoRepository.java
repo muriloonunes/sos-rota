@@ -24,7 +24,9 @@ public interface AtendimentoRepository {
             GravidadeOcorrencia gravidade
     );
 
-    Atendimento buscarPorOcorrenciaId(Long ocorrenciaId);
+    Atendimento buscarPorOcorrencia(Long ocorrenciaId);
+
+    List<Atendimento> buscarPorAmbulancia(Long ambulanciaId);
 
     Double tempoMedioRespostaPorGravidade(GravidadeOcorrencia gravidade);
 

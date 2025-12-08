@@ -7,6 +7,7 @@ import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Ambulancia;
 import mhd.sosrota.model.Bairro;
 import mhd.sosrota.model.exceptions.CadastroException;
+import mhd.sosrota.model.exceptions.DeleteException;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.presentation.UiUtils;
@@ -109,10 +110,33 @@ public class EditarAmbulanciaController implements Navigable {
 
     @FXML
     private void handleDeletar() {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                service.deletarAmbulancia(ambulancia.getId());
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                AlertUtil.showInfo("Sucesso", "Ambulância deletada com sucesso.");
+                handleCancelar();
+            }
+
+            @Override
+            protected void failed() {
+                Throwable e = getException();
+                if (e instanceof DeleteException) {
+                    AlertUtil.showError("Erro!", e.getMessage());
+                } else {
+                    mostrarErro("Erro ao deletar ambulância.");
+                }
+            }
+        };
+
         var result = AlertUtil.showConfirmation("Deletar ambulância", "Tem certeza que deseja deletar a ambulância?");
         if (result.get() == ButtonType.OK) {
-            service.deletarAmbulancia(ambulancia.getId());
-            handleCancelar(); //pra fechar o modal de edição
+            new Thread(task).start();
         }
     }
 

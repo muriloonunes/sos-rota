@@ -37,7 +37,10 @@ public class ProfissionalRepositoryImpl implements ProfissionalRepository {
     @Override
     public Profissional buscarPorId(long id) {
         try (EntityManager em = JpaManager.getEntityManager()) {
-            return em.find(Profissional.class, id);
+            return em.createQuery(
+                            "SELECT p FROM Profissional p JOIN FETCH p.equipe WHERE p.id = :id", Profissional.class
+                    ).setParameter("id", id)
+                    .getSingleResult();
         } catch (Exception e) {
             return null;
         }

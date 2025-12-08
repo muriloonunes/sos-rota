@@ -94,7 +94,18 @@ public class Ambulancia {
                 ", placa='" + placa + '\'' +
                 ", tipoAmbulancia=" + tipoAmbulancia +
                 ", statusAmbulancia=" + statusAmbulancia +
-                ", bairroBase=" + bairroBase +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Ambulancia that)) return false;
+        return id != null && id.equals(that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
     }
 }

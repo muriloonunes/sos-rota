@@ -40,16 +40,16 @@ public class EquipeRepositoryImpl implements EquipeRepository {
     }
 
     @Override
-    public Equipe buscaPorPlacaAmbulancia(String placa) {
+    public Equipe buscaPorAmbulancia(Long id) {
         try (EntityManager em = JpaManager.getEntityManager()) {
             TypedQuery<Equipe> q = em.createQuery(
                     "SELECT e FROM Equipe e " +
                             "JOIN FETCH e.ambulancia a " +
                             "LEFT JOIN FETCH e.profissionais " +
-                            "WHERE a.placa = :placa",
+                            "WHERE a.id = :id",
                     Equipe.class
             );
-            q.setParameter("placa", placa);
+            q.setParameter("id", id);
             return q.getSingleResult();
         } catch (NoResultException e) {
             return null;

@@ -23,7 +23,7 @@ public class DetalhesAtendimentoController implements Navigable {
     @FXML
     private Label idOcorrenciaLabel, tipoLabel, gravidadeLabel, bairroLabel, statusLabel, obsLabel;
     @FXML
-    private Label ambulanciaLabel, distanciaLabel;
+    private Label ambulanciaLabel, distanciaLabel, baseAmbulanciaLabel;
     @FXML
     private Label horaAberturaLabel, horaDespachoLabel, horaChegadaLabel, horaConclusaoLabel;
     @FXML
@@ -63,10 +63,11 @@ public class DetalhesAtendimentoController implements Navigable {
                     atendimento.getAmbulancia().getPlaca(),
                     atendimento.getAmbulancia().getTipoAmbulancia());
             ambulanciaLabel.setText(infoAmb);
+            baseAmbulanciaLabel.setText(atendimento.getAmbulancia().getBairroBase().getNome());
 
             distanciaLabel.setText(String.format("%.2f Km", atendimento.getDistanciaKm()));
 
-            horaDespachoLabel.setText(formatarData(atendimento.getDataHoraDespacho()));
+            horaDespachoLabel.setText(formatarData(atendimento.getDataHoraDespacho().toLocalDateTime()));
             horaChegadaLabel.setText(formatarData(atendimento.getDataHoraChegada()));
             horaConclusaoLabel.setText(formatarData(atendimento.getDataHoraConclusao()));
 

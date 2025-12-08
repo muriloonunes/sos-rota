@@ -56,6 +56,11 @@ public class EditarEquipeController implements Navigable {
     private Profissional enfermeiroOriginal;
     private Profissional condutorOriginal;
 
+    private List<Ambulancia> ambulanciasCarregadas;
+    private List<Profissional> medicosCarregados;
+    private List<Profissional> enfermeirosCarregados;
+    private List<Profissional> condutoresCarregados;
+
     @FXML
     public void initialize() {
         erroLabel.setVisible(false);
@@ -109,30 +114,28 @@ public class EditarEquipeController implements Navigable {
                     }
                 }
 
-                var medicos = profissionaisDisponiveis.stream()
+                medicosCarregados = profissionaisDisponiveis.stream()
                         .filter(p -> p.getFuncaoProfissional() == FuncaoProfissional.MEDICO)
                         .collect(Collectors.toList());
 
-                var enfermeiros = profissionaisDisponiveis.stream()
+                enfermeirosCarregados = profissionaisDisponiveis.stream()
                         .filter(p -> p.getFuncaoProfissional() == FuncaoProfissional.ENFERMEIRO)
                         .collect(Collectors.toList());
 
-                var condutores = profissionaisDisponiveis.stream()
+                condutoresCarregados = profissionaisDisponiveis.stream()
                         .filter(p -> p.getFuncaoProfissional() == FuncaoProfissional.CONDUTOR)
                         .collect(Collectors.toList());
 
-                updateValue(null);
-
-                ambulanciaComboBox.getItems().setAll(ambulancias);
-                medicoComboBox.getItems().setAll(medicos);
-                enfermeiroComboBox.getItems().setAll(enfermeiros);
-                condutorComboBox.getItems().setAll(condutores);
-
+                ambulanciasCarregadas = ambulancias;
                 return null;
             }
 
             @Override
             protected void succeeded() {
+                ambulanciaComboBox.getItems().setAll(ambulanciasCarregadas);
+                medicoComboBox.getItems().setAll(medicosCarregados);
+                enfermeiroComboBox.getItems().setAll(enfermeirosCarregados);
+                condutorComboBox.getItems().setAll(condutoresCarregados);
                 preencherCamposComEquipe();
             }
 
@@ -150,10 +153,6 @@ public class EditarEquipeController implements Navigable {
     private void preencherCamposComEquipe() {
         if (equipeEmEdicao == null) {
             return;
-        }
-        if (equipeEmEdicao.getAmbulancia() != null) {
-            ambulanciaComboBox.getSelectionModel()
-                    .select(equipeEmEdicao.getAmbulancia());
         }
         Profissional medico = equipeEmEdicao.getProfissionais().stream()
                 .filter(p -> p.getFuncaoProfissional() == FuncaoProfissional.MEDICO)
@@ -178,6 +177,10 @@ public class EditarEquipeController implements Navigable {
         }
         if (condutor != null) {
             condutorComboBox.getSelectionModel().select(condutor);
+        }
+        if (equipeEmEdicao.getAmbulancia() != null) {
+            ambulanciaComboBox.getSelectionModel()
+                    .select(equipeEmEdicao.getAmbulancia());
         }
 
         ambulanciaOriginal = ambulanciaComboBox.getValue();

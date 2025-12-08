@@ -91,20 +91,14 @@ public class CicloAtendimentoService {
     }
 
     private void tratarAtendimentoPendente(Atendimento at, EntityManager em) {
-        LocalDateTime dataDespacho = at.getDataHoraDespacho();
+        OffsetDateTime dataDespacho = at.getDataHoraDespacho();
         LocalDateTime agora = LocalDateTime.now();
 
         long tempoViagem = (long) (at.getDistanciaKm() * FATOR_CONVERSAO);  //o tempo entre sair da base e chegar na ocorrencia
 
-        ZonedDateTime horaChegada = dataDespacho.plusSeconds(tempoViagem)
-                .atOffset(ZoneOffset.ofHours(-6)).atZoneSameInstant(ZoneId.of("America/Sao_Paulo")); //hora de chegar na ocorrencia
+        OffsetDateTime horaChegada = dataDespacho.plusSeconds(tempoViagem); //hora de chegar na ocorrencia
         LocalDateTime horaFimAtendimento = horaChegada.plusSeconds(TEMPO_ATENDIMENTO).toLocalDateTime(); //hora de terminar o atendimento
         LocalDateTime horaRetornoBase = horaFimAtendimento.plusSeconds(tempoViagem); //hora de voltar pra base
-
-        System.out.println("Data Despacho: " + dataDespacho);
-        System.out.println("Hora Chegada: " + horaChegada);
-        System.out.println("Hora Fim Atendimento: " + horaFimAtendimento);
-        System.out.println("Hora Retorno Base: " + horaRetornoBase);
 
         if (agora.isAfter(horaRetornoBase)) {
             at.getOcorrencia().setStatusOcorrencia(StatusOcorrencia.CONCLUIDA);

@@ -7,7 +7,7 @@ import java.util.List;
 public interface EquipeRepository {
     Boolean insertEquipe(Equipe equipe);
 
-    Equipe buscaPorPlacaAmbulancia(String placa);
+    Equipe buscaPorAmbulancia(Long id);
 
     List<Equipe> buscaPorNomeProfissional(String nome);
 

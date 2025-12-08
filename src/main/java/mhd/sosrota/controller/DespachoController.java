@@ -4,10 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Ocorrencia;
 import mhd.sosrota.navigation.Navigable;
@@ -72,10 +69,8 @@ public class DespachoController implements Navigable {
         }
         preencherResumo();
 
-        // 4. Carregar Lista (Aqui entra o algoritmo!)
         carregarSugestoesDeAmbulancia();
 
-        // 5. Bloquear botão se nada selecionado
         btnConfirmar.disableProperty().bind(tabelaAmbulancias.getSelectionModel().selectedItemProperty().isNull());
     }
 
@@ -84,8 +79,6 @@ public class DespachoController implements Navigable {
         lblTipo.setText(ocorrenciaAtual.getTipoOcorrencia());
         lblGravidade.setText(ocorrenciaAtual.getGravidadeOcorrencia().getDescricao());
 
-        // Simulação simples do SLA restante (poderia usar a lógica do timer se quisesse)
-        // Apenas para dar noção estática ao abrir a tela
         LocalDateTime limite = ocorrenciaAtual.getLimiteSLA().toLocalDateTime();
         if (limite != null) {
             long minutosRestantes = java.time.Duration.between(LocalDateTime.now(), limite).toMinutes();
@@ -131,7 +124,6 @@ public class DespachoController implements Navigable {
         double distancia = selecao.getDistanciaKm();
         double tempo = selecao.getTempoEstimadoMin();
 
-        UiUtils.setButtonLoading(btnConfirmar, true, "Confirmar Despacho");
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
@@ -142,7 +134,7 @@ public class DespachoController implements Navigable {
             @Override
             protected void succeeded() {
                 UiUtils.setButtonLoading(btnConfirmar, false, "Confirmar Despacho");
-                AlertUtil.showInfo( "Sucesso", "Ambulância despachada com sucesso.");
+                AlertUtil.showInfo("Sucesso", "Ambulância despachada com sucesso.");
                 handleCancelar();
             }
 
@@ -153,8 +145,16 @@ public class DespachoController implements Navigable {
                 AlertUtil.showError("Erro", "Algo deu errado ao despachar a ambulância");
             }
         };
-
-        new Thread(task).start();
+        LocalDateTime limiteSLA = ocorrenciaAtual.getLimiteSLA().toLocalDateTime();
+        LocalDateTime agora = LocalDateTime.now();
+        LocalDateTime estimativaChegada = agora.plusMinutes((long) tempo);
+        if (estimativaChegada.isAfter(limiteSLA)) {
+            var result = AlertUtil.showConfirmation("Atenção", "O tempo estimado para chegada da ambulância excede o SLA da ocorrência. Deseja continuar?");
+            if (result.get() == ButtonType.OK) {
+                UiUtils.setButtonLoading(btnConfirmar, true, "Confirmar Despacho");
+                new Thread(task).start();
+            }
+        }
     }
 
     @FXML

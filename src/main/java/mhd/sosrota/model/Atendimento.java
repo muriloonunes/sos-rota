@@ -1,16 +1,15 @@
 package mhd.sosrota.model;
 
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+
 /**
  *
  * @author Murilo Nunes <murilo_no@outlook.com>
  * @date 04/12/2025
  * @brief Class Atendimento
  */
-
-import jakarta.persistence.*;
-
-import java.time.LocalDateTime;
-
 @Entity
 @Table(name = "atendimentos")
 public class Atendimento {
@@ -29,7 +28,7 @@ public class Atendimento {
     private Ambulancia ambulancia;
 
     @Column(name = "data_hora_despacho", nullable = false, insertable = false, updatable = false)
-    private LocalDateTime dataHoraDespacho;
+    private OffsetDateTime dataHoraDespacho;
 
     @Column(name = "data_hora_chegada")
     private LocalDateTime dataHoraChegada;
@@ -40,7 +39,8 @@ public class Atendimento {
     @Column(name = "distancia_km", nullable = false)
     private Double distanciaKm;
 
-    public Atendimento() {}
+    public Atendimento() {
+    }
 
     public Atendimento(Ocorrencia ocorrencia, Ambulancia ambulancia, Double distanciaKm) {
         this.ocorrencia = ocorrencia;
@@ -72,12 +72,8 @@ public class Atendimento {
         this.ambulancia = ambulancia;
     }
 
-    public LocalDateTime getDataHoraDespacho() {
+    public OffsetDateTime getDataHoraDespacho() {
         return dataHoraDespacho;
-    }
-
-    public void setDataHoraDespacho(LocalDateTime dataHoraDespacho) {
-        this.dataHoraDespacho = dataHoraDespacho;
     }
 
     public LocalDateTime getDataHoraChegada() {

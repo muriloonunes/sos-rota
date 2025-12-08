@@ -11,6 +11,7 @@ import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Ambulancia;
 import mhd.sosrota.model.Bairro;
 import mhd.sosrota.model.exceptions.CadastroException;
+import mhd.sosrota.model.exceptions.DeleteException;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.navigation.Screens;
@@ -44,13 +45,10 @@ public class AmbulanciaController implements Navigable {
     private TableColumn<Ambulancia, String> colunaPlaca, colunaTipo, colunaStatus, colunaBase;
     @FXML
     private TableColumn<Ambulancia, Void> colunaAcoes;
-    @FXML
-    private Pagination paginacaoAmbulancias;
 
     private final AmbulanciaService service = AppContext.getInstance().getAmbulanciaService();
     private final ObservableList<Ambulancia> ambulancias = FXCollections.observableArrayList();
 
-    private final int itensPorPagina = 8;
     private Navigator navigator;
 
     @FXML
@@ -71,16 +69,6 @@ public class AmbulanciaController implements Navigable {
                         .or(baseComboBox.valueProperty().isNull()))
                         .or(placaTextField.textProperty().length().lessThan(7))
         );
-
-        paginacaoAmbulancias.currentPageIndexProperty().addListener((_, _, _) ->
-                UiUtils.atualizarPaginacao(
-                        paginacaoAmbulancias,
-                        tabelaAmbulancias,
-                        ambulancias,
-                        itensPorPagina,
-                        () -> tabelaAmbulancias.refresh()
-                )
-        );
     }
 
     private void configurarTabela() {
@@ -99,10 +87,7 @@ public class AmbulanciaController implements Navigable {
                     abrirEditarAmbulancias(ambulancia);
                     carregarAmbulancias();
                 },
-                (ambulancia) -> {
-                    service.deletarAmbulancia(ambulancia.getId());
-                    carregarAmbulancias();
-                },
+                this::deletarAmbulancia,
                 "Deletar ambulância",
                 "Tem certeza que deseja deletar a ambulância?"
         ));
@@ -127,7 +112,6 @@ public class AmbulanciaController implements Navigable {
             protected void succeeded() {
                 ambulancias.setAll(getValue());
                 tabelaAmbulancias.setItems(ambulancias);
-//                UiUtils.atualizarPaginacao(paginacaoAmbulancias, tabelaAmbulancias, ambulancias, itensPorPagina);
             }
 
             @Override
@@ -186,6 +170,36 @@ public class AmbulanciaController implements Navigable {
                 } else {
                     e.printStackTrace();
                     mostrarErro("Algo deu errado.");
+                }
+            }
+        };
+
+        new Thread(task).start();
+    }
+
+    private void deletarAmbulancia(Ambulancia ambulancia) {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                service.deletarAmbulancia(ambulancia.getId());
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                AlertUtil.showInfo("Sucesso", "Ambulância deletada com sucesso.");
+                carregarAmbulancias();
+            }
+
+            @Override
+            protected void failed() {
+                Throwable e = getException();
+                if (e instanceof CadastroException) {
+                    mostrarErro(e.getMessage());
+                } else if (e instanceof DeleteException) {
+                    AlertUtil.showError("Erro!", e.getMessage());
+                } else {
+                    mostrarErro("Erro ao deletar ambulância.");
                 }
             }
         };

@@ -9,8 +9,6 @@ import org.hibernate.dialect.type.PostgreSQLEnumJdbcType;
 
 import java.time.Duration;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -53,17 +51,6 @@ public class Ocorrencia {
     @Column(name = "sla_final")
     @Convert(converter = DurationToSecondsConverter.class)
     private Duration slaFinal;
-
-    @OneToMany(mappedBy = "ocorrencia", fetch = FetchType.LAZY)
-    private List<Atendimento> atendimentos = new ArrayList<>();
-
-    public List<Atendimento> getAtendimentos() {
-        return atendimentos;
-    }
-
-    public void setAtendimentos(List<Atendimento> atendimentos) {
-        this.atendimentos = atendimentos;
-    }
 
     public Ocorrencia() {
     }

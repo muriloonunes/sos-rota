@@ -5,6 +5,7 @@ import mhd.sosrota.model.Equipe;
 import mhd.sosrota.model.Profissional;
 import mhd.sosrota.model.enums.FuncaoProfissional;
 import mhd.sosrota.model.exceptions.CadastroException;
+import mhd.sosrota.model.exceptions.DeleteException;
 import mhd.sosrota.repository.ProfissionalRepository;
 
 import java.util.List;
@@ -113,22 +114,21 @@ public record ProfissionalService(ProfissionalRepository repo) {
         }
     }
 
-    public boolean deletarProfissional(Long id) {
+    public void deletarProfissional(Long id) {
         //todo avaliar se essas verificações são suficientes
         Profissional profissional = repo.buscarPorId(id);
-        // cada profissional tem botao proprio, ent meio q o id sempre vai ser valido, mas quero garantir, vai que
         if (profissional == null) {
-            throw new CadastroException("Profissional não encontrado para exclusão.");
+            throw new DeleteException("Profissional não encontrado para exclusão.");
         }
 
         Equipe equipe = profissional.getEquipe();
         if (equipe != null && equipe.isAtivo()) {
-            throw new CadastroException(
+            throw new DeleteException(
                     "O profissional está alocado em uma equipe ativa.\n" +
                             "Remova-o da equipe ou inative a equipe antes de excluir."
             );
         }
 
-        return repo.deletar(profissional);
+        repo.deletar(profissional);
     }
 }

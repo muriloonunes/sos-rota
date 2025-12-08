@@ -1,6 +1,7 @@
 package mhd.sosrota.repository;
 
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import jakarta.persistence.TypedQuery;
 import mhd.sosrota.infrastructure.database.JpaManager;
 import mhd.sosrota.model.Ambulancia;
@@ -43,15 +44,38 @@ public class AtendimentoRepositoryImpl implements AtendimentoRepository {
     }
 
     @Override
-    public Atendimento buscarPorOcorrenciaId(Long ocorrenciaId) {
+    public Atendimento buscarPorOcorrencia(Long ocorrenciaId) {
         try (EntityManager em = JpaManager.getEntityManager()) {
             return em.createQuery(
                             "SELECT a FROM Atendimento a " +
-                                    "JOIN FETCH a.ambulancia " +
-                                    "WHERE a.ocorrencia.id = :ocid", Atendimento.class)
+                                    "JOIN FETCH a.ambulancia amb " +
+                                    "JOIN FETCH amb.bairroBase " +
+                                    "WHERE a.ocorrencia.id = :ocid",
+                            Atendimento.class)
                     .setParameter("ocid", ocorrenciaId)
                     .getSingleResult();
-        } catch (Exception e) {
+        } catch (NoResultException e) {
+            return null;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public List<Atendimento> buscarPorAmbulancia(Long ambulanciaId) {
+        try (EntityManager em = JpaManager.getEntityManager()) {
+            return em.createQuery(
+                            "SELECT a FROM Atendimento a " +
+                                    "WHERE a.ambulancia.id = :ambid",
+                            Atendimento.class)
+                    .setParameter("ambid", ambulanciaId)
+                    .getResultList();
+        } catch (NoResultException e) {
+            return null;
+        }
+        catch (Exception e) {
             e.printStackTrace();
             return null;
         }

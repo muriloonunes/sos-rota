@@ -14,13 +14,10 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 public class OcorrenciaService {
-    private OcorrenciaRepository repository;
+    private final OcorrenciaRepository repository;
 
     public OcorrenciaService(OcorrenciaRepository repository) {
         this.repository = repository;
-    }
-
-    public OcorrenciaService() {
     }
 
     public List<Ocorrencia> listarTodas() {

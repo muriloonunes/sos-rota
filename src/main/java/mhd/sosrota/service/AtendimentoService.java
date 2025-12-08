@@ -95,7 +95,7 @@ public class AtendimentoService {
     }
 
     public Atendimento obterHistorico(Long ocorrenciaId) {
-        return atendimentoRepository.buscarPorOcorrenciaId(ocorrenciaId);
+        return atendimentoRepository.buscarPorOcorrencia(ocorrenciaId);
     }
 
     public List<Atendimento> consultarHistorico(Long ambulanciaId,

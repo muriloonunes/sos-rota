@@ -64,15 +64,13 @@ public class EquipeService {
         return repo.findAllEquipes();
     }
 
-    public Equipe buscarPorPlaca(String placa) {
-        return repo.buscaPorPlacaAmbulancia(placa);
+    public Equipe buscarPorAmbulancia(Long id) {
+        return repo.buscaPorAmbulancia(id);
     }
 
     public List<Equipe> buscarPorNomeProfissional(String nome) {
         return repo.buscaPorNomeProfissional(nome);
     }
-
-
 
     /**
      * Valida a composição mínima da equipe conforme o tipo da ambulância.

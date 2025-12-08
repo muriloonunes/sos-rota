@@ -1,11 +1,16 @@
 package mhd.sosrota.service;
 
 import mhd.sosrota.model.Ambulancia;
+import mhd.sosrota.model.Atendimento;
 import mhd.sosrota.model.Bairro;
+import mhd.sosrota.model.Equipe;
 import mhd.sosrota.model.enums.StatusAmbulancia;
 import mhd.sosrota.model.enums.TipoAmbulancia;
 import mhd.sosrota.model.exceptions.CadastroException;
+import mhd.sosrota.model.exceptions.DeleteException;
 import mhd.sosrota.repository.AmbulanciaRepository;
+import mhd.sosrota.repository.AtendimentoRepository;
+import mhd.sosrota.repository.EquipeRepository;
 import org.hibernate.exception.ConstraintViolationException;
 
 import java.sql.SQLException;
@@ -18,29 +23,30 @@ import java.util.List;
  * @brief Class AmbulanciaService
  */
 public class AmbulanciaService {
-    private AmbulanciaRepository repo;
+    private final AmbulanciaRepository ambulanciaRepository;
+    private final AtendimentoRepository atendimentoRepository;
+    private final EquipeRepository equipeRepository;
 
-    public AmbulanciaService(AmbulanciaRepository repo) {
-        this.repo = repo;
-    }
-
-    public AmbulanciaService() {
+    public AmbulanciaService(AmbulanciaRepository ambulanciaRepository, AtendimentoRepository atendimentoRepository, EquipeRepository equipeRepository) {
+        this.ambulanciaRepository = ambulanciaRepository;
+        this.atendimentoRepository = atendimentoRepository;
+        this.equipeRepository = equipeRepository;
     }
 
     public List<Ambulancia> listarTodasAmbulancias() {
-        return repo.listarTodasAmbulancias();
+        return ambulanciaRepository.listarTodasAmbulancias();
     }
 
     public List<Ambulancia> listarAmbulanciaSemEquipe() {
-        return repo.listarAmbulanciaSemEquipe();
+        return ambulanciaRepository.listarAmbulanciaSemEquipe();
     }
 
     public Ambulancia encontrarPorId(long id) {
-        return repo.encontrarPorId(id);
+        return ambulanciaRepository.encontrarPorId(id);
     }
 
     public Ambulancia encontrarPorIdComBairro(long id) {
-        return repo.encontrarPorIdComBairro(id);
+        return ambulanciaRepository.encontrarPorIdComBairro(id);
     }
 
     public void cadastrarAmbulancia(String placa, String tipoDesc, Bairro base) {
@@ -51,22 +57,9 @@ public class AmbulanciaService {
             StatusAmbulancia status = StatusAmbulancia.INATIVA; //sempre iniciamos a ambulancia como inativa, pois ela se inicia sem equipe
             TipoAmbulancia tipo = TipoAmbulancia.fromDescricao(tipoDesc);
             Ambulancia ambulancia = new Ambulancia(status, tipo, placa, base);
-            repo.salvar(ambulancia);
+            ambulanciaRepository.salvar(ambulancia);
         } catch (Exception e) {
-            Throwable causaAtual = e;
-            while (causaAtual != null) {
-                if (causaAtual instanceof ConstraintViolationException) {
-                    throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
-                }
-                if (causaAtual instanceof SQLException) {
-                    if ("23505".equals(((SQLException) causaAtual).getSQLState())) {
-                        throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
-                    }
-                }
-                causaAtual = causaAtual.getCause();
-            }
-
-            throw e;
+            tratarExcecao(e);
         }
     }
 
@@ -78,7 +71,7 @@ public class AmbulanciaService {
             throw new CadastroException("Selecione uma base válida.");
         }
         try {
-            Ambulancia ambulanciaExistente = repo.encontrarPorId(id);
+            Ambulancia ambulanciaExistente = ambulanciaRepository.encontrarPorId(id);
             if (ambulanciaExistente == null) {
                 throw new CadastroException("Ambulância não encontrada.");
             }
@@ -90,35 +83,52 @@ public class AmbulanciaService {
             TipoAmbulancia tipo = TipoAmbulancia.fromDescricao(tipoDesc);
             Ambulancia ambulancia = new Ambulancia(status, tipo, placa, base);
             ambulancia.setId(id);
-            repo.atualizarAmbulancia(ambulancia);
+            ambulanciaRepository.atualizarAmbulancia(ambulancia);
         } catch (Exception e) {
-            Throwable causaAtual = e;
-            while (causaAtual != null) {
-                if (causaAtual instanceof ConstraintViolationException) {
-                    throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
-                }
-                if (causaAtual instanceof SQLException) {
-                    if ("23505".equals(((SQLException) causaAtual).getSQLState())) {
-                        throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
-                    }
-                }
-                causaAtual = causaAtual.getCause();
-            }
-            throw e;
+            tratarExcecao(e);
         }
     }
 
-    public boolean deletarAmbulancia(long id) {
+    public void deletarAmbulancia(long id) {
         //TODO ver quais regras de negocio impedem uma ambulancia de ser deletada
         //Não é permitido excluir uma ambulância que esteja vinculada a atendimentos históricos (somente
         //inativar);
-        return repo.deletarAmbulancia(id);
+        List<Atendimento> atendimentos = atendimentoRepository.buscarPorAmbulancia(id);
+        if (atendimentos != null && !atendimentos.isEmpty()) {
+            throw new DeleteException("Não é possível excluir uma ambulância que já tenha feito atendimentos. \n Inative-a ao invés disso.");
+        }
+        Equipe equipe = equipeRepository.buscaPorAmbulancia(id);
+        if (equipe != null) {
+            throw new DeleteException("Não é possível excluir uma ambulância que esteja vinculada a uma equipe. \n Remova-a da equipe ou inative-a ao invés disso.");
+        }
+        ambulanciaRepository.deletarAmbulancia(id);
     }
 
     public long obterQtdAmbulanciaStatus(StatusAmbulancia status) {
-        return repo.obterAmbulanciaStatus(status).size();
+        return ambulanciaRepository.obterAmbulanciaStatus(status).size();
     }
+
     public List<Ambulancia> obterAmbulanciaStatus(StatusAmbulancia status) {
-        return repo.obterAmbulanciaStatus(status);
+        return ambulanciaRepository.obterAmbulanciaStatus(status);
+    }
+
+    private void tratarExcecao(Exception e) {
+        Throwable causaAtual = e;
+        while (causaAtual != null) {
+
+            if (causaAtual instanceof ConstraintViolationException) {
+                throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
+            }
+
+            if (causaAtual instanceof SQLException sqlEx) {
+                if ("23505".equals(sqlEx.getSQLState())) {
+                    throw new CadastroException("Já existe uma ambulância cadastrada com essa placa.");
+                }
+            }
+
+            causaAtual = causaAtual.getCause();
+        }
+
+        throw new RuntimeException(e);
     }
 }

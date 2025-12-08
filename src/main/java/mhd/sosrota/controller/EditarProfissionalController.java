@@ -7,6 +7,7 @@ import mhd.sosrota.infrastructure.AppContext;
 import mhd.sosrota.model.Profissional;
 import mhd.sosrota.model.enums.FuncaoProfissional;
 import mhd.sosrota.model.exceptions.CadastroException;
+import mhd.sosrota.model.exceptions.DeleteException;
 import mhd.sosrota.navigation.Navigable;
 import mhd.sosrota.navigation.Navigator;
 import mhd.sosrota.presentation.UiUtils;
@@ -106,10 +107,32 @@ public class EditarProfissionalController implements Navigable {
 
     @FXML
     private void handleDeletar() {
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() {
+                service.deletarProfissional(profissionalEmEdicao.getId());
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                AlertUtil.showInfo("Sucesso", "Profissional deletado com sucesso.");
+                handleCancelar();
+            }
+
+            @Override
+            protected void failed() {
+                Throwable e = getException();
+                if (e instanceof DeleteException) {
+                    AlertUtil.showError("Erro!", e.getMessage());
+                } else {
+                    mostrarErro("Erro ao deletar profissional.");
+                }
+            }
+        };
         var result = AlertUtil.showConfirmation("Deletar profissional", "Tem certeza que deseja deletar esse profissional?");
         if (result.get() == ButtonType.OK) {
-            service.deletarProfissional(profissionalEmEdicao.getId());
-            handleCancelar();
+            new Thread(task).start();
         }
     }
 
